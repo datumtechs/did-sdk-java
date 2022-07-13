@@ -1,0 +1,9 @@
+dependencies {
+	compile "com.platon.sdk:core:$platonClientVersion"
+}
+
+sonarqube {
+	properties {
+		property "sonar.exclusions", "src/main/java/**/constant/**,"
+	}
+}

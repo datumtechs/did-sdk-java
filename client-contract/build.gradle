@@ -1,0 +1,15 @@
+dependencies {
+	compile project(":client-common")
+}
+
+sonarqube {
+	properties {
+		property "sonar.exclusions", "**/AuthorityController.java," +
+				"**/AuthorityData.java," +
+				"**/CredentialContract.java," +
+				"**/PctController.java," +
+				"**/PctData.java," +
+				"**/PidContract.java,"+
+				"**/RoleContract.java,"
+	}
+}

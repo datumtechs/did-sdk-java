@@ -1,0 +1,216 @@
+buildscript {
+	repositories {
+        mavenCentral()
+        jcenter()
+        
+        maven {url "https://plugins.gradle.org/m2/"}
+    	maven {url "https://mvnrepository.com/artifact/"}
+
+	}
+  
+	dependencies {
+    	classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1")
+  	}
+}
+
+allprojects {
+   	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+	apply plugin: 'jacoco'
+	apply plugin: 'org.sonarqube'
+    
+    repositories {
+    	mavenLocal()
+        maven {url "https://sdk.platon.network/nexus/content/repositories/releases"}
+    	maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+     	// maven {url "http://192.168.9.39:8081/repository/maven-public/"}
+	}
+	
+	sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    
+    
+    // We don't want any compiler warnings
+    compileJava {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.encoding = "UTF-8"
+    }
+    
+    compileTestJava {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.encoding = "UTF-8"
+    }
+    
+    javadoc {
+        options.encoding = 'UTF-8'
+    }
+    
+    sonarqube {
+		properties {
+	    	property "sonar.sourceEncoding", "UTF-8"
+	    	// sonar扫描的路径
+	    	property "sonar.sources", "src/main/java"
+		}
+	}
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+
+    dependencies {
+    	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    	
+        testCompile "junit:junit:$junitVersion"
+        testCompile "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.2'
+        testCompile group: 'org.powermock', name: 'powermock-api-easymock', version: '2.0.2'
+        testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
+        testCompile group: 'org.powermock', name: 'powermock-core', version: '2.0.2'
+
+		compile "com.alibaba:fastjson:$fastJsonVersion"
+        compile "org.apache.commons:commons-lang3:$commonLang3Version"
+        compile "org.projectlombok:lombok:${lombokVersion}"
+        compile "commons-io:commons-io:$commonIoVersion"
+        compile "org.springframework.retry:spring-retry:1.2.4.RELEASE"
+        compile "org.jsonschema2pojo:jsonschema2pojo-core:1.0.1"
+        compile "com.github.fge:json-schema-validator:2.2.6"
+        compile "com.github.reinert:jjschema:1.16"
+        compile "javax.validation:validation-api:2.0.1.Final"
+        compile "org.slf4j:slf4j-log4j12:1.7.25"
+        compile "commons-configuration:commons-configuration:1.10"
+    }
+
+    //jacoco测试报表的功能
+    jacocoTestReport {
+	    reports {
+	        xml.enabled true
+	        html.enabled true
+	    }
+	}
+
+	jacocoTestCoverageVerification {
+		violationRules {
+			rule {
+				limit {
+					minimum = 0.7
+				}
+			}
+		}
+	 }
+
+	check.dependsOn jacocoTestReport
+}
+
+configure(subprojects.findAll { it.name != 'pid-tests' }) {
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+    apply plugin: 'maven-publish'
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task testJar(type: Jar) {
+        classifier = 'tests'
+        from sourceSets.test.output
+    }
+
+    artifacts {
+       //archives sourcesJar, javadocJar, testJar
+       archives sourcesJar, testJar
+    }
+
+    ext {
+        ossrhUsername = project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : System.getenv("ossrhUsername")
+        ossrhPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : System.getenv("ossrhPassword")
+        isSnapshotVersion = project.version.endsWith("-SNAPSHOT")
+    }
+
+    publishing {
+		publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                artifact sourcesJar {
+                    classifier 'sources'
+                }
+
+                artifact testJar {
+                    classifier 'tests'
+                }
+            }
+        }
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                onlyIf {
+                    ossrhUsername != '' && ossrhPassword != ''
+                }
+
+                String repoUrl = isSnapshotVersion ? "$mavenSnapshots" : "$mavenReleases";
+                repository(url: repoUrl) {
+                    authentication(
+                            userName: ossrhUsername,
+                            password: ossrhPassword
+                    )
+                }
+
+                pom.project {
+                    name 'PlatONDID'
+                    packaging 'jar'
+                    description project.description
+                    url 'https://platon.network/'
+
+                    scm {
+                        connection 'scm:git:https://github.com/PlatONnetwork/PlatON-Go.git'
+                        url 'https://github.com/PlatONnetwork/PlatON-Go.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'zrj'
+                            name 'zhangrongjing'
+                            email 'zhangrongjing@juzix.net'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        required {gradle.taskGraph.hasTask('uploadArchives') }
+        // only execute as part of this task
+        sign configurations.archives
+    }
+
+    task release {
+        //TODO run clean & closeAndPromoteRepository once
+        dependsOn 'build'
+        dependsOn 'uploadArchives'
+    
+        tasks.findByName('uploadArchives').mustRunAfter 'build'
+    }
+}
+
+

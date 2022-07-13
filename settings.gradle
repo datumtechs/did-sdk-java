@@ -1,0 +1,10 @@
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+	}
+}
+rootProject.name = 'DID-SDK'
+include 'client-sdk'
+include 'client-contract'
+include 'client-csies'
+include 'client-common'

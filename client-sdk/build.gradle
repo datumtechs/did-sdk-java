@@ -1,0 +1,10 @@
+dependencies {
+	compile project(":client-csies")
+	compile project(":client-contract")
+}
+sonarqube {
+	properties {
+		property "sonar.exclusions", "src/main/java/**/req/**,src/main/java/**/resp/**"
+	}
+}
+
