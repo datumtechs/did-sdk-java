@@ -50,7 +50,8 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
     }
 	
 	@Override
-	public TransactionResp<Boolean> createPid(String pid, String publicKey)  {
+	public TransactionResp<Boolean> createPid(String pidPublicKey, String publicKey)  {
+		String pid = PidUtils.generatePid(pidPublicKey);
 		if (!PidUtils.isValidPid(pid)) {
 			log.error("Failed to call `createPid()`: the `pid` is illegal");
 			return TransactionResp.build(RetEnum.RET_PID_INVALID);
@@ -68,20 +69,20 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 		}
 
 		String pidAddr = PidUtils.convertPidToAddressStr(pid);
-		String created = DateUtils.getCurrentTimeStampString();
+		String created = DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp());
 
-		//		function createPid(
+		//	function createPid(
 		//		string memory createTime,
 		//		string memory authentication,
 		//		string memory publicKey,
 		//		string memory updateTime
-		//    ) public returns (bool success)
+		//   ) public returns (bool success)
 		TransactionReceipt receipt = null;
 		try {
 			receipt = this.getPidContract().createPid(
 					created,
 					buildAuthentication(
-							publicKey,
+							pidPublicKey,
 							pidAddr,
 							PidConst.DocumentAttrStatus.PID_AUTH_VALID.getTag()),
 					buildPublicWithoutIndex(
@@ -101,10 +102,7 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 
 		TransactionInfo tx = new TransactionInfo(receipt);
 
-		List<Pid.PIDAttributeChangeEventResponse> response =
-				this.getPidContract().getPIDAttributeChangeEvents(receipt);
-
-		if (CollectionUtils.isEmpty(response)) {
+		if (!receipt.isStatusOK()) {
 			log.error(
 					"Failed to create PID, the tx receipt is null, txHash is {}",
 					tx.getTransactionHash()
@@ -140,7 +138,7 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 			// Start to extract Document Attribute and assemble it into Document Info
 			DocumentData doc = PidEventProcessor
 					.processBlockReceipt(this.getPidContract(),
-							PidUtils.convertAddressStrToPid(identity.toString()), lastBlockNumber);
+							PidUtils.convertAddressStrToPid(identity), lastBlockNumber);
 
 			// Maybe never match this condition
 			// The document has at least one publicKey
@@ -464,7 +462,7 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String contractAddress) {
 		String string = new String(contractAddress);
 		try {
-			Pid pidContract = Pid.deploy(getWeb3j(), credentials, gasProvider, string).send();
+			Pid pidContract = Pid.deploy(getWeb3j(), credentials, gasProvider).send();
 			Optional<TransactionReceipt> value = pidContract.getTransactionReceipt();
 			String pidContractTransHash = "";
 			if(value.isPresent()){

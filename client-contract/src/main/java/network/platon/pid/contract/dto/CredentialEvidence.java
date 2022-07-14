@@ -14,6 +14,8 @@ public class CredentialEvidence {
 	private String signaturedata;
 	
 	private String signer;
+
+	private String create;
 	
 	public enum TypeEnum {
 		

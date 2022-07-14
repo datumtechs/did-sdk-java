@@ -22,7 +22,7 @@ public class DocumentData {
     /**
      * Required: The create date.
      */
-    private Long created;
+    private String created;
 
     /**
      * Required: The update date.

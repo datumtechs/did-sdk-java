@@ -46,11 +46,6 @@ public class PidEventProcessor {
                 PidConst.PID_EVENT_ATTRIBUTE_CHANGE_RLP,
                 PidConst.PID_EVENT_ATTRIBUTE_CHANGE_STR
         );
-        topicMap.put(
-                PidConst.PID_EVENT_ERROR_RLP,
-                PidConst.PID_EVETN_ERROR_STR
-        );
-
     }
 
 
@@ -337,7 +332,7 @@ public class PidEventProcessor {
     }
 
     private static void assembleCreated(String value, DocumentData document) {
-        document.setCreated(Long.valueOf(value));
+        document.setCreated(value);
     }
 
 }

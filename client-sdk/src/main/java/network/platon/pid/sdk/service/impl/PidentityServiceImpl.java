@@ -50,11 +50,11 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		}
 
 		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
-		String publicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
-		String pid = PidUtils.generatePid(publicKey);
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
 		TransactionResp<Boolean> tresp =
 				this.getPidContractService(new InitContractData(req.getPrivateKey()))
-						.createPid(pid, req.getPublicKey());
+						.createPid(pidPublicKey, req.getPublicKey());
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
 		}

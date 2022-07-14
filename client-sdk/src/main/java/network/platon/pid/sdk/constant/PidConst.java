@@ -19,19 +19,9 @@ public class PidConst {
 
 	public static final String PID_PREFIX = "did:pid:";
 
-	public static final String PID_EVETN_ERROR_STR = "pidError";
-	public static final String PID_EVENT_ERROR_RLP = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(
-			PID_EVETN_ERROR_STR.getBytes(StandardCharsets.UTF_8)), 64);
-
 	public static final String PID_EVENT_ATTRIBUTE_CHANGE_STR = "PIDAttributeChanged";
 	public static final String PID_EVENT_ATTRIBUTE_CHANGE_RLP = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(
 			PID_EVENT_ATTRIBUTE_CHANGE_STR.getBytes(StandardCharsets.UTF_8)), 64);
-
-	public static final String AUTHORITY_EVENT_ERROR_STR = "authorityControllerError";
-	public static final String AUTHORITY_EVENT_ERROR_RLP = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(
-			AUTHORITY_EVENT_ERROR_STR.getBytes(StandardCharsets.UTF_8)), 64);
-
-
 
 	public static final String PLATONE_PID_PATTERN = "did:pid:[a-zA-Z0-9]{42}";
 

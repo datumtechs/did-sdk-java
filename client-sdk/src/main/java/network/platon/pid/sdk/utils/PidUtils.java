@@ -271,8 +271,8 @@ public class PidUtils {
 		}
 
 		doc.setId(data.getId());
-		doc.setCreated(DateUtils.convertTimestampToUtc(data.getCreated()));
-		doc.setUpdated(DateUtils.convertTimestampToUtc(data.getUpdated()));
+		doc.setCreated(data.getCreated());
+		doc.setUpdated(data.getUpdated());
 		doc.setStatus(data.getStatus());
 		doc.setContext(PidConst.PID_DEFAULT_CONTEXT);
 		return doc;

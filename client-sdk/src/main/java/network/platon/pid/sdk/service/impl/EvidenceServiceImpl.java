@@ -3,6 +3,7 @@ package network.platon.pid.sdk.service.impl;
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.enums.RetEnum;
+import network.platon.pid.common.utils.DateUtils;
 import network.platon.pid.contract.dto.CredentialEvidence;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.base.dto.CheckData;
@@ -21,7 +22,7 @@ import network.platon.pid.sdk.service.EvidenceService;
 import network.platon.pid.sdk.utils.PidUtils;
 import network.platon.pid.sdk.utils.VerifyInputDataUtils;
 import java.io.Serializable;
-import java.util.Date;
+import java.math.BigInteger;
 
 /**
  * The specific implementation of evidence vouchers, including storing vouchers in PlatON, querying data, etc
@@ -70,7 +71,8 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		
 		//Compute and sign hash data
 		String evidenceSign = AlgorithmHandler.signMessageStr(credentialHash, req.getPrivateKey());
-		TransactionResp<String> resp = getCredentialContractService().createCredentialEvience(credentialHash, credential.getIssuer(), evidenceSign);
+		String created = DateUtils.getCurrentTimeStampString();
+		TransactionResp<String> resp = getCredentialContractService().createCredentialEvience(credentialHash, credential.getIssuer(), evidenceSign, created);
 		if(!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(),resp.getErrMsg());
 		}
@@ -90,7 +92,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		if(!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(),resp.getErrMsg());
 		}
-		TransactionResp<Long> status = this.getCredentialContractService().getStatus(req.getEvidenceId());
+		TransactionResp<BigInteger> status = this.getCredentialContractService().getStatus(req.getEvidenceId());
 		if(status.checkFail()){
 			return BaseResp.build(status.getCode(),status.getErrMsg());
 		}
@@ -98,7 +100,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		queryEvidenceResp.setCredentialHash(req.getEvidenceId());
 		EvidenceSignInfo evidenceSignInfo = new EvidenceSignInfo();
 		evidenceSignInfo.setSignature(resp.getData().getSignaturedata());
-		evidenceSignInfo.setTimestamp(resp.getData().getUpdate());
+		evidenceSignInfo.setTimestamp(resp.getData().getCreate());
 		evidenceSignInfo.setSigner(resp.getData().getSigner());
 		queryEvidenceResp.setStatus(CredentialStatus.getStatusData(status.getData()).getDesc());
 		queryEvidenceResp.setSignInfo(evidenceSignInfo);
@@ -111,7 +113,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		if (verifyBaseResp.getCode() != RetEnum.RET_SUCCESS.getCode()) {
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
 		}
-		TransactionResp<Long> status = this.getCredentialContractService().getStatus(req.getCredentialHash());
+		TransactionResp<BigInteger> status = this.getCredentialContractService().getStatus(req.getCredentialHash());
 		if(status.checkFail()){
 			return BaseResp.build(status.getCode(),status.getErrMsg());
 		}
@@ -157,7 +159,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		if(!evidenceSign.equals(resp.getData().getSignaturedata())){
 			return BaseResp.build(RetEnum.RET_EVIDENCE_NO_OPERATION_ERROR);
 		}
-		TransactionResp<Long> status = this.getCredentialContractService().getStatus(hash);
+		TransactionResp<BigInteger> status = this.getCredentialContractService().getStatus(hash);
 		if(status.checkFail()){
 			return BaseResp.build(status.getCode(),status.getErrMsg());
 		}

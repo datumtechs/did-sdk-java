@@ -43,7 +43,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String roleContractAddress) {
 		String string = new String(roleContractAddress);
 		try {
-			Credential credentialContract = Credential.deploy(getWeb3j(), credentials, gasProvider, string).send();
+			Credential credentialContract = Credential.deploy(getWeb3j(), credentials, gasProvider).send();
 			String contractAddress = credentialContract.getContractAddress();
 			String transHash = "";
 			Optional<TransactionReceipt> value = credentialContract.getTransactionReceipt();
@@ -61,10 +61,9 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	}
 
 	@Override
-	public TransactionResp<String> createCredentialEvience(String hash, String signer, String signatureData) {
+	public TransactionResp<String> createCredentialEvience(String hash, String signer, String signatureData, String updateTime) {
 		try {
-			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(Numeric.hexStringToByteArray(hash), signer, signatureData)
-				.send();
+			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(hash.getBytes(), signer, signatureData, updateTime).send();
 			return TransactionResp.buildTxSuccess(new TransactionInfo(transactionReceipt));
 		} catch (Exception e) {
 			log.error("create credential erorr.", e);
@@ -97,6 +96,28 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 			return TransactionResp.buildSuccess(flag);
 		} catch (Exception e) {
 			log.error("query credential erorr.", e);
+			return TransactionResp.build(RetEnum.RET_CREDENTIAL_CONTRACT_QUERTY_ERROR);
+		}
+	}
+
+	@Override
+	public TransactionResp<BigInteger> getStatus(String hash) {
+		try {
+			BigInteger status = this.getCredentialContract().getStatus(hash.getBytes()).send();
+			return TransactionResp.buildSuccess(status);
+		} catch (Exception e) {
+			log.error("query credential status erorr.", e);
+			return TransactionResp.build(RetEnum.RET_CREDENTIAL_GET_STATUS_FAIL);
+		}
+	}
+
+	@Override
+	public TransactionResp<Boolean> changeStatus(String hash,BigInteger status) {
+		try {
+			TransactionReceipt transactionReceipt = this.getCredentialContract().changeStatus(hash.getBytes(), status).send();
+			return TransactionResp.buildTxSuccess(new TransactionInfo(transactionReceipt));
+		} catch (Exception e) {
+			log.error("change credential status erorr.", e);
 			return TransactionResp.build(RetEnum.RET_CREDENTIAL_CONTRACT_QUERTY_ERROR);
 		}
 	}

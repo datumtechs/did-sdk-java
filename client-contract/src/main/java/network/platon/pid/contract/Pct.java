@@ -241,7 +241,7 @@ public class Pct extends Contract {
         return executeRemoteCallTransaction(function);
     }
 
-    public static RemoteCall<Pct> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider, String string) {
+    public static RemoteCall<Pct> deploy(Web3j web3j, Credentials credentials, GasProvider contractGasProvider) {
         return deployRemoteCall(Pct.class, web3j, credentials, contractGasProvider, BINARY,  "");
     }
 

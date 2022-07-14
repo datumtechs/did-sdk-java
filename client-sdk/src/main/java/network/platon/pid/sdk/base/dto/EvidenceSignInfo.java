@@ -16,5 +16,5 @@ public class EvidenceSignInfo {
 	@CustomSize(min = ReqAnnoationArgs.COMMON_DATA_SIZE)
 	private String signature;
 	
-	private Long timestamp;
+	private String timestamp;
 }
