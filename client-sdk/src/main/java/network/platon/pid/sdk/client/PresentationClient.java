@@ -4,8 +4,9 @@ import network.platon.pid.sdk.req.presentation.CreatePresetationReq;
 import network.platon.pid.sdk.req.presentation.VerifyPresetationReq;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.presentation.CreatePresetationResp;
+import network.platon.pid.sdk.service.PresentationService;
 
-public class PresentationClient extends BusinessClient implements PresentationService  {
+public class PresentationClient extends BusinessClient implements PresentationService {
 
 	@Override
 	public BaseResp<CreatePresetationResp> createPresentation(CreatePresetationReq req) {

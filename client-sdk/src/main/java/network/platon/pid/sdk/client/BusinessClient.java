@@ -2,11 +2,7 @@ package network.platon.pid.sdk.client;
 
 import network.platon.pid.contract.dto.InitContractData;
 import network.platon.pid.sdk.service.BusinessBaseService;
-import network.platon.pid.sdk.service.impl.VoteServiceImpl;
-import network.platon.pid.sdk.service.impl.CredentialServiceImpl;
-import network.platon.pid.sdk.service.impl.EvidenceServiceImpl;
-import network.platon.pid.sdk.service.impl.PctServiceImpl;
-import network.platon.pid.sdk.service.impl.PidentityServiceImpl;
+import network.platon.pid.sdk.service.impl.*;
 
 public abstract class BusinessClient {
 	
@@ -20,7 +16,7 @@ public abstract class BusinessClient {
 		return this.createBaseService(PctServiceImpl.getInstance());
 	}
 	
-	protected VoteServiceImpl getAgencyService (){
+	protected VoteServiceImpl getVoteService (){
 		return this.createBaseService(VoteServiceImpl.getInstance());
 	}
 	

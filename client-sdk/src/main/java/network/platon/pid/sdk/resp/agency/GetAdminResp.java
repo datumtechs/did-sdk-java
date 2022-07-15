@@ -8,8 +8,9 @@ import lombok.Data;
  * @Date: 2020-06-15 14:36
  */
 @Data
-public class QueryAdminRoleResp {
+public class GetAdminResp {
 
-    private string admin;
+    private String adminAddress;
+    private String adminServiceUrl;
 
 }

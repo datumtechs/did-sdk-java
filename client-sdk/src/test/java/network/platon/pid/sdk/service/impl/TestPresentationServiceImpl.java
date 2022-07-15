@@ -5,7 +5,6 @@ import network.platon.pid.common.utils.DateUtils;
 import network.platon.pid.sdk.BaseTest;
 import network.platon.pid.sdk.base.dto.*;
 import network.platon.pid.sdk.factory.PClient;
-import network.platon.pid.sdk.req.agency.SetAuthorityReq;
 import network.platon.pid.sdk.req.credential.CreateCredentialReq;
 import network.platon.pid.sdk.req.pct.CreatePctReq;
 import network.platon.pid.sdk.req.pid.CreatePidReq;
@@ -15,12 +14,10 @@ import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.credential.CreateCredentialResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;
 import network.platon.pid.sdk.resp.presentation.CreatePresetationResp;
-import network.platon.pid.sdk.utils.ConvertUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class TestPresentationServiceImpl extends BaseTest{

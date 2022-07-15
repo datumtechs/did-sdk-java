@@ -1,11 +1,9 @@
 package network.platon.pid.sdk.service.impl;
 
 import lombok.Data;
-import network.platon.pid.common.config.PidConfig;
 import network.platon.pid.contract.dto.InitContractData;
 import network.platon.pid.sdk.req.pct.QueryPctJsonListReq;
 import network.platon.pid.sdk.resp.BaseResp;
-import network.platon.pid.sdk.resp.agency.SetAuthorityResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;
 import network.platon.pid.sdk.resp.pid.CreatePidResp;
 import org.junit.Test;

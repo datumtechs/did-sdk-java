@@ -6,8 +6,7 @@ import com.platon.tuples.generated.Tuple2;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.common.utils.DateUtils;
-import network.platon.pid.contract.AuthorityController;
-import network.platon.pid.contract.AuthorityData;
+
 import network.platon.pid.contract.dto.ContractNameValues;
 import network.platon.pid.contract.dto.DeployContractData;
 import network.platon.pid.contract.dto.TransactionInfo;
@@ -15,8 +14,10 @@ import network.platon.pid.sdk.base.dto.AuthorityInfo;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.contract.service.VoteContractService;
 import network.platon.pid.sdk.contract.service.ContractService;
+import network.platon.pid.sdk.req.agency.*;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.TransactionResp;
+import network.platon.pid.sdk.resp.agency.*;
 import network.platon.pid.sdk.utils.ConvertUtils;
 import network.platon.pid.sdk.utils.PidUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +55,35 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
         }
         return new VoteContractServiceImpl();
     }
+
+    @Override
+    public BaseResp<Boolean> submitProposal(SubmitProposalReq req){}
+
+    @Override
+    public BaseResp<Boolean> withdrawProposal(WithdrawProposalReq req){
+    }
+
+    @Override
+    BaseResp<Boolean> voteProposal(VoteProposalReq req){}
+
+    @Override
+    BaseResp<Boolean> effectProposal(EffectProposalReq req){}
+
+    @Override
+    public BaseResp<GetAdminResp> getAdmin(){}
+
+    @Override
+    public BaseResp<GetAllAuthorityResp> getAllAuthority(){}
+
+    @Override
+    public BaseResp<GetAllProposalIdResp> getAllProposalId(){}
+
+    @Override
+    public BaseResp<GetProposalIdResp> getProposalId(GetProposalIdReq req){}
+
+    @Override
+    public BaseResp<GetProposalResp> getProposal(GetProposalReq req){}
+
 
     @Override
     public BaseResp<Tuple2<String, String>> getAdmin() {

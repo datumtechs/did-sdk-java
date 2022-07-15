@@ -1,7 +1,7 @@
 package network.platon.pid.sdk.factory;
 
 import network.platon.pid.contract.dto.InitContractData;
-import network.platon.pid.sdk.client.AgencyClient;
+import network.platon.pid.sdk.client.VoteClient;
 import network.platon.pid.sdk.client.BusinessClient;
 import network.platon.pid.sdk.client.CredentialClient;
 import network.platon.pid.sdk.client.EvidenceClient;
@@ -32,12 +32,12 @@ public class PClient{
 		return new PctClient();
 	}
 
-	public static AgencyClient createAgencyClient(InitContractData initContractData) {
-		return (AgencyClient) createClient(initContractData,new AgencyClient());
+	public static VoteClient createAgencyClient(InitContractData initContractData) {
+		return (VoteClient) createClient(initContractData,new VoteClient());
 	}
 	
-	public static AgencyClient createAgencyClient() {
-		return new AgencyClient();
+	public static VoteClient createAgencyClient() {
+		return new VoteClient();
 	}
 
 	public static CredentialClient createCredentialClient(InitContractData initContractData) {
