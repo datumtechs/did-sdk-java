@@ -124,8 +124,8 @@ public enum RetEnum {
     RET_PRESENTATION_VERIFY_ERROR(205005,"Verify presentation proof fail"),
 
 
-    // about Agency
-
+    // about vote
+    RET_VOTE_CALL_CONTRACT_ERROR(206000, "Failed to call vote Contract"),
 
     ;
     // ------------------------

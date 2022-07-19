@@ -44,20 +44,11 @@ public class ReloadClient {
 			case PID:
 				PidConfig.setPID_CONTRACT_ADDRESS(deployContractData.getContractAddress());
 				break;
-			case ROLE:
-				PidConfig.setROLE_CONTRACT_ADDRESS(deployContractData.getContractAddress());
+			case PCT:
+				PidConfig.setPCT_CONTRACT_ADDRESS(deployContractData.getContractAddress());
 				break;
-			case AUTHORITY_CONTROLLER:
-				PidConfig.setAUTHORITY_CONTROLLER_CONTRACT_ADDRESS(deployContractData.getContractAddress());
-				break;
-			case AUTHORITY_DATA:
-				PidConfig.setAUTHORITY_DATA_CONTRACT_ADDRESS(deployContractData.getContractAddress());
-				break;
-			case PCT_CONTROLLER:
-				PidConfig.setPCT_CONTROLLER_CONTRACT_ADDRESS(deployContractData.getContractAddress());
-				break;
-			case PCT_DATA:
-				PidConfig.setPCT_DATA_CONTRACT_ADDRESS(deployContractData.getContractAddress());
+			case VOTE:
+				PidConfig.setVOTE_CONTRACT_ADDRESS(deployContractData.getContractAddress());
 				break;
 			case CREDENTIAL:
 				PidConfig.setCREDENTIAL_CONTRACT_ADDRESS(deployContractData.getContractAddress());

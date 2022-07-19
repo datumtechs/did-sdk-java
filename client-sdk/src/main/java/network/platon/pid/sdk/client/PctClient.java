@@ -21,11 +21,4 @@ public class PctClient extends BusinessClient implements PctService  {
 	public BaseResp<QueryPctJsonResp> queryPctJsonById(QueryPctJsonReq req) {
 		return this.getPctService().queryPctJsonById(req);
 	}
-
-	@Override
-	public BaseResp<List<Integer>> queryPctIdsByIssuer(QueryPctJsonListReq req) {
-		return this.getPctService().queryPctIdsByIssuer(req);
-	}
-	
-
 }

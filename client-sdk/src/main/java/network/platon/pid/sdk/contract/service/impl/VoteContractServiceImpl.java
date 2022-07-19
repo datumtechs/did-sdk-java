@@ -59,7 +59,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `submitProposal()` of vote contract, the proposalUrl: {}, the exception: {}",
                     proposalUrl, e
             );
-            return TransactionResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return TransactionResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         return TransactionResp.buildTxSuccess(true, new TransactionInfo(receipt));
@@ -75,7 +75,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `withdrawProposal()` of vote contract, the proposalId: {}, the exception: {}",
                     proposalId, e
             );
-            return TransactionResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return TransactionResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         return TransactionResp.buildTxSuccess(true, new TransactionInfo(receipt));
@@ -91,7 +91,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `voteProposal()` of vote contract, the proposalId: {}, the exception: {}",
                     proposalId, e
             );
-            return TransactionResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return TransactionResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         return TransactionResp.buildTxSuccess(true, new TransactionInfo(receipt));
@@ -107,7 +107,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `effectProposal()` of vote contract, the proposalId: {}, the exception: {}",
                     proposalId, e
             );
-            return TransactionResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return TransactionResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         return TransactionResp.buildTxSuccess(true, new TransactionInfo(receipt));
@@ -123,7 +123,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `getAdmin()` on vote contract: the exception: {}",
                     e
             );
-            return BaseResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return BaseResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         GetAdminResp resp = new GetAdminResp();
@@ -145,7 +145,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `getAllAuthority()` on vote contract: the exception: {}",
                     e
             );
-            return BaseResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return BaseResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         GetAllAuthorityResp resp = new GetAllAuthorityResp();
@@ -166,7 +166,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `getAllProposalId()` on vote contract: the exception: {}",
                     e
             );
-            return BaseResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return BaseResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         GetAllProposalIdResp resp = new GetAllProposalIdResp();
@@ -185,7 +185,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `getProposalId()` on vote contract blockNo: {}: the exception: {}", blockNo,
                     e
             );
-            return BaseResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return BaseResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         GetProposalIdResp resp = new GetProposalIdResp();
@@ -205,7 +205,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
                     "Failed to call `getProposalId()` on vote contract proposalId: {}: the exception: {}", proposalId,
                     e
             );
-            return BaseResp.build(RetEnum.RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR);
+            return BaseResp.build(RetEnum.RET_VOTE_CALL_CONTRACT_ERROR);
         }
 
         ProposalInfo info = new ProposalInfo();

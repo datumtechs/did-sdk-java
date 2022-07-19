@@ -249,42 +249,6 @@ public class PidEventProcessor {
         document.getPublicKey().add(pubKey);
     }
 
-
-    // the publicKey format on contract, example:
-    //          key: PidAttrType.AUTH.getCode
-    //          value: {publicKey}|{controller}|{status}
-    private static void assembleAuthentications(String value, DocumentData document) {
-
-        log.debug("[QueryDocument] call method assembleAuthentications() parameter, value:{}, document:{}",
-                value, document);
-
-        if (StringUtils.isBlank(value)) {
-            return;
-        }
-        String[] valueArray = StringUtils.splitByWholeSeparator(value, commonConstant.SEPARATOR_PIPELINE);
-        if (valueArray.length != PidConst.PID_AUTH_VALUE_MEM_LEN) {
-            return;
-        }
-        String publicKey = valueArray[0];
-        // convert address to pid
-        String controller = PidUtils.convertAddressStrToPid(valueArray[1]);
-        String status = valueArray[2];
-        List<DocumentAuthData> authList = document.getAuthentication();
-
-        for (DocumentAuthData auth : authList) {
-            // The latest Attribute of the publicKey has been obtained,
-            // the old Attribute does not need to be collected.
-            if (StringUtils.equals(auth.getPublicKeyHex(), publicKey)) {
-                return;
-            }
-        }
-        DocumentAuthData auth = new DocumentAuthData();
-        auth.setController(controller);
-        auth.setPublicKeyHex(publicKey);
-        auth.setStatus(status);
-        document.getAuthentication().add(auth);
-    }
-
     // the service format on contract, example:
     //          key: PidAttrType.SERVICE.getCode,  value:  {id}|{type}|{endPoint}|{status}
     private static void assembleServices(String value, DocumentData document) {

@@ -42,20 +42,10 @@ public class PidentityClient extends BusinessClient implements PidentityService 
 	}
 
 	@Override
-	public BaseResp<SetPidAttrResp> setAuthentication(SetPidAuthReq req) {
-		return getPidentityService().setAuthentication(req);
-	}
-
-	@Override
 	public BaseResp<SetPidAttrResp> setService(SetServiceReq req) {
 		return getPidentityService().setService(req);
 	}
 
-	@Override
-	public BaseResp<SetPidAttrResp> revocationAuthentication(SetPidAuthReq req) {
-		return getPidentityService().revocationAuthentication(req);
-	}
-	
 	@Override
 	public BaseResp<SetPidAttrResp> revocationPublicKey(RevocationPublicKeyReq req) {
 		return getPidentityService().revocationPublicKey(req);
