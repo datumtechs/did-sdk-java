@@ -19,7 +19,6 @@ import network.platon.pid.common.utils.PropertyUtils;
 import network.platon.pid.contract.client.RetryableClient;
 import network.platon.pid.contract.dto.DeployContractData;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
-import network.platon.pid.sdk.base.dto.AuthorityInfo;
 import network.platon.pid.sdk.base.dto.Credential;
 import network.platon.pid.sdk.client.ReloadClient;
 import network.platon.pid.sdk.contract.service.ContractService;

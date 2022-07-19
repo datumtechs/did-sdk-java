@@ -40,11 +40,6 @@ public class DocumentData {
     private List<DocumentPubKeyData> publicKey = new ArrayList<>();
 
     /**
-     * Required: The authentication list of DID Document on PIDContract
-     */
-    private List<DocumentAuthData> authentication = new ArrayList<>();
-
-    /**
      * Required: The service list of DID Document
      */
     private List<DocumentServiceData> service = new ArrayList<>();

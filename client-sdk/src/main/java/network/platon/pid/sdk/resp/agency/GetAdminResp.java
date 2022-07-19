@@ -2,6 +2,8 @@ package network.platon.pid.sdk.resp.agency;
 
 import lombok.Data;
 
+import java.math.BigInteger;
+
 /**
  * @Description:
  * @Author: Gavin
@@ -12,5 +14,6 @@ public class GetAdminResp {
 
     private String adminAddress;
     private String adminServiceUrl;
+    private BigInteger adminJoinTime;
 
 }

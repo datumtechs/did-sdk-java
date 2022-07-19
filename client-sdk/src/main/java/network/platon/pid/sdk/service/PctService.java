@@ -30,6 +30,4 @@ public interface PctService {
 	 * @return
 	 */
 	BaseResp<QueryPctJsonResp> queryPctJsonById(QueryPctJsonReq req);
-
-	BaseResp<List<Integer>> queryPctIdsByIssuer(QueryPctJsonListReq req);
 }

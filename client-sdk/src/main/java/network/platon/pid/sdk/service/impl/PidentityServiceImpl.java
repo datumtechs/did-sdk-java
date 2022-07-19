@@ -52,16 +52,18 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
 		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
 		String pid = PidUtils.generatePid(pidPublicKey);
+
 		TransactionResp<Boolean> tresp =
 				this.getPidContractService(new InitContractData(req.getPrivateKey()))
-						.createPid(pidPublicKey, req.getPublicKey());
+						.createPid(pid, req.getPublicKey(), req.getType());
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
 		}
 		CreatePidResp createPidResp = new CreatePidResp();
-		createPidResp.setPublicKey(req.getPublicKey());
 		createPidResp.setPrivateKey(req.getPrivateKey());
 		createPidResp.setPid(pid);
+		createPidResp.setPublicKey(req.getPublicKey());
+		createPidResp.setType(req.getType());
 		createPidResp.setTransactionInfo(tresp.getTransactionInfo());
 		return BaseResp.buildSuccess(createPidResp);
 	}
@@ -117,18 +119,11 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			log.error("Failed to call `addPublicKey()`: the `AddPublickeyReq` is illegal");
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
-		String pid = req.getPid();
-		String controller = req.getController();
-		if (StringUtils.isBlank(controller)) {
-			controller = pid;
-		}
-		if (!PidUtils.isValidPid(pid) || !PidUtils.isValidPid(controller)) {
-			log.error(
-					"Failed to call `addPublicKey()`: the pid or controller is invalid, pid: {}, controller: {}",
-					pid, controller
-			);
-			return BaseResp.build(RetEnum.RET_PID_INVALID);
-		}
+
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
+
 		String identity = PidUtils.convertPidToAddressStr(pid);
 		BaseResp<DocumentData> resp = this.getPidContractService().getDocument(identity);
 		if (resp.checkFail()) {
@@ -142,15 +137,16 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			);
 			return BaseResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_REVOCATED);
 		}
-		Integer index = 0;
+		int index = req.getIndex();
 		boolean isExist = false;
 		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
 			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())) {
 				String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(),
 						commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
-				index = Integer.valueOf(valueArray[1]);
-				isExist = true;
-				break;
+				if(index == Integer.parseInt(valueArray[1])){
+					isExist = true;
+					break;
+				}
 			}
 		}
 		if (isExist) {
@@ -160,12 +156,14 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			);
 			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_ALREADY_EXIST);
 		}
+
 		TransactionResp<Boolean> tresp =
 				this.getPidContractService(new InitContractData(req.getPrivateKey()))
 				.addPublicKey(
 						identity,
-						PidUtils.convertPidToAddressStr(controller),
-						req.getType().getTypeName(), req.getPublicKey());
+						req.getPublicKey(),
+						req.getType().getTypeName(),
+						index);
 
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
@@ -189,22 +187,17 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			log.error("Failed to call `updatePublicKey()`: the `UpdatePublicKeyReq` is illegal");
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
-		String pid = req.getPid();
-		String controller = req.getController();
 
-		if (!PidUtils.isValidPid(pid) || !PidUtils.isValidPid(controller)) {
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
+
+		if (!PidUtils.isValidPid(pid)) {
 			log.error(
-					"Failed to call `updatePublicKey()`: the pid or controller is invalid, pid: {}, controller: {}",
-					pid, controller
+					"Failed to call `updatePublicKey()`: the pid or controller is invalid, pid: {}",
+					pid
 			);
 			return BaseResp.build(RetEnum.RET_PID_INVALID);
-		}
-		// validate the public key status
-		if (PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID == req.getStatus()) {
-			log.error(
-					"Failed to call `updatePublicKey()`: the public key status is illegal, pid: {}, status: {}",
-					pid, req.getStatus().getTag());
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
 
 		String identity = PidUtils.convertPidToAddressStr(pid);
@@ -221,16 +214,17 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			);
 			return BaseResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_REVOCATED);
 		}
-		Integer index = 0;
+		Integer index = req.getIndex();
 		boolean isExist = false;
+		boolean isSame = false;
 		String pubKeyStatus = commonConstant.EMPTY_STR;
 		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
-			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())) {
-				String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(),
-						commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
-				index = Integer.valueOf(valueArray[1]);
-				pubKeyStatus = pubKey.getStatus();
+			String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
+			if (index == Integer.parseInt(valueArray[1])) {
 				isExist = true;
+				if(StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())){
+					isSame = true;
+				}
 				break;
 			}
 		}
@@ -240,6 +234,13 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 					index
 			);
 			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_NOTEXIST);
+		}
+		if(isSame){
+			log.error(
+					"Failed to call `updatePublicKey()`: the public key is the same, index: {}, public key: {}",
+					index, req.getPublicKey()
+			);
+			return BaseResp.build(RetEnum.RET_PID_UPDATE_PUBLICKEY_SAME);
 		}
 
 		if (StringUtils.equals(PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID.getTag(), pubKeyStatus)) {
@@ -254,11 +255,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 				this.getPidContractService(new InitContractData(req.getPrivateKey()))
 						.updatePublicKey(
 								PidUtils.convertPidToAddressStr(pid),
-								index,
-								PidUtils.convertPidToAddressStr(controller),
-								req.getType().getTypeName(),
 								req.getPublicKey(),
-								req.getStatus());
+								req.getType().getTypeName(),
+								index);
 
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
@@ -270,91 +269,69 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 	}
 
 	@Override
-	public BaseResp<SetPidAttrResp> setAuthentication(SetPidAuthReq req) {
-
+	public BaseResp<SetPidAttrResp> revocationPublicKey(RevocationPublicKeyReq req) {
 		BaseResp<String> verifyBaseResp = req.validFiled();
 		if (verifyBaseResp.checkFail()) {
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
 		}
 		req.setPublicKey(PidUtils.appendHexPrefix(req.getPublicKey()));
 
-		if (!PidUtils.verifySetAuthenticationArg(req)) {
-			log.error("Failed to call `setAuthentication()`: the `SetPidAuthReq` is illegal");
+		if (!PidUtils.verifyRevocationPublicKeyArg(req)) {
+			log.error("Failed to call `revocationPublicKey()`: the `RevocationPublickeyReq` is illegal");
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
-		String pid = req.getPid();
-		String controller = req.getController();
 
-		if (!PidUtils.isValidPid(pid) || !PidUtils.isValidPid(controller)) {
-			log.error(
-					"Failed to call `setAuthentication()`: the pid or controller is invalid, pid: {}, controller: {}",
-					pid, controller
-			);
-			return BaseResp.build(RetEnum.RET_PID_INVALID);
-		}
-		// validate the authentication status
-		if (PidConst.DocumentAttrStatus.PID_AUTH_INVALID == req.getStatus()) {
-			log.error(
-					"Failed to call `setAuthentication()`: the authentication status is illegal, pid: {}, status: {}",
-					pid, req.getStatus().getTag());
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
-		}
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
 		String identity = PidUtils.convertPidToAddressStr(pid);
-		BaseResp<DocumentData> resp = this.getPidContractService().getDocument(identity);
-		if (resp.checkFail()) {
-			return BaseResp.build(resp.getCode(), resp.getErrMsg());
+
+		BaseResp<DocumentData> getDocResp = this.getPidContractService().getDocument(identity);
+		if (getDocResp.checkFail()) {
+			return BaseResp.build(getDocResp.getCode(), getDocResp.getErrMsg());
 		}
-		DocumentData doc = resp.getData();
-		if (StringUtils.equals(PidConst.DocumentStatus.DEACTIVATION.getTag(), doc.getStatus())) {
+		DocumentData docData = getDocResp.getData();
+		if (StringUtils.equals(PidConst.DocumentStatus.DEACTIVATION.getTag(), docData.getStatus())) {
 			log.error(
-					"Failed to call `setAuthentication()`: the identity has bean revocated, pid: {}, status: {}",
-					pid, doc.getStatus()
+					"Failed to call `revocationPublicKey()`: the identity has bean revocated, pid: {}, status: {}",
+					pid, docData.getStatus()
 			);
 			return BaseResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_REVOCATED);
 		}
 
-		boolean pubKeyIsExist = false;
-		String pubKeyStatus = commonConstant.EMPTY_STR;
-		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
-			// If find a `public key` that is consistent with the current auth req
-			// in the `public key` collection
+		// The last valid publicKey cannot be revocated
+		List<DocumentPubKeyData> publicKeys = PidUtils.getValidPublicKeys(docData);
+		if (publicKeys.size() == 1 && StringUtils.equals(publicKeys.get(0).getPublicKeyHex(), req.getPublicKey())) {
+			log.error("Failed to call `revocationPublicKey()`: Can not revocation the last public key");
+			return BaseResp.build(RetEnum.RET_PID_CONNOT_REVOCATION_LAST_PUBLICKEY);
+		}
+
+		Integer index = 0;
+		String type = commonConstant.EMPTY_STR;
+		boolean isExist = false;
+		for (DocumentPubKeyData pubKey : publicKeys) {
 			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())) {
-				pubKeyStatus = pubKey.getStatus();
-				pubKeyIsExist = true;
+				String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
+				index = Integer.valueOf(valueArray[1]);
+				type = pubKey.getType();
+				isExist = true;
 				break;
 			}
 		}
-
-		// When the corresponding public key is not found,
-		// we need to add a new public key while setting up authentication.
-		if (!pubKeyIsExist) {
-			TransactionResp<Boolean> addPublicResp =
-					this.getPidContractService(new InitContractData(req.getPrivateKey()))
-							.addPublicKey(
-									identity,
-									PidUtils.convertPidToAddressStr(controller),
-									PidConst.PublicKeyType.SECP256K1.getTypeName(),
-									req.getPublicKey());
-
-			if (addPublicResp.checkFail()) {
-				return BaseResp.build(addPublicResp.getCode(), addPublicResp.getErrMsg());
-			}
+		// Does not exist and has been revoked, both belong to non-existence
+		if (!isExist) {
+			log.error("Failed to call `revocationPublicKey()`: the public key index is not exist");
+			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_NOTEXIST);
 		}
 
-		if (StringUtils.equals(PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID.getTag(), pubKeyStatus)) {
-			log.error(
-					"Failed to call `setAuthentication()`: the public key has been revocated, status: {}",
-					pubKeyStatus
-			);
-			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_ALREADY_REVOCATED);
-		}
-
+		// revocation the publicKey
 		TransactionResp<Boolean> tresp =
 				this.getPidContractService(new InitContractData(req.getPrivateKey()))
-						.setAuthentication(
+						.revocationPublicKey(
 								identity,
-								PidUtils.convertPidToAddressStr(controller),
-								req.getPublicKey(), req.getStatus());
+								req.getPublicKey(),
+								type,
+								index);
 
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
@@ -362,6 +339,7 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		SetPidAttrResp attrResp = new SetPidAttrResp();
 		attrResp.setStatus(tresp.getData());
 		attrResp.setTransactionInfo(tresp.getTransactionInfo());
+
 		return BaseResp.buildSuccess(attrResp);
 	}
 
@@ -375,7 +353,11 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			log.error("Failed to call `setService()`: the `SetServiceReq` is illegal");
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
-		String pid = req.getPid();
+
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
+
 		if (!PidUtils.isValidPid(pid) ) {
 			log.error(
 					"Failed to call `setService()`: the addr convert base on `pid` is illegal, pid: {}",
@@ -421,211 +403,6 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		return BaseResp.buildSuccess(attrResp);
 	}
 
-
-	@Override
-	public BaseResp<SetPidAttrResp> revocationAuthentication(SetPidAuthReq req) {
-		BaseResp<String> verifyBaseResp = req.validFiled();
-		if (verifyBaseResp.checkFail()) {
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
-		}
-		req.setPublicKey(PidUtils.appendHexPrefix(req.getPublicKey()));
-
-		if (!PidUtils.verifySetAuthenticationArg(req)) {
-			log.error("Failed to call `revocationAuthentication()`: the `SetPidAuthReq` is illegal");
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
-		}
-		String pid = req.getPid();
-		String controller = req.getController();
-
-		if (!PidUtils.isValidPid(pid) || !PidUtils.isValidPid(controller)) {
-			log.error(
-					"Failed to call `revocationAuthentication()`: the pid or controller is invalid, pid: {}, controller: {}",
-					pid, controller);
-			return BaseResp.build(RetEnum.RET_PID_INVALID);
-		}
-		String identity = PidUtils.convertPidToAddressStr(pid);
-		BaseResp<DocumentData> resp = this.getPidContractService().getDocument(identity);
-		if (resp.checkFail()) {
-			return BaseResp.build(resp.getCode(), resp.getErrMsg());
-		}
-		DocumentData doc = resp.getData();
-		return this.revocationAuthenticationByDocumentData(req, doc);
-	}
-	private BaseResp<SetPidAttrResp> revocationAuthenticationByDocumentData(SetPidAuthReq req, DocumentData docData) {
-		String pid = req.getPid();
-		String controller = req.getController();
-
-		// verify the doc status
-		if (StringUtils.equals(PidConst.DocumentStatus.DEACTIVATION.getTag(), docData.getStatus())) {
-			log.error(
-					"Failed to call `revocationAuthentication()`: the identity has bean revocated, pid: {}, status: {}",
-					pid, docData.getStatus()
-			);
-			return BaseResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_REVOCATED);
-		}
-		boolean authKeyExist = false;
-		String authStatus = commonConstant.EMPTY_STR;
-		// verify the auth status
-		for (DocumentAuthData auth : docData.getAuthentication()) {
-			if (StringUtils.equals(auth.getPublicKeyHex(), req.getPublicKey())) {
-				authStatus = auth.getStatus();
-				authKeyExist = true;
-				break;
-			}
-		}
-
-		if (!authKeyExist) {
-			log.error(
-					"Failed to call `revocationAuthentication()`: the authentication is not exist"
-			);
-			return BaseResp.build(RetEnum.RET_PID_SET_AUTHENTICATION_NOTEXIST);
-		}
-
-		if (StringUtils.equals(PidConst.DocumentAttrStatus.PID_AUTH_INVALID.getTag(), authStatus)) {
-			log.error(
-					"Failed to call `revocationAuthentication()`: the authentication has been revocated, " +
-					"authentication status: {}", authStatus
-			);
-			return BaseResp.build(RetEnum.RET_PID_SET_AUTHENTICATION_ALREADY_REVOCATED);
-		}
-
-		boolean pubKeyExist = false;
-		String pubKeyStatus = commonConstant.EMPTY_STR;
-		// find the publicKey with publicKey of auth
-		for (DocumentPubKeyData pubKey : docData.getPublicKey()) {
-			// If find a `public key` that is consistent with the current auth req
-			// in the `public key` collection
-			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())
-					&& StringUtils.equals(pubKey.getController(), controller)) {
-				pubKeyStatus = pubKey.getStatus();
-				pubKeyExist = true;
-				break;
-			}
-		}
-		if (!pubKeyExist) {
-			log.error(
-					"Failed to call `revocationAuthentication()`: the public key is not exist"
-			);
-			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_NOTEXIST);
-		}
-
-		if (StringUtils.equals(PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID.getTag(), pubKeyStatus)) {
-			log.error(
-					"Failed to call `revocationAuthentication()`: the public key has been revocated, " +
-					"public key status: {}", pubKeyStatus
-			);
-			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_ALREADY_REVOCATED);
-		}
-
-		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
-						.setAuthentication(
-								PidUtils.convertPidToAddressStr(pid),
-								PidUtils.convertPidToAddressStr(controller),
-								req.getPublicKey(),
-								PidConst.DocumentAttrStatus.PID_AUTH_INVALID);
-		if (tresp.checkFail()) {
-			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
-		}
-		SetPidAttrResp attrResp = new SetPidAttrResp();
-		attrResp.setStatus(tresp.getData());
-		attrResp.setTransactionInfo(tresp.getTransactionInfo());
-		return BaseResp.buildSuccess(attrResp);
-	}
-
-
-
-	@Override
-	public BaseResp<SetPidAttrResp> revocationPublicKey(RevocationPublicKeyReq req) {
-		BaseResp<String> verifyBaseResp = req.validFiled();
-		if (verifyBaseResp.checkFail()) {
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
-		}
-		req.setPublicKey(PidUtils.appendHexPrefix(req.getPublicKey()));
-
-		if (!PidUtils.verifyRevocationPublicKeyArg(req)) {
-			log.error("Failed to call `revocationPublicKey()`: the `RevocationPublickeyReq` is illegal");
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
-		}
-		String pid = req.getPid();
-		String identity = PidUtils.convertPidToAddressStr(pid);
-		BaseResp<DocumentData> getDocResp = this.getPidContractService().getDocument(identity);
-		if (getDocResp.checkFail()) {
-			return BaseResp.build(getDocResp.getCode(), getDocResp.getErrMsg());
-		}
-		DocumentData docData = getDocResp.getData();
-		if (StringUtils.equals(PidConst.DocumentStatus.DEACTIVATION.getTag(), docData.getStatus())) {
-			log.error(
-					"Failed to call `revocationPublicKey()`: the identity has bean revocated, pid: {}, status: {}",
-					pid, docData.getStatus()
-			);
-			return BaseResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_REVOCATED);
-		}
-
-		// The last valid publicKey cannot be revocated
-		List<DocumentPubKeyData> publicKeys = PidUtils.getValidPublicKeys(docData);
-		if (publicKeys.size() == 1 && StringUtils.equals(publicKeys.get(0).getPublicKeyHex(), req.getPublicKey())) {
-			log.error("Failed to call `revocationPublicKey()`: Can not revocation the last public key");
-			return BaseResp.build(RetEnum.RET_PID_CONNOT_REVOCATION_LAST_PUBLICKEY);
-		}
-
-		Integer index = 0;
-		String controller = commonConstant.EMPTY_STR;
-		String type = commonConstant.EMPTY_STR;
-		boolean isExist = false;
-		for (DocumentPubKeyData pubKey : publicKeys) {
-			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())) {
-				String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
-				index = Integer.valueOf(valueArray[1]);
-				controller = pubKey.getController();
-				type = pubKey.getType();
-				isExist = true;
-				break;
-			}
-		}
-		// Does not exist and has been revoked, both belong to non-existence
-		if (!isExist) {
-			log.error("Failed to call `revocationPublicKey()`: the public key index is not exist");
-			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_NOTEXIST);
-		}
-
-		// revocation the authentication by publicKey
-		SetPidAuthReq revocationPidAuthReq = SetPidAuthReq.builder()
-				.pid(req.getPid())
-				.controller(controller)
-				.privateKey(req.getPrivateKey())
-				.publicKey(req.getPublicKey())
-				.build();
-		BaseResp<SetPidAttrResp> revocationAuthResp = this
-				.revocationAuthenticationByDocumentData(revocationPidAuthReq, docData);
-		if (revocationAuthResp.checkFail()
-				&& revocationAuthResp.checkNoEqualCode(RetEnum.RET_PID_SET_AUTHENTICATION_NOTEXIST)
-				&& revocationAuthResp.checkNoEqualCode(RetEnum.RET_PID_SET_AUTHENTICATION_ALREADY_REVOCATED)) {
-
-			return BaseResp.build(revocationAuthResp.getCode(), revocationAuthResp.getErrMsg());
-		}
-
-		// revocation the publicKey
-		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
-						.updatePublicKey(
-								identity,
-								index,
-								PidUtils.convertPidToAddressStr(controller),
-								type,
-								req.getPublicKey(),
-								PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID);
-
-		if (tresp.checkFail()) {
-			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
-		}
-		SetPidAttrResp attrResp = new SetPidAttrResp();
-		attrResp.setStatus(tresp.getData());
-		attrResp.setTransactionInfo(tresp.getTransactionInfo());
-
-		return BaseResp.buildSuccess(attrResp);
-	}
-
 	@Override
 	public BaseResp<SetPidAttrResp> revocationService(SetServiceReq req) {
 		BaseResp<String> verifyBaseResp = req.validFiled();
@@ -636,7 +413,11 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			log.error("Failed to call `revocationService()`: the `SetServiceReq` is illegal");
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
-		String pid = req.getPid();
+
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
+
 		if (!PidUtils.isValidPid(pid) ) {
 			log.error(
 					"Failed to call `revocationService()`: the addr convert base on `pid` is illegal, pid: {}",
@@ -715,7 +496,10 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID);
 		}
 
-		String pid = req.getPid();
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
+
 		if (!PidUtils.isValidPid(pid) ) {
 			log.error(
 					"Failed to call `changeDocumentStatus()`: the addr convert base on `pid` is illegal, pid: {}",

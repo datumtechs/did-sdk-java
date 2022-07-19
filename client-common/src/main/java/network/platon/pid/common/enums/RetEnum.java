@@ -71,8 +71,7 @@ public enum RetEnum {
     RET_PID_UPDATE_PUBLICKEY_ERROR(201010, "Failed to update public key"),
     RET_PID_PUBLICKEY_ALREADY_REVOCATED(201011, "The public key has bean revocated"),
     RET_PID_CONNOT_REVOCATION_LAST_PUBLICKEY(201012, "Can not revocation the last public key"),
-    RET_PID_SET_AUTHENTICATION_ERROR(201013, "Failed to set authentication"),
-    RET_PID_SET_AUTHENTICATION_ALREADY_REVOCATED(201014, "The authentication has bean revocated"),
+    RET_PID_UPDATE_PUBLICKEY_SAME(201013, "the public key is the same"),
     RET_PID_SET_SERVICE_ALREADY_EXIST(201015, "The service is already exist"),
     RET_PID_SET_SERVICE_NOTEXIST(201016, "The service is not exist"),
     RET_PID_SET_SERVICE_ALREADY_REVOCATED(201017, "The service has bean revocated"),
@@ -126,20 +125,7 @@ public enum RetEnum {
 
 
     // about Agency
-    RET_AGENCY_ROLE_CALL_CONTRACT_ERROR (206000, "Failed to call roleContract"),
-    RET_AGENCY_AUTHORITY_CALL_CONTRACT_ERROR (206001, "Failed to call authorityContract"),
-    RET_AGENCY_ADMIN_ROLE_NOTEXIST (206002, "The admin is not exist"),
-    RET_AGENCY_SET_AUTHORITY_CONTRACT_ADDR_ERROR(206003, "Failed to set authorityContract Addr"),
-    RET_AGENCY_AUTHORITY_CONTRACT_ADDR_NOTEXIST (206004, "The authorityContract Addr is not exist"),
-    RET_AGENCY_SET_ROLE_CONTRACT_ADDR_ERROR(206005, "Failed to set roleContract Addr"),
-    RET_AGENCY_ROLE_CONTRACT_ADDR_NOTEXIST (206006, "The roleContract Addr is not exist"),
-    RET_AGENCY_AUTHORITY_ACCUMULATE_NOTEXIST (206007, "The accumulate is not exist"),
-    RET_AGENCY_AUTHORITY_ISSUER_NOTEXIST (206008, "The authority issuer is not exist"),
-    RET_AGENCY_ADD_AUTHORITY_ISSUER_ERROR(206009, "Failed to add authority issuer"),
-    RET_AGENCY_UPDATE_AUTHORITY_ISSUER_ERROR (206010, "Failed to update authority issuer"),
-    RET_AGENCY_REMOVE_AUTHORITY_ISSUER_ERROR (206011, "Failed to remove authority issuer"),
-    RET_AGENCY_AUTHORITY_NAME_ALREADY_EXIST (206012, "The authority name is already exist"),
-    RET_AGENCY_AUTHORITY_ISSUER_ALREADY_EXIST (206013, "The authority issuer is already exist"),
+
 
     ;
     // ------------------------

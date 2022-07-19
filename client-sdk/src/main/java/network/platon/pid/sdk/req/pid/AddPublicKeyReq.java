@@ -17,26 +17,13 @@ import network.platon.pid.sdk.req.BaseReq;
 public class AddPublicKeyReq extends BaseReq{
 
 	/**
-	 * Required: The PlatON DID.
+	 * Required: The PlatON DID private key.
 	 */
 	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-	private String pid;
-
-
-	/**
-	 * Required: The type.  (default: Secp256k1)
-	 */
-	@Builder.Default
-	@CustomIgnore
-	private PidConst.PublicKeyType type = PidConst.PublicKeyType.SECP256K1;
-
-	/**
-	 * Required: The owner.
-	 */
-	private String controller;
+	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
+			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
+	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
+	private String privateKey;
 
 	/**
 	 * Required: The public key.
@@ -48,14 +35,13 @@ public class AddPublicKeyReq extends BaseReq{
 	private String publicKey;
 
 	/**
-	 * Required: The PlatON DID private key.
+	 * Required: The type.  (default: Secp256k1)
 	 */
-	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
-			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
-	private String privateKey;
+	@Builder.Default
+	@CustomIgnore
+	private PidConst.PublicKeyType type = PidConst.PublicKeyType.SECP256K1;
 
+	private int index;
 
 	/**
 	 * nothing to do.

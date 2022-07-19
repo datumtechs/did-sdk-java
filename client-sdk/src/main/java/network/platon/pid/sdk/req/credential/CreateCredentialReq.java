@@ -33,10 +33,6 @@ public class CreateCredentialReq extends BaseReq {
 	@CustomSize(min = ReqAnnoationArgs.COMMON_DATA_SIZE)
 	private Map<String, Object> claim;
 	
-//	@CustomNotNull
-//	@CustomMin(value = ReqAnnoationArgs.COMMON_DATA_SIZE)
-//	private Long issuanceDate;
-	
 	@CustomNotBlank
 	@CustomSize(min = ReqAnnoationArgs.PUBLIC_KEY_INDEX_SIZE_MIN)
 	private String publicKeyId;
@@ -46,12 +42,6 @@ public class CreateCredentialReq extends BaseReq {
 			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
 	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
 	private String privateKey;
-	
-	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-	private String issuer;
 	
 	private String context;
 	

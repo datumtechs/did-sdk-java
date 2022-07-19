@@ -6,13 +6,14 @@ import lombok.EqualsAndHashCode;
 import network.platon.pid.sdk.annoation.CustomMin;
 import network.platon.pid.sdk.annoation.CustomNotNull;
 import network.platon.pid.sdk.constant.ReqAnnoationArgs;
+import network.platon.pid.sdk.req.BaseReq;
 
 import java.math.BigInteger;
 
 @Data
 @Builder
 @EqualsAndHashCode(callSuper=false)
-public class GetProposalIdReq {
+public class GetProposalIdReq extends BaseReq {
 
     @CustomNotNull
     @CustomMin(value = ReqAnnoationArgs.COMMON_DATA_SIZE)

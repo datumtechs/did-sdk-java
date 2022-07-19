@@ -3,14 +3,12 @@ package network.platon.pid.sdk.utils;
 import network.platon.pid.common.utils.DateUtils;
 import network.platon.pid.contract.AuthorityController;
 import network.platon.pid.csies.utils.ConverDataUtils;
-import network.platon.pid.sdk.base.dto.AuthorityInfo;
 import network.platon.pid.sdk.constant.PidConst;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**

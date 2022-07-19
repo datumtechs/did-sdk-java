@@ -66,6 +66,16 @@ public abstract class BusinessBaseService {
 		this.initContractData = initContractData;
 		return getVoteContractService();
 	}
+
+	protected PctContractService getPctContractService(InitContractData initContractData){
+		this.initContractData = initContractData;
+		return getPctContractService();
+	}
+
+	protected CredentialContractService getCredentialContractService(InitContractData initContractData){
+		this.initContractData = initContractData;
+		return getCredentialContractService();
+	}
 	
 	public void reloadContractData(InitContractData initContractData) {
 		this.initContractData = initContractData;

@@ -39,15 +39,11 @@ public class PidConst {
 
 	public static enum DocumentAttrStatus {
 
-		PID_AUTH_INVALID(Uint8.of(1), "1"),
-		PID_AUTH_VALID(Uint8.of(0), "0"),
-
 		PID_PUBLICKEY_INVALID(Uint8.of(1), "1"),
 		PID_PUBLICKEY_VALID(Uint8.of(0), "0"),
 
 		PID_SERVICE_INVALID(Uint8.of(1), "1"),
 		PID_SERVICE_VALID(Uint8.of(0), "0");
-
 
 		/**
 		 * The Attr status code on Document

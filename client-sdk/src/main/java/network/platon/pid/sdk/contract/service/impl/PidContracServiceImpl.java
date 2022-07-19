@@ -11,7 +11,6 @@ import network.platon.pid.contract.dto.DeployContractData;
 import network.platon.pid.contract.dto.TransactionInfo;
 import network.platon.pid.sdk.base.dto.DocumentData;
 import network.platon.pid.sdk.constant.PidConst;
-import network.platon.pid.sdk.constant.PidConst.PublicKeyType;
 import network.platon.pid.sdk.constant.commonConstant;
 import network.platon.pid.sdk.contract.service.ContractService;
 import network.platon.pid.sdk.contract.service.PidContractService;
@@ -50,8 +49,7 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
     }
 	
 	@Override
-	public TransactionResp<Boolean> createPid(String pidPublicKey, String publicKey)  {
-		String pid = PidUtils.generatePid(pidPublicKey);
+	public TransactionResp<Boolean> createPid(String pid, String publicKey, String publicKeyType)  {
 		if (!PidUtils.isValidPid(pid)) {
 			log.error("Failed to call `createPid()`: the `pid` is illegal");
 			return TransactionResp.build(RetEnum.RET_PID_INVALID);
@@ -68,7 +66,6 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 			return TransactionResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_EXIST);
 		}
 
-		String pidAddr = PidUtils.convertPidToAddressStr(pid);
 		String created = DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp());
 
 		//	function createPid(
@@ -81,14 +78,10 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 		try {
 			receipt = this.getPidContract().createPid(
 					created,
-					buildAuthentication(
-							pidPublicKey,
-							pidAddr,
-							PidConst.DocumentAttrStatus.PID_AUTH_VALID.getTag()),
-					buildPublicWithoutIndex(
+					buildPublicWithIndex(
 							publicKey,
-							pidAddr,
-							PublicKeyType.SECP256K1.getTypeName(),
+							publicKeyType,
+							String.valueOf(1),
 							PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID.getTag()),
 					created).send();
 		} catch (Exception e) {
@@ -163,25 +156,22 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 	 * add a valid public key to document, first.
 	 *
 	 * @param identity
-	 * @param controllerIdentity
+	 * @param index
 	 * @param type
 	 * @param publicKey
 	 * @return
 	 */
 	@Override
-	public TransactionResp<Boolean> addPublicKey(String identity, String controllerIdentity, String type, String publicKey) {
+	public TransactionResp<Boolean> addPublicKey(String identity, String publicKey, String type, int index) {
 
-		//  document publicKey format in contract:
-		//  key: Uint8(2)
-		//  value: {publicKey}|{controller}|{type}|{status}|{index}
 		TransactionReceipt receipt = null;
 		try {
 			receipt = this.getPidContract().setAttribute(
 					PidAttrType.PUBLICKEY.getCode(),
-					buildPublicWithoutIndex(
+					buildPublicWithIndex(
 							publicKey,
-							controllerIdentity.toString(),
 							type,
+							String.valueOf(index),
 							PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID.getTag()),
 					DateUtils.getCurrentTimeStampString()).send();
 		} catch (Exception e) {
@@ -207,7 +197,7 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 	}
 
 	@Override
-	public TransactionResp<Boolean> updatePublicKey(String identity, Integer index, String controllerIdentity, String type, String publicKey, PidConst.DocumentAttrStatus status) {
+	public TransactionResp<Boolean> updatePublicKey(String identity, String publicKey, String type, int index) {
 
 		//  document publicKey format in contract:
 		//  key: Uint8(2)
@@ -218,10 +208,9 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 					PidAttrType.PUBLICKEY.getCode(),
 					buildPublicWithIndex(
 							publicKey,
-							controllerIdentity.toString(),
 							type,
-							status.getTag(),
-							index.toString()),
+							String.valueOf(index),
+							PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID.getTag()),
 					DateUtils.getCurrentTimeStampString()).send();
 		} catch (Exception e) {
 			log.error(
@@ -245,27 +234,26 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 		return TransactionResp.buildTxSuccess(true, tx);
 	}
 
-
 	@Override
-	public TransactionResp<Boolean> setAuthentication(String identity, String controllerIdentity, String publicKey, PidConst.DocumentAttrStatus status) {
+	public TransactionResp<Boolean> revocationPublicKey(String identity, String publicKey, String type, int index) {
 
-		//  document authentication format in contract:
-		//  key: Uint8(1)
-		//  value: {publicKey}|{controller}|{status}
+		//  document publicKey format in contract:
+		//  key: Uint8(2)
+		//  value: {publicKey}|{controller}|{type}|{status}|{index}
 		TransactionReceipt receipt = null;
 		try {
 			receipt = this.getPidContract().setAttribute(
-					PidAttrType.AUTH.getCode(),
-					buildAuthentication(
+					PidAttrType.PUBLICKEY.getCode(),
+					buildPublicWithIndex(
 							publicKey,
-							controllerIdentity.toString(),
-							status.getTag()),
+							type,
+							String.valueOf(index),
+							PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID.getTag()),
 					DateUtils.getCurrentTimeStampString()).send();
 		} catch (Exception e) {
 			log.error(
-					"Failed to call `setAuthentication()` of PIDContract, the pid: {}, the exception: {}",
-					identity.toString(), e
-			);
+					"Failed to call `setAttribute()` of PIDContract, the pid: {}, the exception: {}",
+					identity.toString(), e);
 			return TransactionResp.build(RetEnum.RET_PID_IDENTITY_CALL_CONTRACT_ERROR);
 		}
 
@@ -276,10 +264,10 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 
 		if (CollectionUtils.isEmpty(response)) {
 			log.error(
-					"Failed to set authentication for PID, the tx receipt is null, txHash is {}",
+					"Failed to update public key for PID, the tx receipt is null, txHash is {}",
 					tx.getTransactionHash()
 			);
-			return TransactionResp.build(RetEnum.RET_PID_SET_AUTHENTICATION_ERROR);
+			return TransactionResp.build(RetEnum.RET_PID_UPDATE_PUBLICKEY_ERROR);
 		}
 		return TransactionResp.buildTxSuccess(true, tx);
 	}
@@ -486,68 +474,18 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 	 * rule:
 	 * 		{publicKey}|{controller}|{type}|{status}|{index}
 	 * @param publicKey
-	 * @param controller
-	 * @param typeName
-	 * @param status
-	 * @return
-	 */
-	public String buildPublicWithoutIndex(String publicKey, String controller, String typeName, String status) {
-		String keyStr = new StringBuilder()
-				.append(publicKey)
-				.append(commonConstant.SEPARATOR_PIPELINE)
-				.append(controller)
-				.append(commonConstant.SEPARATOR_PIPELINE)
-				.append(typeName)
-				.append(commonConstant.SEPARATOR_PIPELINE)
-				.append(status)
-				.toString();
-		return keyStr;
-	}
-
-
-	/**
-	 * build the publicKey value on contract
-	 *
-	 * rule:
-	 * 		{publicKey}|{controller}|{type}|{status}|{index}
-	 * @param publicKey
-	 * @param controller
 	 * @param typeName
 	 * @param status
 	 * @param index
 	 * @return
 	 */
-	public String buildPublicWithIndex(String publicKey, String controller, String typeName, String status, String index) {
+	public String buildPublicWithIndex(String publicKey, String typeName, String index, String status) {
 		String keyStr = new StringBuilder()
 				.append(publicKey)
-				.append(commonConstant.SEPARATOR_PIPELINE)
-				.append(controller)
 				.append(commonConstant.SEPARATOR_PIPELINE)
 				.append(typeName)
 				.append(commonConstant.SEPARATOR_PIPELINE)
-				.append(status)
-				.append(commonConstant.SEPARATOR_PIPELINE)
 				.append(index)
-				.toString();
-		return keyStr;
-	}
-
-
-	/**
-	 * build the authentication value on contract
-	 *
-	 * rule:
-	 * 		{publicKey}|{controller}|{status}
-	 * @param publicKey
-	 * @param controller
-	 * @param status
-	 * @return
-	 */
-	public String buildAuthentication(String publicKey, String controller, String status) {
-		String keyStr = new StringBuilder()
-				.append(publicKey)
-				.append(commonConstant.SEPARATOR_PIPELINE)
-				.append(controller)
 				.append(commonConstant.SEPARATOR_PIPELINE)
 				.append(status)
 				.toString();

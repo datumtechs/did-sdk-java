@@ -20,7 +20,6 @@ import network.platon.pid.contract.dto.InitContractData;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.csies.utils.ConverDataUtils;
 import network.platon.pid.sdk.BaseTest;
-import network.platon.pid.sdk.base.dto.AuthorityInfo;
 import network.platon.pid.sdk.base.dto.Credential;
 import network.platon.pid.sdk.factory.PClient;
 import network.platon.pid.sdk.req.credential.CreateCredentialReq;

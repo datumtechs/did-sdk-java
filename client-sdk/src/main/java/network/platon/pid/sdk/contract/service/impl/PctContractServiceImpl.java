@@ -79,7 +79,7 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String contractAddress) {
 		String string = new String(contractAddress);
 		try {
-			Pct pct = Pct.deploy(getWeb3j(), credentials, gasProvider, string)
+			Pct pct = Pct.deploy(getWeb3j(), credentials, gasProvider)
 					.send();
 			Optional<TransactionReceipt> value = pct.getTransactionReceipt();
 			String pctTransHash = "";

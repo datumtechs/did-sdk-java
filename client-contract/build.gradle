@@ -4,12 +4,9 @@ dependencies {
 
 sonarqube {
 	properties {
-		property "sonar.exclusions", "**/AuthorityController.java," +
-				"**/AuthorityData.java," +
-				"**/CredentialContract.java," +
-				"**/PctController.java," +
-				"**/PctData.java," +
-				"**/PidContract.java,"+
-				"**/RoleContract.java,"
+		property "sonar.exclusions", "**/Credential.java," +
+				"**/Pct.java," +
+				"**/Pid.java," +
+				"**/Vote.java,"
 	}
 }

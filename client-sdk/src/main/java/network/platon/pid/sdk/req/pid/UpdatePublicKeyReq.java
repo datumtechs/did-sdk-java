@@ -19,14 +19,13 @@ import network.platon.pid.sdk.req.BaseReq;
 public class UpdatePublicKeyReq extends BaseReq {
 
         /**
-         * Required: The PlatON DID.
+         * Required: The PlatON DID private key.
          */
-		@CustomNotBlank
-        @CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-                max = ReqAnnoationArgs.PID_SIZE_MAX)
-        @CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-        private String pid;
-
+        @CustomNotBlank
+        @CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
+                max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
+        @CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
+        private String privateKey;
 
         /**
          * Required: The type.
@@ -35,14 +34,7 @@ public class UpdatePublicKeyReq extends BaseReq {
         @CustomIgnore
         private PidConst.PublicKeyType type;
 
-        /**
-         * Required: The owner.
-         */
-        @CustomNotBlank
-        @CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-                max = ReqAnnoationArgs.PID_SIZE_MAX)
-        @CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-        private String controller;
+        int index;
 
         /**
          * Required: The public key.
@@ -54,39 +46,11 @@ public class UpdatePublicKeyReq extends BaseReq {
         private String publicKey;
 
         /**
-         * Required: The PlatON DID private key.
-         */
-        @CustomNotBlank
-        @CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
-                max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-        @CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
-        private String privateKey;
-
-
-        /**
-         * Option: The PlatON DID private key.
-         */
-        @CustomNotNull
-        @CustomIgnore
-        private PidConst.DocumentAttrStatus status;
-
-
-        /**
          * nothing to do.
          * @param type the public key type
          */
         public void setType(PidConst.PublicKeyType type) {
             this.type = type;
         }
-
-        /**
-         * nothing to do.
-         * @param status the public key status
-         */
-        public void setStatus(PidConst.DocumentAttrStatus status) {
-            this.status = status;
-        }
-
-
 
 }

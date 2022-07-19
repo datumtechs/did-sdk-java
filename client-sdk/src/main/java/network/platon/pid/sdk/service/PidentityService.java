@@ -51,20 +51,6 @@ public interface PidentityService {
 	BaseResp<SetPidAttrResp> revocationPublicKey(RevocationPublicKeyReq req);
 
 	/**
-	 * Set custom parameters according to PId
-	 * @param req
-	 * @return
-	 */
-	BaseResp<SetPidAttrResp> setAuthentication(SetPidAuthReq req);
-
-	/**
-	 * Revocation custom parameters according to PId
-	 * @param req
-	 * @return
-	 */
-	BaseResp<SetPidAttrResp> revocationAuthentication(SetPidAuthReq req);
-
-	/**
 	 * Set the corresponding service parameter according to PId
 	 * @param req
 	 * @return

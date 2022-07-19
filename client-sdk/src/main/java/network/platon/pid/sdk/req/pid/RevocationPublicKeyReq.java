@@ -16,13 +16,13 @@ import network.platon.pid.sdk.req.BaseReq;
 public class RevocationPublicKeyReq extends BaseReq{
 
 	/**
-	 * Required: The PlatON DID.
+	 * Required: The PlatON DID private key.
 	 */
 	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-	private String pid;
+	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
+			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
+	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
+	private String privateKey;
 
 	/**
 	 * Required: The public key.
@@ -32,14 +32,5 @@ public class RevocationPublicKeyReq extends BaseReq{
 			max = ReqAnnoationArgs.PUBLIC_KEY_SIZE_MAX)
 	@CustomPattern(value = PidConst.PLATONE_PUBLICK_KEY_PATTERN)
 	private String publicKey;
-
-	/**
-	 * Required: The PlatON DID private key.
-	 */
-	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
-			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
-	private String privateKey;
 	
 }

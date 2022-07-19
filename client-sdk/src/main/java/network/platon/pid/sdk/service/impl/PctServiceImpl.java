@@ -1,7 +1,11 @@
 package network.platon.pid.sdk.service.impl;
 
+import com.platon.crypto.ECKeyPair;
+import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.enums.RetEnum;
+import network.platon.pid.contract.dto.InitContractData;
+import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.req.pct.CreatePctReq;
 import network.platon.pid.sdk.req.pct.QueryPctJsonListReq;
 import network.platon.pid.sdk.req.pct.QueryPctJsonReq;
@@ -12,8 +16,10 @@ import network.platon.pid.sdk.resp.pct.QueryPctJsonResp;
 import network.platon.pid.sdk.service.BusinessBaseService;
 import network.platon.pid.sdk.service.PctService;
 import network.platon.pid.sdk.utils.PctUtils;
+import network.platon.pid.sdk.utils.PidUtils;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 
 @Slf4j
@@ -43,11 +49,16 @@ public class PctServiceImpl extends BusinessBaseService implements PctService,Se
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
 
+        ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+        String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+        String pid = PidUtils.generatePid(pidPublicKey);
+
         if (!PctUtils.isPctJsonSchemaValid(req.getPctjson())) {
-            log.info("req pid = {},json format error", req.getPid());
+            log.info("req pid = {},json format error", pid);
             return BaseResp.build(RetEnum.RET_PCT_JSON_SCHEMA_ERROR);
         }
-        TransactionResp<Uint32> tresp = this.getPctContractService().registerPct(req.getPctjson(), req.getPid());
+
+        TransactionResp<BigInteger> tresp = this.getPctContractService(new InitContractData(req.getPrivateKey())).registerPct(req.getPctjson(), req.getExtra());
         if(tresp.checkFail()) {
         	log.error("Failed to register pctJson schema, req: {}, error:{}", req, tresp.getErrMsg());
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
@@ -64,30 +75,11 @@ public class PctServiceImpl extends BusinessBaseService implements PctService,Se
         if (verifyBaseResp.getCode() != RetEnum.RET_SUCCESS.getCode()) {
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
-        BaseResp<String> pctJsonResp = this.getPctContractService().queryPctJsonById(req.getPctId());
+        BaseResp<String> pctJsonResp = this.getPctContractService().queryPctById(req.getPctId());
         if(!pctJsonResp.checkSuccess()) {
         	log.error("Failed to call queryPctJsonById, req: {}", req);
 			return BaseResp.build(pctJsonResp.getCode(),pctJsonResp.getErrMsg());
 		}
-        BaseResp<String> pidResp = this.getPctContractService().queryPctIssuerById(req.getPctId());
-        if(!pidResp.checkSuccess()) {
-            log.error("Failed to call queryPctJsonById, req: {}", req);
-            return BaseResp.build(pidResp.getCode(),pidResp.getErrMsg());
-        }
-        return BaseResp.buildSuccess(QueryPctJsonResp.of(pidResp.getData(), pctJsonResp.getData()));
-    }
-
-    @Override
-    public BaseResp<List<Integer>> queryPctIdsByIssuer(QueryPctJsonListReq req) {
-        BaseResp<String> verifyBaseResp = req.validFiled();
-        if (verifyBaseResp.getCode() != RetEnum.RET_SUCCESS.getCode()) {
-            return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
-        }
-        BaseResp<List<Integer>> resp = this.getPctContractService().queryPctIdsByIssuer(req.getIssuer());
-        if(!resp.checkSuccess()) {
-        	log.error("Failed to call queryPctIdsByIssuer, req: {}", req);
-			return BaseResp.build(resp.getCode(),resp.getErrMsg());
-		}
-        return BaseResp.buildSuccess(resp.getData());
+        return BaseResp.buildSuccess(QueryPctJsonResp.of(req.getPctId(), pctJsonResp.getData()));
     }
 }

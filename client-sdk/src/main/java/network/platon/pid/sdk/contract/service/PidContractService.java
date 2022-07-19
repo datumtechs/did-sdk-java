@@ -9,15 +9,15 @@ import java.math.BigInteger;
 public interface PidContractService {
 
 
-	TransactionResp<Boolean> createPid(String pid, String publicKey);
+	TransactionResp<Boolean> createPid(String pid, String publicKey, String publicKeyType);
 
 	BaseResp<DocumentData> getDocument(String identity);
 
-	TransactionResp<Boolean> addPublicKey(String identity, String controllerIdentity, String type, String publicKey);
+	TransactionResp<Boolean> addPublicKey(String identity, String publicKey, String type, int index);
 
-	TransactionResp<Boolean> updatePublicKey(String identity, Integer index, String controllerIdentity, String type, String publicKey, PidConst.DocumentAttrStatus status);
+	TransactionResp<Boolean> updatePublicKey(String identity, String publicKey, String type, int index);
 
-	TransactionResp<Boolean> setAuthentication(String identity, String controllerIdentity, String publicKey, PidConst.DocumentAttrStatus status);
+	TransactionResp<Boolean> revocationPublicKey(String identity, String publicKey, String type, int index);
 
 	TransactionResp<Boolean> setService(String identity, String serviceId, String serviceType, String serviceEndPoint, PidConst.DocumentAttrStatus status);
 

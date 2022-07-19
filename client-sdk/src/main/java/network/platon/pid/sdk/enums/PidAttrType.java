@@ -14,20 +14,10 @@ public enum  PidAttrType {
 
     CREATED(BigInteger.valueOf(0), "created"),
 
-    AUTH(BigInteger.valueOf(1), "authentication"),
+    PUBLICKEY(BigInteger.valueOf(1), "publicKey"),
 
-//    UPDATED(Uint8.of(2), "updated"),
-
-    PUBLICKEY(BigInteger.valueOf(2), "publicKey"),
-
-    SERVICE(BigInteger.valueOf(3), "service"),
+    SERVICE(BigInteger.valueOf(2), "service"),
     ;
-
-//    STATUS(Uint8.of(4), "status");
-
-
-
-
 
     /**
      * type code.

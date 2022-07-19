@@ -13,10 +13,12 @@ import network.platon.pid.contract.dto.TransactionInfo;
 public class CreatePidResp {
 
 	private String privateKey;
-	
-	private String publicKey;
-	
+
 	private String pid;
+
+	private String type;
+
+	private String publicKey;
 
 	private TransactionInfo transactionInfo;
 	

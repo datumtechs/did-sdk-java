@@ -97,9 +97,9 @@ public class VerifyInputDataUtils {
 		return RetEnum.RET_SUCCESS;
 	}
 	
-	public static BaseResp<CheckData> checkBaseData(String holder,String issuer,String publicKeyId,String privateKey,String pctId, Map<String, Object> claim){
-		string holderAddress = PidUtils.convertPidToAddressStr(holder);
-		if(StringUtils.isBlank(holderAddress.getAddress())) {
+	public static BaseResp<CheckData> checkBaseData(String holder, String issuer, String publicKeyId,String privateKey,String pctId, Map<String, Object> claim){
+		String holderAddress = PidUtils.convertPidToAddressStr(holder);
+		if(StringUtils.isBlank(holderAddress)) {
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID,"holder invaild",null);
 		}
 		PidContractService pidContractService = new PidContracServiceImpl();
@@ -109,8 +109,8 @@ public class VerifyInputDataUtils {
 		}
 		
 		//Determine whether the document data is consistent
-		string pidAddress = PidUtils.convertPidToAddressStr(issuer);
-		if(StringUtils.isBlank(pidAddress.getAddress())) {
+		String pidAddress = PidUtils.convertPidToAddressStr(issuer);
+		if(StringUtils.isBlank(pidAddress)) {
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID,"issuer invaild",null);
 		}
 		BaseResp<DocumentData> getDocResp = pidContractService.getDocument(PidUtils.convertPidToAddressStr(issuer));
@@ -126,7 +126,7 @@ public class VerifyInputDataUtils {
 		}
 		
 		PctContractService pctContractService = new PctContractServiceImpl();
-		BaseResp<String> resp = pctContractService.queryPctJsonById(pctId);
+		BaseResp<String> resp = pctContractService.queryPctById(pctId);
 		if(!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(),resp.getErrMsg(),null);
 		}

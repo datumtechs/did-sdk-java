@@ -1,12 +1,11 @@
 package network.platon.pid.sdk.contract.service;
 
 import com.platon.tuples.generated.Tuple2;
-import network.platon.pid.sdk.base.dto.AuthorityInfo;
+import network.platon.pid.sdk.req.agency.*;
 import network.platon.pid.sdk.resp.BaseResp;
-import network.platon.pid.sdk.resp.TransactionResp;
+import network.platon.pid.sdk.resp.agency.*;
 
 import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @Description:
@@ -15,10 +14,22 @@ import java.util.List;
  */
 public interface VoteContractService {
 
-    /**
-     * Get the associated RoleContract address in AuthorityContract
-     * @return
-     */
-    BaseResp<Tuple2<String, String>> getAdmin();
+    BaseResp<Boolean> submitProposal(BigInteger proposalType,  String proposalUrl, String candidate, String candidateServiceUrl);
+
+    BaseResp<Boolean> withdrawProposal(BigInteger proposalId);
+
+    BaseResp<Boolean> voteProposal(BigInteger proposalId);
+
+    BaseResp<Boolean> effectProposal(BigInteger proposalId);
+
+    BaseResp<GetAdminResp> getAdmin();
+
+    BaseResp<GetAllAuthorityResp> getAllAuthority();
+
+    BaseResp<GetAllProposalIdResp> getAllProposalId();
+
+    BaseResp<GetProposalIdResp> getProposalId(BigInteger blockNo);
+
+    BaseResp<GetProposalResp> getProposal(BigInteger proposalId);
 
 }

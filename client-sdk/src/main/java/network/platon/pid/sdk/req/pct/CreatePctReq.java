@@ -16,13 +16,14 @@ import network.platon.pid.sdk.req.BaseReq;
 public class CreatePctReq extends BaseReq{
 
 	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-	private String pid;
+	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
+			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
+	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
+	private String privateKey;
 	
 	@CustomNotBlank
 	@CustomSize(min = ReqAnnoationArgs.PCT_JSON_SIZE_MIN)
 	private String pctjson;
 
+	private byte[] extra;
 }

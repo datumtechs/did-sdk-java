@@ -5,6 +5,7 @@ import com.platon.bech32.Bech32;
 import com.platon.crypto.Hash;
 import com.platon.protocol.core.DefaultBlockParameterNumber;
 import com.platon.protocol.core.methods.response.*;
+import com.platon.utils.JSONUtil;
 import com.platon.utils.Numeric;
 import network.platon.pid.common.enums.ContractStatusEnum;
 import network.platon.pid.contract.Pid;
@@ -162,13 +163,13 @@ public class PidEventProcessor {
                 return response;
             }
 
-            String identityHash = res.identity;
+            String identity = res.identity;
 
             String address = PidUtils.convertPidToAddressStr(document.getId());
 
             // the `topic` is already sha3(rlp(topic)) encoded value
             String pidTopicHash = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(Bech32.addressDecode(address)), 64);
-            if (!StringUtils.equals(pidTopicHash, identityHash)) {
+            if (!StringUtils.equals(pidTopicHash, identity)) {
                 response.setDecodeEventLogStatus(ContractStatusEnum.C_KEY_NOT_MATCH);
                 return response;
             }
@@ -196,9 +197,6 @@ public class PidEventProcessor {
             case CREATED:
                 assembleCreated(value, document);
                 break;
-            case AUTH:
-                assembleAuthentications(value, document);
-                break;
             case PUBLICKEY:
                 assemblePublicKeys(value, document);
                 break;
@@ -212,7 +210,7 @@ public class PidEventProcessor {
 
     // the publicKey format on contract, example:
     //          key: PidAttrType.PUBLICKEY.getCode
-    //          value:   {publicKey}|{controller}|{type}|{status}|{index}
+    //          value:   {publicKey}|{type}|{index}|{status}
     private static void assemblePublicKeys(String value, DocumentData document) {
 
         log.debug("Call method assemblePublicKeys() parameter, value:{}, document:{}",
@@ -221,17 +219,16 @@ public class PidEventProcessor {
         if (StringUtils.isBlank(value)) {
             return;
         }
+
         String[] valueArray = StringUtils.splitByWholeSeparator(value, commonConstant.SEPARATOR_PIPELINE);
         if (valueArray.length != PidConst.PID_PUBLICKEY_VALUE_MEM_LEN) {
             return;
         }
 
         String publicKey = valueArray[0];
-        // convert address to pid
-        String controller = PidUtils.convertAddressStrToPid(valueArray[1]);
-        String type = valueArray[2];
+        String type = valueArray[1];
+        String index = valueArray[2];
         String status = valueArray[3];
-        String index = valueArray[4];
 
         List<DocumentPubKeyData> publicKeys = document.getPublicKey();
         for (DocumentPubKeyData pub : publicKeys) {
@@ -242,13 +239,11 @@ public class PidEventProcessor {
             }
         }
         DocumentPubKeyData pubKey = new DocumentPubKeyData();
-        pubKey.setId(
-                new StringBuilder()
-                        .append(document.getId())
-                        .append(commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID)
-                        .append(index).toString());
+        pubKey.setId(new StringBuilder()
+                .append(document.getId())
+                .append(commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID)
+                .append(index).toString());
         pubKey.setType(type);
-        pubKey.setController(controller);
         pubKey.setPublicKeyHex(publicKey);
         pubKey.setStatus(status);
         document.getPublicKey().add(pubKey);

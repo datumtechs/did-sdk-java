@@ -6,7 +6,6 @@ import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.utils.DateUtils;
 import network.platon.pid.sdk.BaseTest;
-import network.platon.pid.sdk.base.dto.AuthorityInfo;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pid.CreatePidResp;
 import network.platon.pid.sdk.utils.PidUtils;

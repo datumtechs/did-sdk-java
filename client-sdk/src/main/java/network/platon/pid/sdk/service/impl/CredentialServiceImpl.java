@@ -1,5 +1,7 @@
 package network.platon.pid.sdk.service.impl;
 
+import com.platon.crypto.ECKeyPair;
+import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.config.PidConfig;
 import network.platon.pid.common.constant.ClaimMetaKey;
@@ -20,6 +22,7 @@ import network.platon.pid.sdk.resp.credential.CreateSelectCredentialResp;
 import network.platon.pid.sdk.service.BusinessBaseService;
 import network.platon.pid.sdk.service.CredentialService;
 import network.platon.pid.sdk.utils.CredentialsUtils;
+import network.platon.pid.sdk.utils.PidUtils;
 import network.platon.pid.sdk.utils.PresentationUtils;
 import network.platon.pid.sdk.utils.VerifyInputDataUtils;
 
@@ -55,7 +58,11 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
 		}
 
-		BaseResp<CheckData> checkResp = VerifyInputDataUtils.checkBaseData(req.getPid(), req.getIssuer(), req.getPublicKeyId(), req.getPrivateKey(), req.getPctId(), req.getClaim());
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String issuerPidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String issuerPid = PidUtils.generatePid(issuerPidPublicKey);
+
+		BaseResp<CheckData> checkResp = VerifyInputDataUtils.checkBaseData(req.getPid(), issuerPid, req.getPublicKeyId(), req.getPrivateKey(), req.getPctId(), req.getClaim());
 		if (checkResp.checkFail()) {
 			return BaseResp.build(checkResp.getCode(),checkResp.getErrMsg());
 		}
@@ -154,7 +161,12 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		List<String> type = new ArrayList<>();
 		type.add(String.valueOf(req.getType()));
 		credential.setType(type);
-		credential.setIssuer(req.getIssuer());
+
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		String issuerPidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String issuerPid = PidUtils.generatePid(issuerPidPublicKey);
+
+		credential.setIssuer(issuerPid);
 		Map<String, Object> claimMate = new HashMap<>();
 		claimMate.put(ClaimMetaKey.PCTID, req.getPctId());
 		credential.setClaimMeta(claimMate);

@@ -7,6 +7,7 @@ import com.platon.parameters.NetworkParameters;
 import com.platon.utils.Numeric;
 import network.platon.pid.sdk.base.dto.*;
 import network.platon.pid.sdk.constant.PidConst;
+import network.platon.pid.sdk.req.agency.SubmitProposalReq;
 import network.platon.pid.sdk.req.pid.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -120,13 +121,6 @@ public class PidUtils {
 				.hexStringToByteArray(privateKey)).compareTo(BigInteger.ZERO) > 0;
 	}
 
-	public static boolean isEmptyAuthorityInfo (AuthorityInfo info) {
-		if (null == info || PidUtils.generateZeroAddr().equals(info.getPid()) || StringUtils.isBlank(info.getName())) {
-			return true;
-		}
-		return false;
-	}
-
 	public static boolean verifyAddPublicKeyArg(AddPublicKeyReq req) {
 		return null != req
 				&& null != req.getType()
@@ -151,14 +145,6 @@ public class PidUtils {
 				&& isPrivateKeyValid(req.getPrivateKey());
 	}
 
-	public static boolean verifySetAuthenticationArg(SetPidAuthReq req) {
-		return null != req
-				&& StringUtils.isNotBlank(req.getPublicKey())
-				&& StringUtils.isNotBlank(req.getPrivateKey())
-				&& isPrivateKeyValid(req.getPrivateKey());
-	}
-
-
 	public static boolean verifySetServiceArg(SetServiceReq req) {
 		return null != req
 				&& StringUtils.isNotBlank(req.getService().getId())
@@ -166,23 +152,6 @@ public class PidUtils {
 				&& StringUtils.isNotBlank(req.getService().getServiceEndpoint())
 				&& StringUtils.isNotBlank(req.getPrivateKey())
 				&& isPrivateKeyValid(req.getPrivateKey());
-	}
-
-
-	public static boolean verifySetAuthorityArg(SetAuthorityReq req) {
-		return null != req
-				&& verifyAuthority(req.getAuthority())
-				&& StringUtils.isNotBlank(req.getPrivateKey())
-				&& isPrivateKeyValid(req.getPrivateKey());
-	}
-
-	public static boolean verifyAuthority(AuthorityInfo authorityInfo) {
-		return null != authorityInfo
-				&& isValidPid(authorityInfo.getPid())
-				&& StringUtils.isNotBlank(authorityInfo.getName())
-				&& authorityInfo.getName().getBytes(StandardCharsets.UTF_8).length
-				<= PidConst.MAX_AUTHORITY_ISSUER_NAME_LENGTH;
-
 	}
 
 	public static boolean verifyChangeDocumentStatusArg(ChangeDocumentStatusReq req) {
