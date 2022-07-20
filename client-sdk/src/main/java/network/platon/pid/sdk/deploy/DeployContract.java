@@ -34,72 +34,44 @@ import network.platon.pid.sdk.resp.TransactionResp;
 @Slf4j
 public class DeployContract {
 
-	public static BaseResp<DeployContractData> deployCredentialContract(String privateKey, String roleContractAddress) {
-		ContractService credentialContractService = new CredentialContractServiceImpl();
+	public static BaseResp<DeployContractData> deployCredentialContract(String privateKey, String voteContractAddress) {
+		CredentialContractServiceImpl credentialContractService = new CredentialContractServiceImpl();
 		Credentials credentials = Credentials.create(privateKey);
-		TransactionResp<List<DeployContractData>> resp = credentialContractService.deployContract(credentials,
-				roleContractAddress);
+		TransactionResp<List<DeployContractData>> resp = credentialContractService.deployContract(credentials, voteContractAddress);
 		if (!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(), resp.getErrMsg(), null);
 		}
 		return BaseResp.buildSuccess(resp.getData().get(0));
 	}
 
-	public static BaseResp<DeployContractData> deployRoleContract(String privateKey, String adminAddress) {
-		ContractService contractService = new RoleContractServiceImpl();
+	public static BaseResp<DeployContractData> deployVoteContract(String privateKey, String adminAddress, String serviceUrl) {
+		VoteContractServiceImpl voteContractService = new VoteContractServiceImpl();
 		Credentials credentials = Credentials.create(privateKey);
-		TransactionResp<List<DeployContractData>> resp = contractService.deployContract(credentials, adminAddress);
+		TransactionResp<List<DeployContractData>> resp = voteContractService.deployContract(credentials, adminAddress, serviceUrl);
 		if (!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(), resp.getErrMsg(), null);
 		}
 		return BaseResp.buildSuccess(resp.getData().get(0));
 	}
 
-	public static BaseResp<DeployContractData> deployAuthorityContract(String privateKey, String roleContractAddress) {
-		ContractService contractService = new VoteContractServiceImpl();
+	public static BaseResp<DeployContractData> deployPidContract(String privateKey) {
+		PidContracServiceImpl contractService = new PidContracServiceImpl();
 		Credentials credentials = Credentials.create(privateKey);
-		TransactionResp<List<DeployContractData>> resp = contractService.deployContract(credentials,
-				roleContractAddress);
+		TransactionResp<List<DeployContractData>> resp = contractService.deployContract(credentials);
 		if (!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(), resp.getErrMsg(), null);
 		}
 		return BaseResp.buildSuccess(resp.getData().get(0));
 	}
 
-	public static BaseResp<DeployContractData> deployPidContract(String privateKey, String roleContractAddress) {
-		ContractService contractService = new PidContracServiceImpl();
+	public static BaseResp<DeployContractData> deployPctContract(String privateKey, String voteContractAddress) {
+		PctContractServiceImpl contractService = new PctContractServiceImpl();
 		Credentials credentials = Credentials.create(privateKey);
-		TransactionResp<List<DeployContractData>> resp = contractService.deployContract(credentials,
-				roleContractAddress);
+		TransactionResp<List<DeployContractData>> resp = contractService.deployContract(credentials, voteContractAddress);
 		if (!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(), resp.getErrMsg(), null);
 		}
 		return BaseResp.buildSuccess(resp.getData().get(0));
-	}
-
-	public static BaseResp<DeployContractData> deployPctContract(String privateKey, String roleContractAddress) {
-		ContractService contractService = new PctContractServiceImpl();
-		Credentials credentials = Credentials.create(privateKey);
-		TransactionResp<List<DeployContractData>> resp = contractService.deployContract(credentials,
-				roleContractAddress);
-		if (!resp.checkSuccess()) {
-			return BaseResp.build(resp.getCode(), resp.getErrMsg(), null);
-		}
-		return BaseResp.buildSuccess(resp.getData().get(0));
-	}
-	
-	public static BaseResp<String> setAuthorityContractAddr(String privateKey, String roleContractAddress,String authorityControllerAddress) {
-		RoleContractServiceImpl roleContractService = new RoleContractServiceImpl();
-		PidConfig.setROLE_CONTRACT_ADDRESS(roleContractAddress);
-		roleContractService.reloadAddress(new InitContractData(privateKey), ContractNameValues.ROLE);
-		string string = new string(authorityControllerAddress);
-		TransactionResp<Boolean> resp= roleContractService.setAuthorityContractAddr(string);
-		if(resp.checkFail()) {
-			log.debug("setAuthorityContractAddr error.error:{}",resp.getErrMsg());
-			return BaseResp.build(resp.getCode(), resp.getErrMsg(), null);
-		}
-		log.info("setAuthorityContractAddr success.",JSONObject.toJSONString(resp));
-		return BaseResp.buildSuccess();
 	}
 
 	/**
@@ -114,68 +86,48 @@ public class DeployContract {
 	 * @param adminAddress
 	 * @return
 	 */
-	public static BaseResp<List<DeployContractData>> deployAllContract(String privateKey, String adminAddress) {
+	public static BaseResp<List<DeployContractData>> deployAllContract(String privateKey, String adminAddress, String serviceUrl) {
 		List<DeployContractData> deployContractDatas = new ArrayList<>();
-		ContractService contractService = new RoleContractServiceImpl();
+		VoteContractServiceImpl voteContractService = new VoteContractServiceImpl();
 		Credentials credentials = Credentials.create(privateKey);
-		TransactionResp<List<DeployContractData>> roleResp = contractService.deployContract(credentials, adminAddress);
-		if (!roleResp.checkSuccess()) {
-			log.debug("deploy error.error:{}",roleResp.getErrMsg());
-			return BaseResp.build(roleResp.getCode(), roleResp.getErrMsg(), deployContractDatas);
+		TransactionResp<List<DeployContractData>> voteResp = voteContractService.deployContract(credentials, adminAddress, serviceUrl);
+		if (!voteResp.checkSuccess()) {
+			log.debug("deploy error.error:{}",voteResp.getErrMsg());
+			return BaseResp.build(voteResp.getCode(), voteResp.getErrMsg(), deployContractDatas);
 		}
-		String roleAddress = roleResp.getData().get(0).getContractAddress();
-		deployContractDatas.addAll(roleResp.getData());
+		String voteAddress = voteResp.getData().get(0).getContractAddress();
+		deployContractDatas.addAll(voteResp.getData());
 
-		contractService = new VoteContractServiceImpl();
-		TransactionResp<List<DeployContractData>> authorityResp = contractService.deployContract(credentials,
-				roleAddress);
-		if (!authorityResp.checkSuccess()) {
-			log.debug("deploy error.error:{}",authorityResp.getErrMsg());
-			return BaseResp.build(authorityResp.getCode(), authorityResp.getErrMsg(), deployContractDatas);
-		}
-		deployContractDatas.addAll(authorityResp.getData());
-		
-		contractService = new PidContracServiceImpl();
-		TransactionResp<List<DeployContractData>> pidResp = contractService.deployContract(credentials, roleAddress);
+		PidContracServiceImpl pidContractService = new PidContracServiceImpl();
+		TransactionResp<List<DeployContractData>> pidResp = pidContractService.deployContract(credentials);
 		if (!pidResp.checkSuccess()) {
 			log.debug("deploy error.error:{}",pidResp.getErrMsg());
 			return BaseResp.build(pidResp.getCode(), pidResp.getErrMsg(), deployContractDatas);
 		}
 		deployContractDatas.addAll(pidResp.getData());
 
-		contractService = new PctContractServiceImpl();
-		TransactionResp<List<DeployContractData>> pctResp = contractService.deployContract(credentials, roleAddress);
+		PctContractServiceImpl pctContractService = new PctContractServiceImpl();
+		TransactionResp<List<DeployContractData>> pctResp = pctContractService.deployContract(credentials, voteAddress);
 		if (!pctResp.checkSuccess()) {
 			log.debug("deploy error.error:{}",pctResp.getErrMsg());
 			return BaseResp.build(pctResp.getCode(), pctResp.getErrMsg(), deployContractDatas);
 		}
 		deployContractDatas.addAll(pctResp.getData());
 
-		contractService = new CredentialContractServiceImpl();
-		TransactionResp<List<DeployContractData>> credentialResp = contractService.deployContract(credentials,
-				roleAddress);
+		CredentialContractServiceImpl credentialContractService = new CredentialContractServiceImpl();
+		TransactionResp<List<DeployContractData>> credentialResp = credentialContractService.deployContract(credentials, voteAddress);
 		if (!credentialResp.checkSuccess()) {
 			log.debug("deploy error.error:{}",credentialResp.getErrMsg());
 			return BaseResp.build(credentialResp.getCode(), credentialResp.getErrMsg(), deployContractDatas);
 		}
 		deployContractDatas.addAll(credentialResp.getData());
 
-		RoleContractServiceImpl roleContractService = new RoleContractServiceImpl();
-		PidConfig.setROLE_CONTRACT_ADDRESS(roleAddress);
-		roleContractService.reloadAddress(new InitContractData(privateKey), ContractNameValues.ROLE);
-		string string = new string(authorityResp.getData().get(1).getContractAddress());
-		TransactionResp<Boolean> resp= roleContractService.setAuthorityContractAddr(string);
-		if(resp.checkFail()) {
-			log.debug("setAuthorityContractAddr error.error:{}",resp.getErrMsg());
-			return BaseResp.build(resp.getCode(), resp.getErrMsg(), deployContractDatas);
-		}
-		log.info("setAuthorityContractAddr success. resp:{}",JSONObject.toJSONString(resp));
 		return BaseResp.buildSuccess(deployContractDatas);
 	}
 
-	public static void exportDeployContractData(String privateKey, String adminAddress) {
+	public static void exportDeployContractData(String privateKey, String adminAddress, String serviceUrl) {
 		log.debug("begin deploy.");
-		BaseResp<List<DeployContractData>> deBaseResp = deployAllContract(privateKey, adminAddress);
+		BaseResp<List<DeployContractData>> deBaseResp = deployAllContract(privateKey, adminAddress, serviceUrl);
 		if (deBaseResp.checkSuccess()) {
 			FileOutputStream outSTr = null;
 			BufferedOutputStream Buff = null;
@@ -191,25 +143,13 @@ public class DeployContract {
 						write.append("contract.pid.address=");
 						PropertyUtils.setProperty(PidConfig.getPidcontractname(), deployContractData.getContractAddress());
 						break;
-					case ROLE:
+					case VOTE:
 						write.append("contract.role.address=");
-						PropertyUtils.setProperty(PidConfig.getRolecontractname(), deployContractData.getContractAddress());
+						PropertyUtils.setProperty(PidConfig.getVotecontractname(), deployContractData.getContractAddress());
 						break;
-					case AUTHORITY_CONTROLLER:
-						write.append("contract.authoritycontroller.address=");
-						PropertyUtils.setProperty(PidConfig.getAuthoritycontrollercontractname(), deployContractData.getContractAddress());
-						break;
-					case AUTHORITY_DATA:
-						write.append("contract.authoritydata.address=");
-						PropertyUtils.setProperty(PidConfig.getAuthoritydatacontractname(), deployContractData.getContractAddress());
-						break;
-					case PCT_CONTROLLER:
-						write.append("contract.pctcontroller.address=");
-						PropertyUtils.setProperty(PidConfig.getPctcontrollercontractname(), deployContractData.getContractAddress());
-						break;
-					case PCT_DATA:
+					case PCT:
 						write.append("contract.pctdata.address=");
-						PropertyUtils.setProperty(PidConfig.getPctdatacontractname(), deployContractData.getContractAddress());
+						PropertyUtils.setProperty(PidConfig.getPctcontractname(), deployContractData.getContractAddress());
 						break;
 					case CREDENTIAL:
 						write.append("contract.credential.address=");
@@ -241,9 +181,9 @@ public class DeployContract {
 	}
 	
 	
-	public static BaseResp<List<DeployContractData>>  deployContractData(String privateKey, String adminAddress) {
+	public static BaseResp<List<DeployContractData>>  deployContractData(String privateKey, String adminAddress, String serviceUrl) {
 		log.debug("begin deploy.");
-		BaseResp<List<DeployContractData>> deBaseResp = deployAllContract(privateKey, adminAddress);
+		BaseResp<List<DeployContractData>> deBaseResp = deployAllContract(privateKey, adminAddress, serviceUrl);
 		if (deBaseResp.checkSuccess()) {
 			ReloadClient.deployContractData(deBaseResp.getData());
 			ContractService.init();

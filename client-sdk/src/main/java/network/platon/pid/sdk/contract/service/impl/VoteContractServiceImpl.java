@@ -157,8 +157,9 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public BaseResp<GetAllProposalIdResp> getAllProposalId(){
-        List<String> result = null;
+        List result = null;
         try {
             result = this.getVoteContract().getAllProposalId().send();
         } catch (Exception e) {
@@ -176,6 +177,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public BaseResp<GetProposalIdResp> getProposalId(BigInteger blockNo){
         List<String> result = null;
         try {
@@ -222,11 +224,14 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
         return BaseResp.buildSuccess(resp);
     }
 
-	@Override
-	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String contractAddress) {
-		String string = new String(contractAddress);
+	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String adminAddress, String serviceUrl) {
 		try {
 			Vote vote = Vote.deploy(getWeb3j(), credentials, gasProvider).send();
+            TransactionReceipt receipt = vote.initialize(adminAddress, serviceUrl).send();
+            if(!receipt.isStatusOK()){
+                log.error("deployContract VoteContract error");
+                return TransactionResp.build(RetEnum.RET_DEPLOY_CONTRACT_ERROR, "deployContract VoteContract error");
+            }
             String voteTransHash = "";
             Optional<TransactionReceipt> value = vote.getTransactionReceipt();
             if(value.isPresent()){
@@ -238,7 +243,7 @@ public class VoteContractServiceImpl extends ContractService implements VoteCont
 			List<DeployContractData> lists = Arrays.asList(voteContractData);
 			return TransactionResp.buildSuccess(lists);
 		} catch (Exception e) {
-			log.error("deployContract CredentialContract error", e);
+			log.error("deployContract VoteContract error", e);
 			return TransactionResp.build(RetEnum.RET_DEPLOY_CONTRACT_ERROR, e.getMessage());
 		}
 	}

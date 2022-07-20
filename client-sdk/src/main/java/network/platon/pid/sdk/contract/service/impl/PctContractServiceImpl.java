@@ -75,12 +75,14 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 		}
 	}
 
-	@Override
-	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String contractAddress) {
-		String string = new String(contractAddress);
+	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String voteContractAddress) {
 		try {
-			Pct pct = Pct.deploy(getWeb3j(), credentials, gasProvider)
-					.send();
+			Pct pct = Pct.deploy(getWeb3j(), credentials, gasProvider).send();
+			TransactionReceipt receipt = pct.initialize(voteContractAddress).send();
+			if(!receipt.isStatusOK()){
+				log.error("deployContract PctContract error");
+				return TransactionResp.build(RetEnum.RET_DEPLOY_CONTRACT_ERROR, "deployContract PctContract error");
+			}
 			Optional<TransactionReceipt> value = pct.getTransactionReceipt();
 			String pctTransHash = "";
 			if(value.isPresent()){
@@ -91,7 +93,7 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 			List<DeployContractData> lists = Arrays.asList(pctContractData);
 			return TransactionResp.buildSuccess(lists);
 		} catch (Exception e) {
-			log.error("deployContract CredentialContract error", e);
+			log.error("deployContract PctContract error", e);
 			return TransactionResp.build(RetEnum.RET_DEPLOY_CONTRACT_ERROR, e.getMessage());
 		}
 	}

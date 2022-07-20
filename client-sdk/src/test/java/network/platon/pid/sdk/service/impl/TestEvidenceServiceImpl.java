@@ -69,9 +69,6 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
-		// Add an authority issuer
-		testCreateAuth(issuer);
-
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
 
@@ -94,9 +91,6 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
-
-		// Add an authority issuer
-		testCreateAuth(issuer);
 
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
@@ -122,9 +116,6 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
-
-		// Add an authority issuer
-		testCreateAuth(issuer);
 
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
@@ -157,9 +148,6 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
-		// Add an authority issuer
-		testCreateAuth(issuer);
-
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
 
@@ -189,9 +177,6 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
-
-		// Add an authority issuer
-		testCreateAuth(issuer);
 
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
@@ -268,7 +253,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 			String credentialType = "VerifiableCredential";
 
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-					.issuer(issuer).pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+					.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
 					.type(credentialType).build();
 			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient().createCredential(req);
 			if (resp.checkSuccess())
@@ -311,28 +296,8 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		return createPidResp.getData().getPid();
 	}
 
-	private void testCreateAuth(String pid) throws Exception {
-		AuthorityInfo authorityInfo = new AuthorityInfo();
-		authorityInfo.setPid(pid);
-		authorityInfo.setName("Authority Issuer" + System.currentTimeMillis());
-
-		authorityInfo.setCreateTime(DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp()));
-		authorityInfo.setAccumulate(BigInteger.valueOf(0));
-		authorityInfo.setExtra(new HashMap<String, Object>());
-
-		SetAuthorityReq req = SetAuthorityReq.builder().privateKey(adminPrivateKey).authority(authorityInfo).build();
-
-		BaseResp<SetAuthorityResp> createAuthResp = PClient.createAgencyClient().addAuthorityIssuer(req);
-		if (createAuthResp.checkFail()) {
-			String msg = JSONObject.toJSONString(createAuthResp);
-			logger.error("Add authority issuer error,error msg:{}", msg);
-
-			throw new Exception(msg);
-		}
-	}
-
 	private String testCreatePct(String pid, String privateKey, String pctJson, Integer type) throws Exception {
-		CreatePctReq req = CreatePctReq.builder().pid(pid).pctjson(pctJson).build();
+		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).build();
 		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(privateKey)).registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);

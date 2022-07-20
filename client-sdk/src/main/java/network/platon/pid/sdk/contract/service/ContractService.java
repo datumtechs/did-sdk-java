@@ -151,6 +151,4 @@ public abstract class ContractService {
 		}
 		return credentialContract;
 	}
-
-	public abstract TransactionResp<List<DeployContractData>> deployContract(Credentials credentials,String contractAddress);
 }

@@ -40,10 +40,14 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
         return new CredentialContractServiceImpl();
     }
 	
-	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String roleContractAddress) {
-		String string = new String(roleContractAddress);
+	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String voteContractAddress) {
 		try {
 			Credential credentialContract = Credential.deploy(getWeb3j(), credentials, gasProvider).send();
+			TransactionReceipt receipt = credentialContract.initialize(voteContractAddress).send();
+			if(!receipt.isStatusOK()){
+				log.error("deployContract CredentialContract error");
+				return TransactionResp.build(RetEnum.RET_DEPLOY_CONTRACT_ERROR, "deployContract CredentialContract error");
+			}
 			String contractAddress = credentialContract.getContractAddress();
 			String transHash = "";
 			Optional<TransactionReceipt> value = credentialContract.getTransactionReceipt();

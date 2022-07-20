@@ -18,15 +18,13 @@ public class DepolyContractTest extends BaseTest {
 	@Test
 	public void test_depolyAllContract() {
 		String adminAddress = PidUtils.convertPidToAddressStr(adminPid);
-		resp = DeployContract.deployAllContract(adminPrivateKey, adminAddress);
+		resp = DeployContract.deployAllContract(adminPrivateKey, adminAddress, adminServiceUrl);
 		assertTrue(resp.checkSuccess());
 	}
 
 	@Test
 	public void test_exportDeployContractData() {
 		String adminAddress = PidUtils.convertPidToAddressStr(adminPid);
-		DeployContract.exportDeployContractData(adminPrivateKey, adminAddress);
-		System.out.println(PidConfig.getROLE_CONTRACT_ADDRESS());
-		assertFalse(PidUtils.generateZeroAddr().equals(PidConfig.getROLE_CONTRACT_ADDRESS()));
+		DeployContract.exportDeployContractData(adminPrivateKey, adminAddress, adminServiceUrl);
 	}
 }

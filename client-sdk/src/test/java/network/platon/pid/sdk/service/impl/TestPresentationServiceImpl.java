@@ -59,24 +59,8 @@ public class TestPresentationServiceImpl extends BaseTest{
 		CreatePidReq createPidReq = CreatePidReq.builder().privateKey(adminPrivateKey).build();
 		pidService.createPid(createPidReq);
 
-		AuthorityInfo authorityInfo = new AuthorityInfo();
-		authorityInfo.setPid(adminPid);
-
-		String authorityname = "Gavin Issuer" + RandomStringUtils.randomAlphanumeric(10);
-		authorityInfo.setName(authorityname);
-
-		authorityInfo.setCreateTime(DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp()));
-		authorityInfo.setAccumulate(BigInteger.valueOf(0));
-		authorityInfo.setExtra(new HashMap<String, Object>());
-		SetAuthorityReq addAuthorityReq = SetAuthorityReq.builder()
-				.privateKey(adminPrivateKey)
-				.authority(authorityInfo)
-				.build();
-		agencyService.addAuthorityIssuer(addAuthorityReq);
-
 		String pctJson = "{\"properties\": { \"name\": { \"type\": \"string\" }, \"no\": { \"type\": \"string\" }, \"data\": { \"type\": \"string\" }}}";
 		CreatePctReq createPctReq = CreatePctReq.builder()
-				.pid(adminPid)
 				.pctjson(pctJson)
 				.build();
 		BaseResp<CreatePctResp> createPctRespBaseResp = pctService.registerPct(createPctReq);
@@ -93,7 +77,7 @@ public class TestPresentationServiceImpl extends BaseTest{
 		String credentialType = "VerifiableCredential";
 
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-				.issuer(adminPid).pctId(createPctRespBaseResp.getData().getPctId()).pid(adminPid)
+				.pctId(createPctRespBaseResp.getData().getPctId()).pid(adminPid)
 				.privateKey(adminPrivateKey).publicKeyId(adminPublicKeyId)
 				.type(credentialType).build();
 		BaseResp<CreateCredentialResp> createCredentialRespBaseResp = PClient.createCredentialClient().createCredential(req);

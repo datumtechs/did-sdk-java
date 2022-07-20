@@ -26,14 +26,9 @@ public class TestPctServiceImpl extends BaseTest {
             failedResult(createPidResp);
         }
         String pid = createPidResp.getData().getPid();
-        BaseResp<SetAuthorityResp> setAuthorityRespBaseResp = this.addAuthorityByPid(pid);
-        if (setAuthorityRespBaseResp.checkFail()) {
-            failedResult(setAuthorityRespBaseResp);
-        }
         ((PctServiceImpl)pctService).reloadContractData(new InitContractData(createPidResp.getData().getPrivateKey()));
         String pctJson = "{\"properties\": { \"name\": { \"type\": \"string\" }, \"no\": { \"type\": \"string\" }, \"data\": { \"type\": \"string\" }}}";
         CreatePctReq req = CreatePctReq.builder()
-                .pid(pid)
                 .pctjson(pctJson)
                 .build();
 
@@ -62,7 +57,6 @@ public class TestPctServiceImpl extends BaseTest {
         createPctResult res = createPct();
         okResult(res.getCreatePctResp());
         QueryPctJsonListReq issuer = QueryPctJsonListReq.of(res.getIssuer());
-        okResult(pctService.queryPctIdsByIssuer(issuer));
     }
 
 

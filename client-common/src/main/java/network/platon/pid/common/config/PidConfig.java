@@ -61,6 +61,13 @@ public class PidConfig {
 	
 	private final static String ContractPrivateName = "platon.web3j.contractPrivateKey";
 
+	private static String ADMIN_ADDRESS;
+
+	private final static String AdminAddressName = "platon.web3j.adminAddress";
+
+	private static String ADMIN_SERVICE_URL;
+
+	private final static String AdminServiceUrlName = "platon.web3j.adminServiceUrl";
 	
 	static {
 		load();
@@ -93,6 +100,9 @@ public class PidConfig {
 
 		CHAIN_ID = Long.valueOf(PropertyUtils.getProperty(ChainIdName,"120"));
 		CONTRACT_PRIVATEKEY = PropertyUtils.getProperty(ContractPrivateName,"");
+
+		ADMIN_ADDRESS = PropertyUtils.getProperty(AdminAddressName,"");
+		ADMIN_SERVICE_URL = PropertyUtils.getProperty(AdminServiceUrlName,"");
 	}
 	
 	public static Web3jProtocolEnum getWeb3jProtocolEnum() {
@@ -175,6 +185,23 @@ public class PidConfig {
 		CHAIN_ID = cHAIN_ID;
 	}
 
+	public static String getADMIN_ADDRESS() {
+		return ADMIN_ADDRESS;
+	}
+
+	public static void setADMIN_ADDRESS(String aDMIN_ADDRESS) {
+		ADMIN_ADDRESS = aDMIN_ADDRESS;
+	}
+
+	public static String getADMIN_SERVICE_URL() {
+		return ADMIN_SERVICE_URL;
+	}
+
+	public static void setADMIN_SERVICE_URL(String aDMIN_SERVICE_URL) {
+		ADMIN_SERVICE_URL = aDMIN_SERVICE_URL;
+	}
+
+
 	public static String getCONTRACT_PRIVATEKEY() {
 		return CONTRACT_PRIVATEKEY;
 	}
@@ -225,5 +252,13 @@ public class PidConfig {
 
 	public static String getContractprivatename() {
 		return ContractPrivateName;
+	}
+
+	public static String getAdminAddressName() {
+		return AdminAddressName;
+	}
+
+	public static String getAdminServiceUrlName() {
+		return AdminServiceUrlName;
 	}
 }

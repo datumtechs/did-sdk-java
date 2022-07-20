@@ -156,7 +156,6 @@ public class PidUtils {
 
 	public static boolean verifyChangeDocumentStatusArg(ChangeDocumentStatusReq req) {
 		return null != req
-				&& StringUtils.isNotBlank(req.getPid())
 				&& StringUtils.isNotBlank(req.getPrivateKey())
 				&& isPrivateKeyValid(req.getPrivateKey());
 	}
@@ -206,18 +205,6 @@ public class PidUtils {
 			pubKeyMap.put(pubKey.getPublicKeyHex(), pubKey.getId());
 			doc.getPublicKey().add(pk);
 
-		}
-
-		List<DocumentAuthData> authDataList = data.getAuthentication();
-
-		// assemble authentiacation array
-		for (DocumentAuthData authData : authDataList) {
-			if (StringUtils.equals(PidConst.DocumentAttrStatus.PID_AUTH_INVALID.getTag()
-					, authData.getStatus())
-					|| !pubKeyMap.containsKey(authData.getPublicKeyHex())) {
-				continue;
-			}
-			doc.getAuthentication().add(pubKeyMap.get(authData.getPublicKeyHex()));
 		}
 
 		List<DocumentServiceData> serList = data.getService();

@@ -64,6 +64,7 @@ public class BaseTest {
 
     protected String adminPrivateKey;
     protected String adminAddress;
+    protected String adminServiceUrl;
     protected String adminPid;
     protected String adminPublicKeyId;
 
@@ -84,9 +85,15 @@ public class BaseTest {
         adminPublicKeyId = adminPid + "#keys-1";
         log.debug("adminPublicKeyId:{}", adminPublicKeyId);
 
+        adminAddress = PidConfig.getADMIN_ADDRESS();
+        log.debug("adminAddress:{}", adminAddress);
+
+        adminServiceUrl = PidConfig.getADMIN_SERVICE_URL();
+        log.debug("adminServiceUrl:{}", adminServiceUrl);
+
         if (deployFlag == 0) {
             log.debug("Deploy contract start...");
-            BaseResp<List<DeployContractData>> response = DeployContract.deployAllContract(adminPrivateKey, adminAddress);
+            BaseResp<List<DeployContractData>> response = DeployContract.deployAllContract(adminPrivateKey, adminAddress, adminServiceUrl);
             log.debug("Deploy contract result code:{}", response.getCode());
             if (response.checkSuccess()) {
                 try {
@@ -96,25 +103,13 @@ public class BaseTest {
                                 PropertyUtils.setProperty(PidConfig.getPidcontractname(), deployContractData.getContractAddress());
                                 log.debug("PidContract address:{}", deployContractData.getContractAddress());
                                 break;
-                            case ROLE:
-                                PropertyUtils.setProperty(PidConfig.getRolecontractname(), deployContractData.getContractAddress());
-                                log.debug("RoleContract address:{}", deployContractData.getContractAddress());
+                            case VOTE:
+                                PropertyUtils.setProperty(PidConfig.getVotecontractname(), deployContractData.getContractAddress());
+                                log.debug("VoteContract address:{}", deployContractData.getContractAddress());
                                 break;
-                            case AUTHORITY_CONTROLLER:
-                                PropertyUtils.setProperty(PidConfig.getAuthoritycontrollercontractname(), deployContractData.getContractAddress());
-                                log.debug("AuthorityController address:{}", deployContractData.getContractAddress());
-                                break;
-                            case AUTHORITY_DATA:
-                                PropertyUtils.setProperty(PidConfig.getAuthoritydatacontractname(), deployContractData.getContractAddress());
-                                log.debug("AuthorityData address:{}",deployContractData.getContractAddress());
-                                break;
-                            case PCT_CONTROLLER:
-                                PropertyUtils.setProperty(PidConfig.getPctcontrollercontractname(), deployContractData.getContractAddress());
-                                log.debug("PctController address:{}",deployContractData.getContractAddress());
-                                break;
-                            case PCT_DATA:
-                                PropertyUtils.setProperty(PidConfig.getPctdatacontractname(), deployContractData.getContractAddress());
-                                log.debug("PctData address:{}",deployContractData.getContractAddress());
+                            case PCT:
+                                PropertyUtils.setProperty(PidConfig.getPctcontractname(), deployContractData.getContractAddress());
+                                log.debug("Pct address:{}",deployContractData.getContractAddress());
                                 break;
                             case CREDENTIAL:
                                 PropertyUtils.setProperty(PidConfig.getCredentialcontractname(), deployContractData.getContractAddress());
@@ -202,12 +197,11 @@ public class BaseTest {
         claim.put("no", "12345");
         claim.put("data", "456");
         String context = "1";
-        String issuer = adminPid;
         String pctId = "1000";
         String publicKeyId = "did:pid:lax1uqug0zq7rcxddndleq4ux2ft3tv6dqljphydrl#keys-1";
         String type = "VerifiableCredential";
         CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(new Date(1691863929).getTime())
-                .issuer(issuer).pctId(pctId).pid(adminPid).privateKey(adminPrivateKey).publicKeyId(publicKeyId)
+                .pctId(pctId).pid(adminPid).privateKey(adminPrivateKey).publicKeyId(publicKeyId)
                 .type(type).build();
         resp = credentialService.createCredential(req);
         if (resp.checkFail()) {
@@ -259,26 +253,6 @@ public class BaseTest {
         String privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
         CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).build();
         return pidService.createPid(req);
-    }
-
-    protected BaseResp<SetAuthorityResp> addAuthorityByPid(String pid) {
-
-        AuthorityInfo authorityInfo = new AuthorityInfo();
-        authorityInfo.setPid(pid);
-
-        String authorityname = "Gavin Issuer" + RandomStringUtils.randomAlphanumeric(10);
-        authorityInfo.setName(authorityname);
-
-        authorityInfo.setCreateTime(DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp()));
-        authorityInfo.setAccumulate(BigInteger.valueOf(0));
-        authorityInfo.setExtra(new HashMap<String, Object>());
-
-        SetAuthorityReq addAuthorityReq = SetAuthorityReq.builder()
-                .privateKey(adminPrivateKey)
-                .authority(authorityInfo)
-                .build();
-
-        return agencyService.addAuthorityIssuer(addAuthorityReq);
     }
 
 }

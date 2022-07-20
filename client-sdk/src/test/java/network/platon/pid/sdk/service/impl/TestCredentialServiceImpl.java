@@ -73,9 +73,6 @@ public class TestCredentialServiceImpl extends BaseTest {
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
-		// Add an authority issuer
-		testCreateAuth(issuer);
-
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
 
@@ -90,7 +87,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		String credentialType = "VerifiableCredential";
 
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-				.issuer(issuer).pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+				.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
 				.type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 
@@ -105,9 +102,6 @@ public class TestCredentialServiceImpl extends BaseTest {
 		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
-
-		// Add an authority issuer
-		testCreateAuth(issuer);
 
 		// Create pct data in PlatON
 		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
@@ -124,7 +118,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		// 1.valid claim is null
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(null).context(context).expirationDate(expirationDate)
-				.issuer(issuer).pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
+				.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
@@ -137,7 +131,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		// resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 3.valid expirationDate is 0
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(0L).issuer(issuer).pctId(pctId)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(0L).pctId(pctId)
 				.pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
@@ -150,32 +144,32 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		// 5.valid issuer format error
 		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-				.issuer("11111111111111111111111111111111111111111111111111").pctId(pctId).pid(pid).privateKey(issuerPriKey)
+				.pctId(pctId).pid(pid).privateKey(issuerPriKey)
 				.publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 6.valid issuer is not exists
 		String issuer2 = PidUtils.generatePid(Numeric.toHexStringWithPrefix(Keys.createEcKeyPair().getPublicKey()));
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer2)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_PID_IDENTITY_NOTEXIST.getCode()));
 
 		// 7.valid pctId is too long
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(String.valueOf(Long.MAX_VALUE)).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_PCT_QUERY_BY_ID_ERROR.getCode()));
 
 		// 8.valid pctId is not exists
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId("11223344").pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_PCT_QUERY_JSON_NOT_FOUND_ERROR.getCode()));
 
 		// 9.valid pid format error
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid("11111111111111111111111111111111111111111111111111").privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
 				.type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
@@ -183,25 +177,25 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		// 10.valid pid is not exists
 		String pid2 = PidUtils.generatePid(Numeric.toHexStringWithPrefix(Keys.createEcKeyPair().getPublicKey()));
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid(pid2).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_CREDENTIAL_PID_NOT_FOUND.getCode()));
 
 		// 11.valid privateKey is empty
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid(pid).privateKey("").publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 12.valid privateKey format error
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid(pid).privateKey(issuerPriKey + "ssss").publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 13.valid issuerPubKeyId is not exists
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(pid2 + "#keys-1").type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_CREDENTIAL_PUBLICKEY_NOT_AUTH.getCode()));
@@ -215,7 +209,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		// resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 15.success
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkSuccess());
@@ -311,9 +305,6 @@ public class TestCredentialServiceImpl extends BaseTest {
 			String issuer = testCreatePid(issuerPriKey);
 			String issuerPubKeyId = issuer + "#keys-1";
 
-			// Add an authority issuer
-			testCreateAuth(issuer);
-
 			// Create pct data in PlatON
 			String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
 
@@ -328,7 +319,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 			String credentialType = "VerifiableCredential";
 
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-					.issuer(issuer).pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+					.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
 					.type(credentialType).build();
 			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient().createCredential(req);
 			if (resp.checkSuccess()) return resp.getData().getCredential();
@@ -376,28 +367,9 @@ public class TestCredentialServiceImpl extends BaseTest {
 		return createPidResp.getData().getPid();
 	}
 
-	private void testCreateAuth(String pid) throws Exception {
-		AuthorityInfo authorityInfo = new AuthorityInfo();
-		authorityInfo.setPid(pid);
-		authorityInfo.setName("Authority Issuer" + System.currentTimeMillis());
-
-		authorityInfo.setCreateTime(DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp()));
-		authorityInfo.setAccumulate(BigInteger.valueOf(0));
-		authorityInfo.setExtra(new HashMap<String, Object>());
-
-		SetAuthorityReq req = SetAuthorityReq.builder().privateKey(adminPrivateKey).authority(authorityInfo).build();
-
-		BaseResp<SetAuthorityResp> createAuthResp = PClient.createAgencyClient().addAuthorityIssuer(req);
-		if (createAuthResp.checkFail()) {
-			String msg = JSONObject.toJSONString(createAuthResp);
-			logger.error("Add authority issuer error,error msg:{}", msg);
-
-			throw new Exception(msg);
-		}
-	}
 
 	private String testCreatePct(String pid, String privateKey, String pctJson, Integer type) throws Exception {
-		CreatePctReq req = CreatePctReq.builder().pid(pid).pctjson(pctJson).build();
+		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).build();
 		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(privateKey)).registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);

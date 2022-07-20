@@ -446,9 +446,7 @@ public class PidContracServiceImpl extends ContractService implements PidContrac
 	}
 
 
-	@Override
-	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials, String contractAddress) {
-		String string = new String(contractAddress);
+	public TransactionResp<List<DeployContractData>> deployContract(Credentials credentials) {
 		try {
 			Pid pidContract = Pid.deploy(getWeb3j(), credentials, gasProvider).send();
 			Optional<TransactionReceipt> value = pidContract.getTransactionReceipt();

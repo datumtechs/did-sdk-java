@@ -37,24 +37,13 @@ public class VerifyInputDataUtils {
 		String publicKeyHex = null;
 		for(DocumentPubKeyData publicKey:documentData.getPublicKey()) {
 			if(publicKey.getId().equals(publicKeyId)) {
-				if(PidConst.DocumentAttrStatus.PID_AUTH_INVALID.getTag().equals(publicKey.getStatus())) {
+				if(PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID.getTag().equals(publicKey.getStatus())) {
 					return RetEnum.RET_CREDENTIAL_PUBLICKEY_STATUS_INVAILD;
 				}
 				publicKeyHex = publicKey.getPublicKeyHex();
 			}
 		}
-		Boolean isAuth = false; 
-		for(DocumentAuthData authData:documentData.getAuthentication()) {
-			if(authData.getPublicKeyHex().equals(publicKeyHex)) {
-				if(PidConst.DocumentAttrStatus.PID_AUTH_INVALID.getTag().equals(authData.getStatus())) {
-					return RetEnum.RET_CREDENTIAL_AUTH_STATUS_INVAILD;
-				}
-				isAuth = true;
-			}
-		}
-		if(!isAuth) {
-			return RetEnum.RET_CREDENTIAL_PUBLICKEY_NOT_AUTH;
-		}
+
 		if(StringUtils.isBlank(publicKeyHex)) {
 			log.error(" pid document  not found publicKeyId:{}",publicKeyId);
 			return RetEnum.RET_CREDENTIAL_MATCH_PUBLICKEYID_ERROR;

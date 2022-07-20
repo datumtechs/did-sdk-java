@@ -148,8 +148,6 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -176,8 +174,6 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -206,8 +202,6 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -216,7 +210,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation publicKey
 		RevocationPublicKeyReq revocationPublicKeyReq = RevocationPublicKeyReq.builder()
-				.pid(req.getPid())
 				.privateKey(req.getPrivateKey())
 				.publicKey(publicKey2)
 				.build();
@@ -240,7 +233,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.status(PidConst.DocumentStatus.DEACTIVATION)
 				.build();
@@ -258,8 +250,6 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -292,11 +282,8 @@ public class TestPidServiceImpl extends BaseTest{
 
 
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(controller)
 				.privateKey(result.getPrivateKey())
 				.publicKey(result.getPublicKey())
-				.status(PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID)
 				.type(PidConst.PublicKeyType.RSA)
 				.build();
 		okResult(pidService.updatePublicKey(req));
@@ -323,11 +310,8 @@ public class TestPidServiceImpl extends BaseTest{
 		String controller = PidUtils.generatePid(publicKey2);
 
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(controller)
 				.privateKey(result.getPrivateKey())
 				.publicKey(result.getPublicKey())
-				.status(PidConst.DocumentAttrStatus.PID_PUBLICKEY_INVALID)
 				.type(PidConst.PublicKeyType.RSA)
 				.build();
 		failedResult(pidService.updatePublicKey(req));
@@ -355,11 +339,8 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// update the not exist public Key
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(controller)
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID)
 				.type(PidConst.PublicKeyType.RSA)
 				.build();
 		failedResult(pidService.updatePublicKey(req));
@@ -385,8 +366,6 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -395,22 +374,15 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation publicKey
 		RevocationPublicKeyReq revocationPublicKeyReq = RevocationPublicKeyReq.builder()
-				.pid(result.getPid())
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.build();
 
 		okResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
-		// update the revocation publicKey
-		String controller = PidUtils.generatePid(publicKey2);
-
 		UpdatePublicKeyReq updatePublicKeyReq = UpdatePublicKeyReq.builder()
-				.pid(result.getPid())
-				.controller(controller)
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID)
 				.type(PidConst.PublicKeyType.RSA)
 				.build();
 		failedResult(pidService.updatePublicKey(updatePublicKeyReq));
@@ -440,8 +412,6 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
-				.pid(pid)
-				.controller(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -451,23 +421,15 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentStatus.DEACTIVATION)
 				.build();
 
 		okResult(pidService.changeDocumentStatus(changeDocumentStatusReq));
 
-
-		// update the revocation publicKey
-		String controller = PidUtils.generatePid(publicKey2);
-
 		UpdatePublicKeyReq updatePublicKeyReq = UpdatePublicKeyReq.builder()
-				.pid(pid)
-				.controller(controller)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_PUBLICKEY_VALID)
 				.type(PidConst.PublicKeyType.RSA)
 				.build();
 		failedResult(pidService.updatePublicKey(updatePublicKeyReq));
@@ -497,8 +459,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// add a public Key
 		AddPublicKeyReq addPublicKeyReq= AddPublicKeyReq.builder()
-				.pid(pid)
-				.controller(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -507,7 +467,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revacation the public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
@@ -532,7 +491,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revacation the last public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey)
 				.build();
@@ -564,7 +522,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revacation the not exist public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
@@ -596,8 +553,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// add a public Key
 		AddPublicKeyReq addPublicKeyReq= AddPublicKeyReq.builder()
-				.pid(pid)
-				.controller(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -606,7 +561,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revacation the public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
@@ -639,8 +593,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// add a public Key
 		AddPublicKeyReq addPublicKeyReq= AddPublicKeyReq.builder()
-				.pid(pid)
-				.controller(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
@@ -650,7 +602,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentStatus.DEACTIVATION)
 				.build();
@@ -659,370 +610,10 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revacation the public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
-	}
-
-	@Test
-	public void test_setAuthentication() {
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-
-		SetPidAuthReq req= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_VALID)
-				.build();
-		okResult(pidService.setAuthentication(req));
-	}
-
-
-
-
-
-	@Test
-	public void test_setAuthenticationWithInvalid() {
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-
-		SetPidAuthReq req= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-		failedResult(pidService.setAuthentication(req));
-	}
-
-
-	@Test
-	public void test_setAuthenticationByRevocationPublicKey() {
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-
-
-		// add a public Key
-		AddPublicKeyReq addPublicKeyReq= AddPublicKeyReq.builder()
-				.pid(pid)
-				.controller(pid)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.type(PidConst.PublicKeyType.SECP256K1)
-				.build();
-		okResult(pidService.addPublicKey(addPublicKeyReq));
-
-		// revocation the public key
-		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
-				.pid(pid)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.build();
-		okResult(pidService.revocationPublicKey(revocationPublicKeyReq));
-
-
-		// set authentication by revocation public key
-		SetPidAuthReq req= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-		failedResult(pidService.setAuthentication(req));
-	}
-
-	@Test
-	public void test_setAuthenticationToRevocationDoc() {
-
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-
-
-
-		// revocation document
-		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(pid)
-				.privateKey(privateKey)
-				.status(PidConst.DocumentStatus.DEACTIVATION)
-				.build();
-
-		okResult(pidService.changeDocumentStatus(changeDocumentStatusReq));
-
-
-		// set authentication to revocation document
-		SetPidAuthReq req= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-		failedResult(pidService.setAuthentication(req));
-
-	}
-
-
-	@Test
-	public void test_revocationAuthentication() {
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-		// add an authentication
-		SetPidAuthReq addAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_VALID)
-				.build();
-		okResult(pidService.setAuthentication(addAuthenticationReq));
-
-		// revocation the authentication
-		SetPidAuthReq revocationAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-		okResult(pidService.revocationAuthentication(revocationAuthenticationReq));
-	}
-
-
-	@Test
-	public void test_revocationAuthenticationRepeat() {
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-		// add an authentication
-		SetPidAuthReq addAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_VALID)
-				.build();
-		okResult(pidService.setAuthentication(addAuthenticationReq));
-
-		// revocation the authentication
-		SetPidAuthReq revocationAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-		okResult(pidService.revocationAuthentication(revocationAuthenticationReq));
-		failedResult(pidService.revocationAuthentication(revocationAuthenticationReq));
-	}
-
-
-	@Test
-	public void test_revocationAuthenticationNoExistPubKey() {
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-		// revocation the authentication
-		SetPidAuthReq revocationAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-
-		failedResult(pidService.revocationAuthentication(revocationAuthenticationReq));
-	}
-
-
-	@Test
-	public void test_revocationAuthenticationToInvalidDoc() {
-
-		createPidResult result = this.createPid();
-		if (null == result) {
-			return;
-		}
-
-
-		String  privateKey = result.getPrivateKey();
-		String publicKey = result.getPublicKey();
-		String pid = PidUtils.generatePid(publicKey);
-
-		ECKeyPair keyPair = null;
-
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return;
-		}
-		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
-
-		// add an authentication
-		SetPidAuthReq addAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_VALID)
-				.build();
-		okResult(pidService.setAuthentication(addAuthenticationReq));
-
-
-		// revocation document
-		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(pid)
-				.privateKey(privateKey)
-				.status(PidConst.DocumentStatus.DEACTIVATION)
-				.build();
-
-		okResult(pidService.changeDocumentStatus(changeDocumentStatusReq));
-
-		// revocation the authentication
-		SetPidAuthReq revocationAuthenticationReq= SetPidAuthReq.builder()
-				.pid(pid)
-				.controller(controller)
-				.privateKey(privateKey)
-				.publicKey(publicKey2)
-				.status(PidConst.DocumentAttrStatus.PID_AUTH_INVALID)
-				.build();
-
-		failedResult(pidService.revocationAuthentication(revocationAuthenticationReq));
 	}
 
 	@Test
@@ -1045,7 +636,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_VALID)
 				.service(svr)
@@ -1073,7 +663,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_INVALID)
 				.service(svr)
@@ -1098,7 +687,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentStatus.DEACTIVATION)
 				.build();
@@ -1112,7 +700,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_INVALID)
 				.service(svr)
@@ -1141,7 +728,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_VALID)
 				.service(svr)
@@ -1174,7 +760,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_VALID)
 				.service(svr)
@@ -1207,7 +792,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_VALID)
 				.service(svr)
@@ -1237,7 +821,6 @@ public class TestPidServiceImpl extends BaseTest{
 		svr.setType("SomeServiceType");
 		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentAttrStatus.PID_SERVICE_VALID)
 				.service(svr)
@@ -1249,7 +832,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentStatus.DEACTIVATION)
 				.build();
@@ -1304,7 +886,6 @@ public class TestPidServiceImpl extends BaseTest{
 
 
 		ChangeDocumentStatusReq req = ChangeDocumentStatusReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentStatus.ACTIVATION)
 				.build();
@@ -1327,11 +908,8 @@ public class TestPidServiceImpl extends BaseTest{
 
 		String  privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
 		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String pid = PidUtils.generatePid(publicKey);
-
 
 		ChangeDocumentStatusReq req = ChangeDocumentStatusReq.builder()
-				.pid(pid)
 				.privateKey(privateKey)
 				.status(PidConst.DocumentStatus.ACTIVATION)
 				.build();
