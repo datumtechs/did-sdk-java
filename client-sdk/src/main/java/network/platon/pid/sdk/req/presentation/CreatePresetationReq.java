@@ -27,7 +27,7 @@ public class CreatePresetationReq extends BaseReq{
     @CustomSize(min = 1)
     private List<Credential> credentials;
 
-	@CustomNotNull
+    @CustomNotNull
     private PidAuthentication authentication;
 
 	@CustomNotNull

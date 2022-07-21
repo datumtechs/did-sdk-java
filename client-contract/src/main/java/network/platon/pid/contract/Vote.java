@@ -415,6 +415,7 @@ public class Vote extends Contract {
                 });
     }
 
+    @SuppressWarnings("unchecked")
     public RemoteCall<Tuple3<List<String>, List<String>, List<BigInteger>>> getAllAuthority() {
         final Function function = new Function(FUNC_GETALLAUTHORITY, 
                 Arrays.<Type>asList(), 
@@ -454,6 +455,7 @@ public class Vote extends Contract {
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);
     }
 
+    @SuppressWarnings("unchecked")
     public RemoteCall<Tuple7<BigInteger, String, String, String, String, BigInteger, List<String>>> getProposal(BigInteger proposalId) {
         final Function function = new Function(FUNC_GETPROPOSAL, 
                 Arrays.<Type>asList(new com.platon.abi.solidity.datatypes.generated.Uint256(proposalId)), 
