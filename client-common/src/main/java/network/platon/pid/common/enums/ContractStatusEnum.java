@@ -1,11 +1,5 @@
 package network.platon.pid.common.enums;
 
-/**
- *  contract Code enum
- *  @file ContractStatusEnum.java
- *  @description 
- *	@author Rongjin Zhang
- */
 public enum ContractStatusEnum {
 
     /** Definition of business error codes*/ // the “C” mean a contract

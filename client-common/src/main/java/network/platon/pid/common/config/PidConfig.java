@@ -1,6 +1,5 @@
 package network.platon.pid.common.config;
 
-
 import com.platon.parameters.NetworkParameters;
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,12 +7,6 @@ import lombok.Data;
 import network.platon.pid.common.enums.Web3jProtocolEnum;
 import network.platon.pid.common.utils.PropertyUtils;
 
-/**
- * config for pid
- * @Auther: wanghengtao
- * @Date: 2022年7月11日
- * @Description:
- */
 @Data
 public class PidConfig {
 	

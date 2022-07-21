@@ -1,11 +1,6 @@
 package network.platon.pid.common.enums;
 
-/**
- *  Ret Code enum
- *  @file RetEnum.java
- *  @description 
- *	@author zhangrj
- */
+
 public enum RetEnum {
 
     /** Definition of business error codes*/

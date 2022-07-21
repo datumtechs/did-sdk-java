@@ -22,13 +22,7 @@ import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.utils.ConvertUtils;
 
-/**
- * Base class for all requests
- * 
- * @Auther: Rongjin Zhang
- * @Date: 2020年6月3日
- * @Description:
- */
+
 @Slf4j
 public abstract class BaseReq {
 

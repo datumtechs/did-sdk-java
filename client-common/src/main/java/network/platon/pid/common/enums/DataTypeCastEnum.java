@@ -1,10 +1,5 @@
 package network.platon.pid.common.enums;
 
-/**
- * @Description: An enum that defines the exception status code for DataTypeCastException
- * @Author: Gavin
- * @Date: 2020-06-05 15:50
- */
 public enum DataTypeCastEnum {
 
     /** Definition of business error codes*/

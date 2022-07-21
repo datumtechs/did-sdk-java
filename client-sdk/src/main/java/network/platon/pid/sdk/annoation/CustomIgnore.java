@@ -6,12 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Determine if the request parameter is null
- * @Auther: Rongjin Zhang
- * @Date: 2020年6月3日
- * @Description:
- */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
