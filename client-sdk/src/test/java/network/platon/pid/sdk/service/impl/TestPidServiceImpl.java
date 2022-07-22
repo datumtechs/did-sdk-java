@@ -28,6 +28,7 @@ public class TestPidServiceImpl extends BaseTest{
 	}
 
 	private createPidResult createPid() {
+
 		ECKeyPair keyPair = null;
 
 		try {

@@ -144,7 +144,7 @@ public class DeployContract {
 						PropertyUtils.setProperty(PidConfig.getPidcontractname(), deployContractData.getContractAddress());
 						break;
 					case VOTE:
-						write.append("contract.role.address=");
+						write.append("contract.vote.address=");
 						PropertyUtils.setProperty(PidConfig.getVotecontractname(), deployContractData.getContractAddress());
 						break;
 					case PCT:

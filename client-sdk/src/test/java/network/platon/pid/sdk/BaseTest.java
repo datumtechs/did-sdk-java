@@ -48,9 +48,12 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class BaseTest {
 
-    protected CredentialService credentialService = new CredentialServiceImpl();
 
-    protected PresentationService presentationService = new PresentationServiceImpl();
+    static {
+        NetworkParameters.init(210309L, "lat");
+    }
+
+    protected CredentialService credentialService = new CredentialServiceImpl();
 
     protected EvidenceService evidenceService = new EvidenceServiceImpl();
 

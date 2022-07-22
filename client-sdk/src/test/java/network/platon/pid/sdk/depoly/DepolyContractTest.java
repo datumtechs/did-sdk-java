@@ -1,19 +1,14 @@
 package network.platon.pid.sdk.depoly;
 
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Before;
+import network.platon.pid.sdk.BaseTest;
+import network.platon.pid.sdk.deploy.DeployContract;
 import network.platon.pid.sdk.utils.PidUtils;
 import org.junit.Test;
 
-import network.platon.pid.common.config.PidConfig;
-import network.platon.pid.sdk.BaseTest;
-import network.platon.pid.sdk.deploy.DeployContract;
+import static org.junit.Assert.assertTrue;
 
 public class DepolyContractTest extends BaseTest {
-
 
 	@Test
 	public void test_depolyAllContract() {
