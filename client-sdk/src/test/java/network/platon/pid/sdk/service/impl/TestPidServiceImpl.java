@@ -5,6 +5,7 @@ import com.platon.crypto.Keys;
 import com.platon.utils.Numeric;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.base.dto.PidService;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.req.pid.*;
@@ -29,25 +30,17 @@ public class TestPidServiceImpl extends BaseTest{
 
 	private createPidResult createPid() {
 
-		ECKeyPair keyPair = null;
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(adminPrivateKey);
+		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+		String pid = PidUtils.generatePid(pidPublicKey);
 
-		try {
-			keyPair = Keys.createEcKeyPair();
-		} catch (Exception e) {
-			log.error("Failed to create EcKeyPair, exception: {}", e);
-			return null;
-		}
-		String privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
-		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String pid = PidUtils.generatePid(publicKey);
-
-		if (!createIdentityByPrivateKey(resp, privateKey)) {
+		if (!createIdentityByPrivateKey(resp, adminPrivateKey)) {
 			return null;
 		}
 
 		createPidResult result = new createPidResult();
-		result.setPrivateKey(privateKey);
-		result.setPublicKey(publicKey);
+		result.setPrivateKey(adminPrivateKey);
+		result.setPublicKey(pidPublicKey);
 		result.setPid(pid);
 		return result;
 	}

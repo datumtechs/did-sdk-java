@@ -14,7 +14,6 @@ import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.config.PidConfig;
 import network.platon.pid.common.enums.RetEnum;
-import network.platon.pid.common.utils.DateUtils;
 import network.platon.pid.common.utils.PropertyUtils;
 import network.platon.pid.contract.client.RetryableClient;
 import network.platon.pid.contract.dto.DeployContractData;
@@ -32,12 +31,10 @@ import network.platon.pid.sdk.resp.pid.CreatePidResp;
 import network.platon.pid.sdk.service.*;
 import network.platon.pid.sdk.service.impl.*;
 import network.platon.pid.sdk.utils.PidUtils;
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +54,7 @@ public class BaseTest {
 
     protected EvidenceService evidenceService = new EvidenceServiceImpl();
 
-    protected VoteService agencyService = new VoteServiceImpl();
+    protected VoteService voteService = new VoteServiceImpl();
 
     protected PctService pctService = new PctServiceImpl();
 
@@ -166,7 +163,7 @@ public class BaseTest {
         try {
             receipt = Transfer.sendFunds(
                             web3j, credentials, address,
-                            BigDecimal.valueOf(80000000), Convert.Unit.PVON)
+                            BigDecimal.valueOf(800000000), Convert.Unit.PVON)
                     .send();
         }catch (Exception e) {
             log.error(

@@ -1,6 +1,7 @@
 package network.platon.pid.sdk.contract.service.impl;
 
 import com.platon.crypto.Credentials;
+import com.platon.parameters.NetworkParameters;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.tuples.generated.Tuple3;
 import com.platon.tuples.generated.Tuple7;
