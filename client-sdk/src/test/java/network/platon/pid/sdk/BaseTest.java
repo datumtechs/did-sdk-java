@@ -152,37 +152,9 @@ public class BaseTest {
 
     public boolean createIdentityByPrivateKey(BaseResp<?> resp, String privateKey) {
         ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
-        RetryableClient retryableClient = new RetryableClient();
-        retryableClient.init();
-        Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
-        Credentials credentials = Credentials.create(PidConfig.getCONTRACT_PRIVATEKEY());
         String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-        String hexAddress = Keys.getAddress(publicKey);
-        String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
-        TransactionReceipt receipt = null;
-        try {
-            receipt = Transfer.sendFunds(
-                            web3j, credentials, address,
-                            BigDecimal.valueOf(800000000), Convert.Unit.PVON)
-                    .send();
-        }catch (Exception e) {
-            log.error(
-                    "Transfer failed, the address: {}, the exception: {}",
-                    address, e
-            );
-            return false;
-        }
 
-        if(!receipt.isStatusOK()){
-            log.error(
-                    "Transfer failed, the address: {}",
-                    address
-            );
-
-            return false;
-        }
-
-        CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).build();
+        CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
         BaseResp<CreatePidResp> createPidResp = pidService.createPid(req);
         resp = createPidResp;
         if (createPidResp.checkFail() && createPidResp.getCode() != RetEnum.RET_PID_IDENTITY_ALREADY_EXIST.getCode()) {

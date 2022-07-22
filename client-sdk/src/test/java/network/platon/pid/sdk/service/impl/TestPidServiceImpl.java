@@ -45,8 +45,6 @@ public class TestPidServiceImpl extends BaseTest{
 		return result;
 	}
 
-
-
 	@Test
 	public void test_createPidByPrivateKey() {
 		createPidResult result = this.createPid();
