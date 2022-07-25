@@ -44,7 +44,7 @@ public class PidEventProcessor {
         topicMap = new HashMap<String, String>();
         // EVENT Name: `PIDAttributeChanged` on Pid
         topicMap.put(
-                PidConst.PID_EVENT_ATTRIBUTE_CHANGE_RLP,
+                PidConst.PID_EVENT_ATTRIBUTE_CHANGE_TOPIC,
                 PidConst.PID_EVENT_ATTRIBUTE_CHANGE_STR
         );
     }
@@ -95,6 +95,11 @@ public class PidEventProcessor {
                     } else {
                     	continue;
                     }
+
+                    if (!StringUtils.equals(receipt.getTo(), Pid.getContractAddress())) {
+                        continue;
+                    }
+
                     List<Log> logs = platonReceipt.getResult().getLogs();
 
                     for (Log log : logs) {
@@ -167,9 +172,7 @@ public class PidEventProcessor {
 
             String address = PidUtils.convertPidToAddressStr(document.getId());
 
-            // the `topic` is already sha3(rlp(topic)) encoded value
-            String pidTopicHash = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(Bech32.addressDecode(address)), 64);
-            if (!StringUtils.equals(pidTopicHash, identity)) {
+            if (!StringUtils.equals(address, identity)) {
                 response.setDecodeEventLogStatus(ContractStatusEnum.C_KEY_NOT_MATCH);
                 return response;
             }
@@ -237,6 +240,13 @@ public class PidEventProcessor {
             if (StringUtils.equals(pub.getPublicKeyHex(), publicKey)) {
                 return;
             }
+
+            String[] valueIdArray = StringUtils.splitByWholeSeparator(pub.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
+
+            if (StringUtils.equals(valueIdArray[1], index)) {
+                return;
+            }
+
         }
         DocumentPubKeyData pubKey = new DocumentPubKeyData();
         pubKey.setId(new StringBuilder()

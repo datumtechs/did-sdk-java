@@ -199,7 +199,6 @@ public class PidUtils {
 			PidPublicKey pk = new PidPublicKey();
 			pk.setId(pubKey.getId());
 			pk.setType(pubKey.getType());
-			pk.setController(pubKey.getController());
 			pk.setPublicKeyHex(pubKey.getPublicKeyHex());
 
 			pubKeyMap.put(pubKey.getPublicKeyHex(), pubKey.getId());

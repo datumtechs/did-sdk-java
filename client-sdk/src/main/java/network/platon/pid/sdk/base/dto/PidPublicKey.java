@@ -17,6 +17,4 @@ public class PidPublicKey {
 	
 	private String publicKeyHex;
 	
-	private String controller;
-	
 }

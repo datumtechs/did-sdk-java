@@ -45,7 +45,6 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class BaseTest {
 
-
     static {
         NetworkParameters.init(210309L, "lat");
     }
@@ -68,7 +67,7 @@ public class BaseTest {
     protected String adminPid;
     protected String adminPublicKeyId;
 
-    protected static int deployFlag = 0;
+    protected static int deployFlag = 1;
 
     @Before
     public void setup() {
@@ -151,8 +150,38 @@ public class BaseTest {
     }
 
     public boolean createIdentityByPrivateKey(BaseResp<?> resp, String privateKey) {
+
         ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
         String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+        String hexAddress = Keys.getAddress(publicKey);
+        String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
+
+        RetryableClient retryableClient = new RetryableClient();
+        retryableClient.init();
+        Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
+        Credentials credentials = Credentials.create(PidConfig.getCONTRACT_PRIVATEKEY());
+        TransactionReceipt receipt = null;
+        try {
+            receipt = Transfer.sendFunds(
+                            web3j, credentials, address,
+                            BigDecimal.valueOf(1), Convert.Unit.KPVON)
+                    .send();
+        }catch (Exception e) {
+            log.error(
+                    "Transfer failed, the address: {}, the exception: {}",
+                    address, e
+            );
+            return false;
+        }
+
+        if(!receipt.isStatusOK()){
+            log.error(
+                    "Transfer failed, the address: {}",
+                    address
+            );
+
+            return false;
+        }
 
         CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
         BaseResp<CreatePidResp> createPidResp = pidService.createPid(req);

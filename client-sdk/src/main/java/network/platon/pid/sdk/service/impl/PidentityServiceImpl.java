@@ -140,13 +140,15 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		int index = req.getIndex();
 		boolean isExist = false;
 		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
+			String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
+			if(index == Integer.parseInt(valueArray[1])){
+				isExist = true;
+				break;
+			}
+
 			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())) {
-				String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(),
-						commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
-				if(index == Integer.parseInt(valueArray[1])){
-					isExist = true;
-					break;
-				}
+				isExist = true;
+				break;
 			}
 		}
 		if (isExist) {
@@ -221,6 +223,7 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
 			String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
 			if (index == Integer.parseInt(valueArray[1])) {
+				pubKeyStatus = pubKey.getStatus();
 				isExist = true;
 				if(StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())){
 					isSame = true;

@@ -9,10 +9,14 @@ import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.base.dto.PidService;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.req.pid.*;
+import network.platon.pid.sdk.resp.BaseResp;
+import network.platon.pid.sdk.resp.pid.QueryPidDocumentDataResp;
 import network.platon.pid.sdk.utils.PidUtils;
 import org.junit.Test;
 import network.platon.pid.sdk.BaseTest;
 import network.platon.pid.sdk.service.PidentityService;
+
+import static network.platon.pid.sdk.constant.PidConst.PID_EVENT_ATTRIBUTE_CHANGE_TOPIC;
 
 
 @Slf4j
@@ -29,18 +33,25 @@ public class TestPidServiceImpl extends BaseTest{
 	}
 
 	private createPidResult createPid() {
+		ECKeyPair keyPair = null;
 
-		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(adminPrivateKey);
-		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
-		String pid = PidUtils.generatePid(pidPublicKey);
+		try {
+			keyPair = Keys.createEcKeyPair();
+		} catch (Exception e) {
+			log.error("Failed to create EcKeyPair, exception: {}", e);
+			return null;
+		}
+		String privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
+		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+		String pid = PidUtils.generatePid(publicKey);
 
-		if (!createIdentityByPrivateKey(resp, adminPrivateKey)) {
+		if (!createIdentityByPrivateKey(resp, privateKey)) {
 			return null;
 		}
 
 		createPidResult result = new createPidResult();
-		result.setPrivateKey(adminPrivateKey);
-		result.setPublicKey(pidPublicKey);
+		result.setPrivateKey(privateKey);
+		result.setPublicKey(publicKey);
 		result.setPid(pid);
 		return result;
 	}
@@ -91,14 +102,15 @@ public class TestPidServiceImpl extends BaseTest{
 
 	@Test
 	public void test_queryPidDocumentData() {
-
 		createPidResult result = this.createPid();
 		if (null == result) {
 			return;
 		}
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		okResult(pidService.queryPidDocumentData(queryPidDocumentReq));
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+
+		okResult(resp);
 	}
 
 	@Test
@@ -138,13 +150,39 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+		String publicKey1 = Numeric.toHexStringWithPrefix( AlgorithmHandler.createEcKeyPair(result.getPrivateKey()).getPublicKey());
 
+		// duplicate public key
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
+				.privateKey(result.getPrivateKey())
+				.publicKey(publicKey1)
+				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
+				.build();
+		failedResult(pidService.addPublicKey(req));
+
+		// duplicate index
+		req= AddPublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(1)
+				.build();
+		failedResult(pidService.addPublicKey(req));
+
+
+		req= AddPublicKeyReq.builder()
+				.privateKey(result.getPrivateKey())
+				.publicKey(publicKey2)
+				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(pidService.addPublicKey(req));
+
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -197,6 +235,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(pidService.addPublicKey(req));
 
@@ -221,8 +260,6 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 
-
-
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
 				.privateKey(result.getPrivateKey())
@@ -245,6 +282,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(1)
 				.build();
 
 		// add publicKey to revocation document
@@ -270,15 +308,18 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
-
 
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
-				.publicKey(result.getPublicKey())
+				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.RSA)
+				.index(1)
 				.build();
 		okResult(pidService.updatePublicKey(req));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -299,14 +340,27 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
 
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
 				.publicKey(result.getPublicKey())
 				.type(PidConst.PublicKeyType.RSA)
+				.index(1)
 				.build();
 		failedResult(pidService.updatePublicKey(req));
+
+		req= UpdatePublicKeyReq.builder()
+				.privateKey(result.getPrivateKey())
+				.publicKey(publicKey2)
+				.type(PidConst.PublicKeyType.RSA)
+				.index(1)
+				.build();
+
+		okResult(pidService.updatePublicKey(req));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -327,13 +381,13 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = PidUtils.generatePid(publicKey2);
 
 		// update the not exist public Key
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.RSA)
+				.index(2)
 				.build();
 		failedResult(pidService.updatePublicKey(req));
 	}
@@ -361,6 +415,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(pidService.addPublicKey(req));
 
@@ -372,12 +427,25 @@ public class TestPidServiceImpl extends BaseTest{
 
 		okResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
+		try {
+			keyPair = Keys.createEcKeyPair();
+		} catch (Exception e) {
+			log.error("Failed to create EcKeyPair, exception: {}", e);
+			return;
+		}
+		String publicKey3 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+
 		UpdatePublicKeyReq updatePublicKeyReq = UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
-				.publicKey(publicKey2)
+				.publicKey(publicKey3)
 				.type(PidConst.PublicKeyType.RSA)
+				.index(2)
 				.build();
 		failedResult(pidService.updatePublicKey(updatePublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -387,7 +455,6 @@ public class TestPidServiceImpl extends BaseTest{
 		if (null == result) {
 			return;
 		}
-
 
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
@@ -407,6 +474,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		// add the publicKey
 		okResult(pidService.addPublicKey(req));
@@ -419,12 +487,25 @@ public class TestPidServiceImpl extends BaseTest{
 
 		okResult(pidService.changeDocumentStatus(changeDocumentStatusReq));
 
+		try {
+			keyPair = Keys.createEcKeyPair();
+		} catch (Exception e) {
+			log.error("Failed to create EcKeyPair, exception: {}", e);
+			return;
+		}
+		String publicKey3 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+
 		UpdatePublicKeyReq updatePublicKeyReq = UpdatePublicKeyReq.builder()
 				.privateKey(privateKey)
-				.publicKey(publicKey2)
+				.publicKey(publicKey3)
 				.type(PidConst.PublicKeyType.RSA)
+				.index(2)
 				.build();
 		failedResult(pidService.updatePublicKey(updatePublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -433,7 +514,6 @@ public class TestPidServiceImpl extends BaseTest{
 		if (null == result) {
 			return;
 		}
-
 
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
@@ -454,6 +534,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(pidService.addPublicKey(addPublicKeyReq));
 
@@ -463,6 +544,10 @@ public class TestPidServiceImpl extends BaseTest{
 				.publicKey(publicKey2)
 				.build();
 		okResult(pidService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -479,14 +564,16 @@ public class TestPidServiceImpl extends BaseTest{
 		String publicKey = result.getPublicKey();
 		String pid = PidUtils.generatePid(publicKey);
 
-
-
 		// revacation the last public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
 				.privateKey(privateKey)
 				.publicKey(publicKey)
 				.build();
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -518,6 +605,10 @@ public class TestPidServiceImpl extends BaseTest{
 				.publicKey(publicKey2)
 				.build();
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -548,6 +639,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(pidService.addPublicKey(addPublicKeyReq));
 
@@ -558,6 +650,10 @@ public class TestPidServiceImpl extends BaseTest{
 				.build();
 		okResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -588,6 +684,7 @@ public class TestPidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(PidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(pidService.addPublicKey(addPublicKeyReq));
 
@@ -606,6 +703,10 @@ public class TestPidServiceImpl extends BaseTest{
 				.publicKey(publicKey2)
 				.build();
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test

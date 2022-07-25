@@ -1,7 +1,9 @@
 package network.platon.pid.sdk.constant;
 
+import com.platon.abi.solidity.EventEncoder;
 import com.platon.rlp.wasm.datatypes.Uint8;
 import com.platon.utils.Numeric;
+import network.platon.pid.contract.Pid;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -9,19 +11,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Storage variable
- * @Auther: Rongjin Zhang
- * @Date: 2020年5月29日
- * @Description:
- */
 public class PidConst {
 
 	public static final String PID_PREFIX = "did:pid:";
 
 	public static final String PID_EVENT_ATTRIBUTE_CHANGE_STR = "PIDAttributeChanged";
-	public static final String PID_EVENT_ATTRIBUTE_CHANGE_RLP = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(
-			PID_EVENT_ATTRIBUTE_CHANGE_STR.getBytes(StandardCharsets.UTF_8)), 64);
+	public static final String PID_EVENT_ATTRIBUTE_CHANGE_TOPIC = EventEncoder.encode(Pid.PIDATTRIBUTECHANGE_EVENT);
 
 	public static final String PLATONE_PID_PATTERN = "did:pid:[a-zA-Z0-9]{42}";
 
@@ -119,7 +114,7 @@ public class PidConst {
 	 * the document attr value member length
 	 */
 	public static final int PID_SERVICE_VALUE_MEM_LEN = 4;
-	public static final int PID_PUBLICKEY_VALUE_MEM_LEN = 5;
+	public static final int PID_PUBLICKEY_VALUE_MEM_LEN = 4;
 	public static final int PID_AUTH_VALUE_MEM_LEN = 3;
 
 
