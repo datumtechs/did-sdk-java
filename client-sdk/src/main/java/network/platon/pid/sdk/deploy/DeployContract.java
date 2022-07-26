@@ -24,13 +24,6 @@ import network.platon.pid.sdk.contract.service.impl.PidContracServiceImpl;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.TransactionResp;
 
-/**
- * Release contract tools
- * 
- * @Auther: Rongjin Zhang
- * @Date: 2020年6月16日
- * @Description:
- */
 @Slf4j
 public class DeployContract {
 

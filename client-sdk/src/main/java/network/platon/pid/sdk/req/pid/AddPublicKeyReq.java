@@ -3,10 +3,7 @@ package network.platon.pid.sdk.req.pid;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import network.platon.pid.sdk.annoation.CustomIgnore;
-import network.platon.pid.sdk.annoation.CustomNotBlank;
-import network.platon.pid.sdk.annoation.CustomPattern;
-import network.platon.pid.sdk.annoation.CustomSize;
+import network.platon.pid.sdk.annoation.*;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.constant.ReqAnnoationArgs;
 import network.platon.pid.sdk.req.BaseReq;
@@ -41,6 +38,8 @@ public class AddPublicKeyReq extends BaseReq{
 	@CustomIgnore
 	private PidConst.PublicKeyType type = PidConst.PublicKeyType.SECP256K1;
 
+	@CustomNotNull
+	@CustomIgnore
 	private int index;
 
 	/**

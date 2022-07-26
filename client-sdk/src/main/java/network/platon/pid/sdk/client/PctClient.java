@@ -1,9 +1,6 @@
 package network.platon.pid.sdk.client;
 
-import java.util.List;
-
 import network.platon.pid.sdk.req.pct.CreatePctReq;
-import network.platon.pid.sdk.req.pct.QueryPctJsonListReq;
 import network.platon.pid.sdk.req.pct.QueryPctJsonReq;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;

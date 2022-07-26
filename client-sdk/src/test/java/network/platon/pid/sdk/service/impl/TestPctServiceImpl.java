@@ -1,11 +1,13 @@
 package network.platon.pid.sdk.service.impl;
 
+import com.platon.crypto.ECKeyPair;
+import com.platon.utils.Numeric;
 import lombok.Data;
-import network.platon.pid.contract.dto.InitContractData;
-import network.platon.pid.sdk.req.pct.QueryPctJsonListReq;
+import network.platon.pid.common.config.PidConfig;
+import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;
-import network.platon.pid.sdk.resp.pid.CreatePidResp;
+import network.platon.pid.sdk.utils.PidUtils;
 import org.junit.Test;
 
 import network.platon.pid.sdk.BaseTest;
@@ -21,15 +23,17 @@ public class TestPctServiceImpl extends BaseTest {
     }
 
     private createPctResult createPct () {
-        BaseResp<CreatePidResp> createPidResp = this.createPidBase();
-        if (createPidResp.checkFail()) {
-            failedResult(createPidResp);
-        }
-        String pid = createPidResp.getData().getPid();
-        ((PctServiceImpl)pctService).reloadContractData(new InitContractData(createPidResp.getData().getPrivateKey()));
+
+        ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(PidConfig.getCONTRACT_PRIVATEKEY());
+        String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+        String pid = PidUtils.generatePid(pidPublicKey);
+
         String pctJson = "{\"properties\": { \"name\": { \"type\": \"string\" }, \"no\": { \"type\": \"string\" }, \"data\": { \"type\": \"string\" }}}";
+        String str = "This is a String";
         CreatePctReq req = CreatePctReq.builder()
+                .privateKey(PidConfig.getCONTRACT_PRIVATEKEY())
                 .pctjson(pctJson)
+                .extra(str.getBytes())
                 .build();
 
         createPctResult res = new createPctResult();

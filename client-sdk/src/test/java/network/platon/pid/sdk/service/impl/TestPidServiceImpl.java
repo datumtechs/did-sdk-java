@@ -6,24 +6,21 @@ import com.platon.utils.Numeric;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
+import network.platon.pid.sdk.BaseTest;
 import network.platon.pid.sdk.base.dto.PidService;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.req.pid.*;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pid.QueryPidDocumentDataResp;
+import network.platon.pid.sdk.service.PidentityService;
 import network.platon.pid.sdk.utils.PidUtils;
 import org.junit.Test;
-import network.platon.pid.sdk.BaseTest;
-import network.platon.pid.sdk.service.PidentityService;
-
-import static network.platon.pid.sdk.constant.PidConst.PID_EVENT_ATTRIBUTE_CHANGE_TOPIC;
 
 
 @Slf4j
 public class TestPidServiceImpl extends BaseTest{
 
 	private PidentityService pidService = new PidentityServiceImpl();
-
 
 	@Data
 	private class createPidResult{
@@ -734,6 +731,10 @@ public class TestPidServiceImpl extends BaseTest{
 				.service(svr)
 				.build();
 		okResult(pidService.setService(req));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -744,11 +745,9 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 
-
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
 		String pid = PidUtils.generatePid(publicKey);
-
 
 		PidService svr = new PidService();
 		// serviceId: did:pid:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
@@ -761,6 +760,10 @@ public class TestPidServiceImpl extends BaseTest{
 				.service(svr)
 				.build();
 		failedResult(pidService.setService(req));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -772,11 +775,9 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 
-
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
 		String pid = PidUtils.generatePid(publicKey);
-
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
@@ -785,7 +786,6 @@ public class TestPidServiceImpl extends BaseTest{
 				.build();
 
 		okResult(pidService.changeDocumentStatus(changeDocumentStatusReq));
-
 
 		PidService svr = new PidService();
 		// serviceId: did:pid:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
@@ -809,11 +809,9 @@ public class TestPidServiceImpl extends BaseTest{
 			return;
 		}
 
-
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
 		String pid = PidUtils.generatePid(publicKey);
-
 
 		PidService svr = new PidService();
 		// serviceId: did:pid:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
@@ -831,6 +829,10 @@ public class TestPidServiceImpl extends BaseTest{
 
 		// revocation the service
 		okResult(pidService.revocationService(req));
+
+		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
+		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		okResult(resp);
 	}
 
 

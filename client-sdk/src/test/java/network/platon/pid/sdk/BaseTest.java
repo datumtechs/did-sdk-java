@@ -67,7 +67,7 @@ public class BaseTest {
     protected String adminPid;
     protected String adminPublicKeyId;
 
-    protected static int deployFlag = 1;
+    protected static int deployFlag = 0;
 
     @Before
     public void setup() {
@@ -228,6 +228,7 @@ public class BaseTest {
         retryableClient.init();
         Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
         Credentials credentials = Credentials.create(PidConfig.getCONTRACT_PRIVATEKEY());
+
         String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
         String hexAddress = Keys.getAddress(publicKey);
         String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
@@ -235,7 +236,7 @@ public class BaseTest {
         try {
             receipt = Transfer.sendFunds(
                             web3j, credentials, address,
-                            BigDecimal.valueOf(80000000), Convert.Unit.PVON)
+                            BigDecimal.valueOf(1), Convert.Unit.KPVON)
                     .send();
         }catch (Exception e) {
             log.error(
@@ -252,7 +253,7 @@ public class BaseTest {
         }
 
         String privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
-        CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).build();
+        CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
         return pidService.createPid(req);
     }
 

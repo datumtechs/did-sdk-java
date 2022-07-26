@@ -34,7 +34,9 @@ public class UpdatePublicKeyReq extends BaseReq {
         @CustomIgnore
         private PidConst.PublicKeyType type;
 
-        int index;
+        @CustomNotNull
+        @CustomIgnore
+        private int index;
 
         /**
          * Required: The public key.

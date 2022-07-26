@@ -7,7 +7,6 @@ import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.contract.dto.InitContractData;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.req.pct.CreatePctReq;
-import network.platon.pid.sdk.req.pct.QueryPctJsonListReq;
 import network.platon.pid.sdk.req.pct.QueryPctJsonReq;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.TransactionResp;
@@ -20,7 +19,6 @@ import network.platon.pid.sdk.utils.PidUtils;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.List;
 
 @Slf4j
 public class PctServiceImpl extends BusinessBaseService implements PctService,Serializable,Cloneable{

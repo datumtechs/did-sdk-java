@@ -1,13 +1,10 @@
 package network.platon.pid.sdk.service;
 
 import network.platon.pid.sdk.req.pct.CreatePctReq;
-import network.platon.pid.sdk.req.pct.QueryPctJsonListReq;
 import network.platon.pid.sdk.req.pct.QueryPctJsonReq;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;
 import network.platon.pid.sdk.resp.pct.QueryPctJsonResp;
-
-import java.util.List;
 
 /**
  * Pct(PlatON Claim Template)  related method interface class

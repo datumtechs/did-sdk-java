@@ -14,9 +14,9 @@ import network.platon.pid.sdk.req.BaseReq;
 @NoArgsConstructor
 public class QueryPctJsonListReq extends BaseReq {
 
-	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
-			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
-	private String issuer;
+    @CustomNotBlank
+    @CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
+            max = ReqAnnoationArgs.PID_SIZE_MAX)
+    @CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
+    private String issuer;
 }
