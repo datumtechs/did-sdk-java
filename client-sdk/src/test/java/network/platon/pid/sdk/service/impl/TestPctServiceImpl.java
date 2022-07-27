@@ -5,14 +5,17 @@ import com.platon.utils.Numeric;
 import lombok.Data;
 import network.platon.pid.common.config.PidConfig;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
+import network.platon.pid.sdk.req.pct.QueryPctInfoReq;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;
+import network.platon.pid.sdk.resp.pct.QueryPctInfoResp;
 import network.platon.pid.sdk.utils.PidUtils;
 import org.junit.Test;
 
 import network.platon.pid.sdk.BaseTest;
 import network.platon.pid.sdk.req.pct.CreatePctReq;
-import network.platon.pid.sdk.req.pct.QueryPctJsonReq;
+
+import java.util.Random;
 
 public class TestPctServiceImpl extends BaseTest {
 
@@ -44,24 +47,24 @@ public class TestPctServiceImpl extends BaseTest {
 
     @Test
     public void test_createPct() {
-        okResult(createPct().getCreatePctResp());
+        // okResult(createPct().getCreatePctResp());
+        Random randTest = new Random(23523865082340324L);
+        System.out.println(randTest.nextLong());
+        System.out.println(randTest.nextLong());
+        System.out.println(randTest.nextLong());
+        System.out.println(randTest.nextLong());
     }
 
     @Test
     public void test_queryPctJson() {
         BaseResp<CreatePctResp> createPctResp = createPct().getCreatePctResp();
         okResult(createPctResp);
-        QueryPctJsonReq req = QueryPctJsonReq.builder()
+        QueryPctInfoReq req = QueryPctInfoReq.builder()
         		.pctId(createPctResp.getData().getPctId()).build();
-        okResult(pctService.queryPctJsonById(req));
+        BaseResp<QueryPctInfoResp> resp = pctService.queryPctInfoById(req);
+        okResult(resp);
     }
 
-    @Test
-    public void test_queryPctIdsByPid() {
-        createPctResult res = createPct();
-        okResult(res.getCreatePctResp());
-        QueryPctJsonListReq issuer = QueryPctJsonListReq.of(res.getIssuer());
-    }
 
 
 }

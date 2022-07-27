@@ -7,10 +7,7 @@ import network.platon.pid.common.constant.VpOrVcPoofKey;
 import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.csies.utils.ConverDataUtils;
-import network.platon.pid.sdk.base.dto.CheckData;
-import network.platon.pid.sdk.base.dto.DocumentAuthData;
-import network.platon.pid.sdk.base.dto.DocumentData;
-import network.platon.pid.sdk.base.dto.DocumentPubKeyData;
+import network.platon.pid.sdk.base.dto.*;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.contract.service.PctContractService;
 import network.platon.pid.sdk.contract.service.PidContractService;
@@ -59,7 +56,7 @@ public class VerifyInputDataUtils {
 		return RetEnum.RET_SUCCESS;
 	}
 	
-	public static RetEnum checkPct(String pctJson,Map<String, Object> claim) {
+	public static RetEnum checkPct(String pctJson, Map<String, Object> claim) {
 		//TODO 补充claim数据判断
 		if(StringUtils.isBlank(pctJson)) {
 			log.error("get pct json is null");
@@ -86,7 +83,7 @@ public class VerifyInputDataUtils {
 		return RetEnum.RET_SUCCESS;
 	}
 	
-	public static BaseResp<CheckData> checkBaseData(String holder, String issuer, String publicKeyId,String privateKey,String pctId, Map<String, Object> claim){
+	public static BaseResp<CheckData> checkBaseData(String holder, String issuer, String publicKeyId, String privateKey, String pctId, Map<String, Object> claim){
 		String holderAddress = PidUtils.convertPidToAddressStr(holder);
 		if(StringUtils.isBlank(holderAddress)) {
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID,"holder invaild",null);
@@ -115,11 +112,11 @@ public class VerifyInputDataUtils {
 		}
 		
 		PctContractService pctContractService = new PctContractServiceImpl();
-		BaseResp<String> resp = pctContractService.queryPctById(pctId);
+		BaseResp<PctData> resp = pctContractService.queryPctById(pctId);
 		if(!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(),resp.getErrMsg(),null);
 		}
-		retEnum = VerifyInputDataUtils.checkPct(resp.getData(), claim);
+		retEnum = VerifyInputDataUtils.checkPct(resp.getData().getPctJson(), claim);
 		if(!RetEnum.isSuccess(retEnum)) {
 			return BaseResp.buildError(retEnum);
 		}

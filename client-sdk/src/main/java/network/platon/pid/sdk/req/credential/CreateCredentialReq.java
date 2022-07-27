@@ -18,8 +18,14 @@ public class CreateCredentialReq extends BaseReq {
 	@CustomNotBlank
 	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
 			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
+	@CustomPattern(value = PidConst.PLATON_PID_PATTERN)
 	private String pid;
+
+	@CustomNotBlank
+	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
+			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
+	@CustomPattern(value = PidConst.PLATON_PRIVATE_KEY_PATTERN)
+	private String issuerPrivateKey;
 	
 	@CustomNotNull
 	@CustomMin(value = ReqAnnoationArgs.COMMON_DATA_SIZE)
@@ -40,7 +46,7 @@ public class CreateCredentialReq extends BaseReq {
 	@CustomNotBlank
 	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
 			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
+	@CustomPattern(value = PidConst.PLATON_PRIVATE_KEY_PATTERN)
 	private String privateKey;
 	
 	private String context;

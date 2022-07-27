@@ -6,12 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.contract.dto.InitContractData;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
+import network.platon.pid.sdk.base.dto.PctData;
 import network.platon.pid.sdk.req.pct.CreatePctReq;
-import network.platon.pid.sdk.req.pct.QueryPctJsonReq;
+import network.platon.pid.sdk.req.pct.QueryPctInfoReq;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.TransactionResp;
 import network.platon.pid.sdk.resp.pct.CreatePctResp;
-import network.platon.pid.sdk.resp.pct.QueryPctJsonResp;
+import network.platon.pid.sdk.resp.pct.QueryPctInfoResp;
 import network.platon.pid.sdk.service.BusinessBaseService;
 import network.platon.pid.sdk.service.PctService;
 import network.platon.pid.sdk.utils.PctUtils;
@@ -68,16 +69,16 @@ public class PctServiceImpl extends BusinessBaseService implements PctService,Se
     }
 
     @Override
-    public BaseResp<QueryPctJsonResp> queryPctJsonById(QueryPctJsonReq req) {
+    public BaseResp<QueryPctInfoResp> queryPctInfoById(QueryPctInfoReq req) {
         BaseResp<String> verifyBaseResp = req.validFiled();
         if (verifyBaseResp.getCode() != RetEnum.RET_SUCCESS.getCode()) {
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
-        BaseResp<String> pctJsonResp = this.getPctContractService().queryPctById(req.getPctId());
-        if(!pctJsonResp.checkSuccess()) {
+        BaseResp<PctData> pctInfoResp = this.getPctContractService().queryPctById(req.getPctId());
+        if(!pctInfoResp.checkSuccess()) {
         	log.error("Failed to call queryPctJsonById, req: {}", req);
-			return BaseResp.build(pctJsonResp.getCode(),pctJsonResp.getErrMsg());
+			return BaseResp.build(pctInfoResp.getCode(),pctInfoResp.getErrMsg());
 		}
-        return BaseResp.buildSuccess(QueryPctJsonResp.of(req.getPctId(), pctJsonResp.getData()));
+        return BaseResp.buildSuccess(QueryPctInfoResp.of(pctInfoResp.getData()));
     }
 }

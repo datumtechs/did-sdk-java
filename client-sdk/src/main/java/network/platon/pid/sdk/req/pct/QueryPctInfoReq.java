@@ -11,9 +11,8 @@ import network.platon.pid.sdk.req.BaseReq;
 @Data
 @EqualsAndHashCode(callSuper=false)
 @Builder
-public class QueryPctJsonReq extends BaseReq {
-
-	@CustomNotBlank
-	@CustomSize(min = ReqAnnoationArgs.PCT_ID_SIZE_MIN)
-	private String pctId;
+public class QueryPctInfoReq extends BaseReq {
+    @CustomNotBlank
+    @CustomSize(min = ReqAnnoationArgs.PCT_ID_SIZE_MIN)
+    private String pctId;
 }

@@ -18,7 +18,7 @@ public class CreatePctReq extends BaseReq{
 	@CustomNotBlank
 	@CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
 			max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PRIVATE_KEY_PATTERN)
+	@CustomPattern(value = PidConst.PLATON_PRIVATE_KEY_PATTERN)
 	private String privateKey;
 	
 	@CustomNotBlank

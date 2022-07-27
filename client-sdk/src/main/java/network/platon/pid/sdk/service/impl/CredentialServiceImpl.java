@@ -58,7 +58,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
 		}
 
-		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getIssuerPrivateKey());
 		String issuerPidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
 		String issuerPid = PidUtils.generatePid(issuerPidPublicKey);
 
@@ -73,6 +73,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		HashMap<String, Object> claimMap =  (HashMap<String, Object>) credential.getClaimData();
 		Map<String, Object> saltMap = ConverDataUtils.clone(claimMap);
 		CredentialsUtils.generateSalt(saltMap, null);
+
 		// Get sign data
 		String rawData = CredentialsUtils.getCredentialHash(credential, saltMap, null);
 		// Get signature
@@ -162,7 +163,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		type.add(String.valueOf(req.getType()));
 		credential.setType(type);
 
-		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
+		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getIssuerPrivateKey());
 		String issuerPidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
 		String issuerPid = PidUtils.generatePid(issuerPidPublicKey);
 

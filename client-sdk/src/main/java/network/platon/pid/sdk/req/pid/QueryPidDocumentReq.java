@@ -18,6 +18,6 @@ public class QueryPidDocumentReq extends BaseReq{
 	@CustomNotBlank
 	@CustomSize(min = ReqAnnoationArgs.PID_SIZE_MIN,
 			max = ReqAnnoationArgs.PID_SIZE_MAX)
-	@CustomPattern(value = PidConst.PLATONE_PID_PATTERN)
+	@CustomPattern(value = PidConst.PLATON_PID_PATTERN)
 	private String pid;
 }

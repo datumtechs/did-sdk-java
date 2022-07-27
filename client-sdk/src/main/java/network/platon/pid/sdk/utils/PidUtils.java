@@ -90,7 +90,7 @@ public class PidUtils {
 
 	public static boolean isValidAddressStr(String addr) {
 		if (StringUtils.isBlank(addr)
-				|| !Pattern.compile(PidConst.PLATONE_ADDRESS_PATTERN).matcher(addr).matches()) {
+				|| !Pattern.compile(PidConst.PLATON_ADDRESS_PATTERN).matcher(addr).matches()) {
 			return false;
 		}
 		if(!addr.startsWith(NetworkParameters.getHrp())) {

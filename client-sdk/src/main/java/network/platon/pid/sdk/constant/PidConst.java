@@ -18,12 +18,12 @@ public class PidConst {
 	public static final String PID_EVENT_ATTRIBUTE_CHANGE_STR = "PIDAttributeChanged";
 	public static final String PID_EVENT_ATTRIBUTE_CHANGE_TOPIC = EventEncoder.encode(Pid.PIDATTRIBUTECHANGE_EVENT);
 
-	public static final String PLATONE_PID_PATTERN = "did:pid:[a-zA-Z0-9]{42}";
+	public static final String PLATON_PID_PATTERN = "did:pid:[a-zA-Z0-9]{42}";
 
-	public static final String PLATONE_ADDRESS_PATTERN = "[a-zA-Z0-9]{42}";
+	public static final String PLATON_ADDRESS_PATTERN = "[a-zA-Z0-9]{42}";
 
-	public static final String PLATONE_PRIVATE_KEY_PATTERN = "0x[a-fA-f0-9]{60,64}|[a-fA-f0-9]{60,64}";
-	public static final String PLATONE_PUBLICK_KEY_PATTERN = "0x[a-fA-f0-9]{120,128}|[a-fA-f0-9]{120,128}";
+	public static final String PLATON_PRIVATE_KEY_PATTERN = "0x[a-fA-f0-9]{60,64}|[a-fA-f0-9]{60,64}";
+	public static final String PLATON_PUBLICK_KEY_PATTERN = "0x[a-fA-f0-9]{120,128}|[a-fA-f0-9]{120,128}";
 
 	public static final int ADDRESS_LENGTH_IN_HEX = 42;
 	public static final int MAX_AUTHORITY_ISSUER_NAME_LENGTH = 32;

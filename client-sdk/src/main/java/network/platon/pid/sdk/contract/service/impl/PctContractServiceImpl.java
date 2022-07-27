@@ -10,6 +10,7 @@ import network.platon.pid.contract.Pct;
 import network.platon.pid.contract.dto.ContractNameValues;
 import network.platon.pid.contract.dto.DeployContractData;
 import network.platon.pid.contract.dto.TransactionInfo;
+import network.platon.pid.sdk.base.dto.PctData;
 import network.platon.pid.sdk.contract.service.ContractService;
 import network.platon.pid.sdk.contract.service.PctContractService;
 import network.platon.pid.sdk.resp.BaseResp;
@@ -62,14 +63,18 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 	}
 
 	@Override
-	public BaseResp<String> queryPctById(String pctId) {
+	public BaseResp<PctData> queryPctById(String pctId) {
 		try {
 			Tuple3<String, String, byte[]> pctInfo = this.getPctContract().getPctInfo(new BigInteger(pctId)).send();
-			String pctJson = new String(pctInfo.getValue2());
-			if (StringUtils.isBlank(pctJson)) {
+			if (StringUtils.isBlank(pctInfo.getValue2())) {
 				return BaseResp.build(RetEnum.RET_PCT_QUERY_JSON_NOT_FOUND_ERROR);
 			}
-			return BaseResp.buildSuccess(pctJson);
+			PctData result = new PctData();
+			result.setPid(pctId);
+			result.setIssue(pctInfo.getValue1());
+			result.setPctJson(pctInfo.getValue2());
+			result.setExtra(pctInfo.getValue3());
+			return BaseResp.buildSuccess(result);
 		} catch (Exception e) {
 			log.error("queryPctJsonById pct error {}", pctId, e);
 			return BaseResp.build(RetEnum.RET_PCT_QUERY_BY_ID_ERROR,e.getMessage());

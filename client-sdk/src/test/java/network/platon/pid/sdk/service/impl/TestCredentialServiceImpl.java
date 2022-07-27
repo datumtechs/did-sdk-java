@@ -65,29 +65,32 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 	@Test
 	public void test_createCredential() throws Exception {
-		String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
-		String pid = this.testCreatePid(privateKey);
-
-		ECKeyPair keyPair = Keys.createEcKeyPair();
-		String issuerPriKey = keyPair.getPrivateKey().toString(16);
+		// issuer
+		String issuerPriKey = PidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
-		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+		// holder
+		String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String pid = this.testCreatePid(privateKey);
 
+		// Create pct data in PlatON
+		String pctId = testCreatePct(pctJson);
+
+		// claim data
 		Map<String, Object> claim = new HashMap<>();
 		claim.put("name", "zhangsan");
 		claim.put("no", "123");
 		claim.put("data", "456");
 
+		// context expirationData credentialType
 		String context = "https://platon.network/";
 		long expirationDate = new Date(1691863929).getTime();
-		long issuanceDate = new Date().getTime();
 		String credentialType = "VerifiableCredential";
 
-		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-				.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+		// create credential
+		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).pid(pid)
+				.pctId(pctId).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuerPrivateKey(PidConfig.getCONTRACT_PRIVATEKEY())
 				.type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 
@@ -104,7 +107,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		String issuerPubKeyId = issuer + "#keys-1";
 
 		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+		String pctId = testCreatePct(pctJson);
 
 		Map<String, Object> claim = new HashMap<>();
 		claim.put("name", "zhangsan");
@@ -306,7 +309,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 			String issuerPubKeyId = issuer + "#keys-1";
 
 			// Create pct data in PlatON
-			String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+			String pctId = testCreatePct(pctJson);
 
 			Map<String, Object> claim = new HashMap<>();
 			claim.put("name", "zhangsan");
@@ -336,18 +339,19 @@ public class TestCredentialServiceImpl extends BaseTest {
 	}
 
 	private String testCreatePid(String privateKey) throws Exception {
-		ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
 		RetryableClient retryableClient = new RetryableClient();
 		retryableClient.init();
 		Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
 		Credentials credentials = Credentials.create(PidConfig.getCONTRACT_PRIVATEKEY());
+
+		ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
 		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 		String hexAddress = Keys.getAddress(publicKey);
 		String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
 		TransactionReceipt receipt = null;
 		receipt = Transfer.sendFunds(
 							web3j, credentials, address,
-							BigDecimal.valueOf(80000000), Convert.Unit.PVON)
+						BigDecimal.valueOf(1), Convert.Unit.KPVON)
 					.send();
 		if(!receipt.isStatusOK()){
 			String msg = "Create pid error";
@@ -356,7 +360,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 			throw new Exception(msg);
 		}
 
-		CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).build();
+		CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
 		BaseResp<CreatePidResp> createPidResp = PClient.createPidentityClient().createPid(req);
 		if (createPidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPidResp);
@@ -368,9 +372,11 @@ public class TestCredentialServiceImpl extends BaseTest {
 	}
 
 
-	private String testCreatePct(String pid, String privateKey, String pctJson, Integer type) throws Exception {
-		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).build();
-		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(privateKey)).registerPct(req);
+	private String testCreatePct(String pctJson) throws Exception {
+
+		String str = "This is a String";
+		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).privateKey(PidConfig.getCONTRACT_PRIVATEKEY()).extra(str.getBytes()).build();
+		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient().registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);
 			logger.error("Register pct error,error msg:{}", msg);
