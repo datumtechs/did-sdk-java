@@ -426,7 +426,7 @@ public class Vote extends Contract {
                     public Tuple3<List<String>, List<String>, List<BigInteger>> call() throws Exception {
                         List<Type> results = executeCallMultipleValueReturn(function);
                         return new Tuple3<List<String>, List<String>, List<BigInteger>>(
-                                convertToNative((List<Address>) results.get(0).getValue()), 
+                                convertToNative((List<Address>) results.get(0).getValue()),
                                 convertToNative((List<Utf8String>) results.get(1).getValue()), 
                                 convertToNative((List<Uint256>) results.get(2).getValue()));
                     }

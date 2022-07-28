@@ -66,7 +66,8 @@ public class TestCredentialServiceImpl extends BaseTest {
 	@Test
 	public void test_createCredential() throws Exception {
 		// issuer
-		String issuerPriKey = PidConfig.getCONTRACT_PRIVATEKEY();
+		ECKeyPair keyPair = Keys.createEcKeyPair();
+		String issuerPriKey = keyPair.getPrivateKey().toString(16);
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
@@ -90,7 +91,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		// create credential
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).pid(pid)
-				.pctId(pctId).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuerPrivateKey(PidConfig.getCONTRACT_PRIVATEKEY())
+				.pctId(pctId).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 				.type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 
@@ -301,12 +302,14 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 	private Credential testCreateCredential() {
 		try {
-			String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
-			String pid = this.testCreatePid(privateKey);
-
+			// issuer
 			String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
 			String issuer = testCreatePid(issuerPriKey);
 			String issuerPubKeyId = issuer + "#keys-1";
+
+			// holder
+			String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+			String pid = this.testCreatePid(privateKey);
 
 			// Create pct data in PlatON
 			String pctId = testCreatePct(pctJson);
@@ -322,7 +325,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 			String credentialType = "VerifiableCredential";
 
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-					.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+					.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 					.type(credentialType).build();
 			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient().createCredential(req);
 			if (resp.checkSuccess()) return resp.getData().getCredential();

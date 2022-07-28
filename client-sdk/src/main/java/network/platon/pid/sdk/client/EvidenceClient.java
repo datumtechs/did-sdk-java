@@ -20,11 +20,6 @@ public class EvidenceClient extends BusinessClient implements EvidenceService  {
 	}
 
 	@Override
-	public BaseResp<String> verifyEvidence(VerifyEvidenceReq req) {
-		return getEvidenceService().verifyEvidence(req);
-	}
-
-	@Override
 	public BaseResp<RevokeEvidenceResp> revokeEvidence(RevokeEvidenceReq req) {
 		return getEvidenceService().revokeEvidence(req);
 	}

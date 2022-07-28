@@ -132,18 +132,6 @@ public class Credential implements Serializable{
     }
 	
 	@SuppressWarnings("unchecked")
-	public String obtainAllHash() {
-        Map<String, Object> salt = this.obtainSalt();
-        Object disObject  = proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
-        Map<String, Object> disclosures = null;
-        if(disObject != null && disObject instanceof Map) {
-			disclosures = (Map<String, Object>) proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
-        }
-        Credential credential = ConverDataUtils.clone(this);
-        return CredentialsUtils.getCredentialHash(credential, salt, disclosures);
-    }
-	
-	@SuppressWarnings("unchecked")
 	public Map<String, Object> obtainSalt() {
 		return (Map<String, Object>) this.getProof().get(VpOrVcPoofKey.PROOF_SALT);
 	}
@@ -155,7 +143,7 @@ public class Credential implements Serializable{
 	public String obtainPublickeyId() {
 		return (String) this.getProof().get(VpOrVcPoofKey.PROOF_VERIFICATIONMETHOD);
 	}
-	
+
 	public String obtainSign() {
 		return (String) this.getProof().get(VpOrVcPoofKey.PROOF_JWS);
 	}

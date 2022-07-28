@@ -67,7 +67,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	@Override
 	public TransactionResp<String> createCredentialEvience(String hash, String signer, String signatureData, String updateTime) {
 		try {
-			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(hash.getBytes(), signer, signatureData, updateTime).send();
+			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(Numeric.hexStringToByteArray(hash), signer, signatureData, updateTime).send();
 			return TransactionResp.buildTxSuccess(new TransactionInfo(transactionReceipt));
 		} catch (Exception e) {
 			log.error("create credential erorr.", e);
@@ -82,7 +82,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 			if(blockNumber == null || blockNumber.longValue() == 0) {
 				return TransactionResp.build(RetEnum.RET_CREDENTIAL_CONTRACT_NOT_FOUND_ERROR);
 			}
-			CredentialEvidence credentialEvidence = CredentialEventProcessor.decodeCredentialByBlock(blockNumber, Credential.CREDENTIALATTRIBUTECHANGE_EVENT,hash);
+			CredentialEvidence credentialEvidence = CredentialEventProcessor.decodeCredentialByBlock(blockNumber, Credential.CREDENTIALATTRIBUTECHANGE_EVENT, hash);
 			if(credentialEvidence == null) {
 				return TransactionResp.build(RetEnum.RET_CREDENTIAL_CONTRACT_NOT_FOUND_ERROR);
 			}

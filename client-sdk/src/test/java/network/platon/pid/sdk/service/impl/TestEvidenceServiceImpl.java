@@ -65,7 +65,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String pid = testCreatePid(privateKey);
 
 		// Create issuer's pid by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = PidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
@@ -76,7 +76,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		Credential credential = testCreateCredential(pctId, pid, issuerPriKey, issuerPubKeyId, issuer);
 
 		CreateEvidenceReq req = CreateEvidenceReq.builder().credential(credential).privateKey(issuerPriKey).build();
-		resp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).createEvidence(req);
+		resp = PClient.createEvidenceClient().createEvidence(req);
 
 		assertTrue(resp.checkSuccess());
 	}
@@ -88,7 +88,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String pid = testCreatePid(privateKey);
 
 		// Create issuer's pid by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = PidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
@@ -107,44 +107,13 @@ public class TestEvidenceServiceImpl extends BaseTest {
 	}
 
 	@Test
-	public void test_verifyEvidence() throws Exception {
-		// Create pid by privateKey
-		String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
-		String pid = testCreatePid(privateKey);
-
-		// Create issuer's pid by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
-		String issuer = testCreatePid(issuerPriKey);
-		String issuerPubKeyId = issuer + "#keys-1";
-
-		// Create pct data in PlatON
-		String pctId = testCreatePct(pctJson);
-
-		// Create credential
-		Credential credential = testCreateCredential(pctId, pid, issuerPriKey, issuerPubKeyId, issuer);
-
-		// Create evidence
-		String evidenceId = testCreateEvidence(credential, issuerPriKey);
-
-		// Query evidence by id
-		QueryEvidenceResp queryEvidenceResp = testQueryEvidence(evidenceId);
-
-		// success
-		VerifyEvidenceReq req = VerifyEvidenceReq.builder().credentialHash(credential.obtainAllHash())
-				.evidenceSignInfo(queryEvidenceResp.getSignInfo()).publicKeyId(issuerPubKeyId).build();
-		resp = PClient.createEvidenceClient().verifyEvidence(req);
-
-		assertTrue(resp.checkSuccess());
-	}
-
-	@Test
 	public void test_revokeEvidence() throws Exception {
 		// Create pid by privateKey
 		String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
 		String pid = testCreatePid(privateKey);
 
 		// Create issuer's pid by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = PidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
@@ -157,9 +126,9 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		// Create evidence
 		String evidenceId = testCreateEvidence(credential, issuerPriKey);
 
-		RevokeEvidenceReq req = RevokeEvidenceReq.builder().credential(credential)
+		RevokeEvidenceReq req = RevokeEvidenceReq.builder().evidenceId(credential.obtainHash())
 				.privateKey(issuerPriKey).build();
-		resp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).revokeEvidence(req);
+		resp = PClient.createEvidenceClient().revokeEvidence(req);
 		assertTrue(resp.checkSuccess());
 
 		VerifyCredentialEvidenceReq verifyEvidenceReq = VerifyCredentialEvidenceReq.builder().credential(credential)
@@ -174,7 +143,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String pid = testCreatePid(privateKey);
 
 		// Create issuer's pid by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = PidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreatePid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
@@ -205,7 +174,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 	private String testCreateEvidence(Credential credential, String issuerPriKey) throws Exception {
 		CreateEvidenceReq req = CreateEvidenceReq.builder().credential(credential).privateKey(issuerPriKey).build();
-		BaseResp<CreateEvidenceResp> createEvidenceBaseResp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).createEvidence(req);
+		BaseResp<CreateEvidenceResp> createEvidenceBaseResp = PClient.createEvidenceClient().createEvidence(req);
 
 		if (createEvidenceBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createEvidenceBaseResp);
@@ -216,9 +185,9 @@ public class TestEvidenceServiceImpl extends BaseTest {
 	}
 
 	private Boolean testRevokeEvidence(Credential credential, String issuerPriKey) throws Exception {
-		RevokeEvidenceReq req = RevokeEvidenceReq.builder().credential(credential)
+		RevokeEvidenceReq req = RevokeEvidenceReq.builder().evidenceId(credential.obtainHash())
 				.privateKey(issuerPriKey).build();
-		BaseResp<RevokeEvidenceResp> revokeEvidence = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).revokeEvidence(req);
+		BaseResp<RevokeEvidenceResp> revokeEvidence = PClient.createEvidenceClient().revokeEvidence(req);
 
 		if (revokeEvidence.checkFail()) {
 			String msg = JSONObject.toJSONString(revokeEvidence);
@@ -248,12 +217,11 @@ public class TestEvidenceServiceImpl extends BaseTest {
 			claim.put("data", "456");
 
 			String context = "https://platon.network/";
-			long expirationDate = new Date(1691863929).getTime();
-			long issuanceDate = new Date().getTime();
+			long expirationDate = DateUtils.getCurrentTimeStamp() + 1000000000;
 			String credentialType = "VerifiableCredential";
 
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-					.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+					.pctId(pctId).pid(pid).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 					.type(credentialType).build();
 			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient().createCredential(req);
 			if (resp.checkSuccess())
@@ -288,7 +256,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 			throw new Exception(msg);
 		}
 
-		CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).build();
+		CreatePidReq req = CreatePidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
 		BaseResp<CreatePidResp> createPidResp = PClient.createPidentityClient().createPid(req);
 		if (createPidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPidResp);
