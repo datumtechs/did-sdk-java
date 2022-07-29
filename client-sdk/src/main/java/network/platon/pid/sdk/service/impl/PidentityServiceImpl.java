@@ -9,6 +9,7 @@ import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.base.dto.*;
 import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.constant.commonConstant;
+import network.platon.pid.sdk.contract.service.PidContractService;
 import network.platon.pid.sdk.req.pid.*;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.TransactionResp;
@@ -53,8 +54,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		String pidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
 		String pid = PidUtils.generatePid(pidPublicKey);
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 						.createPid(pid, req.getPublicKey(), req.getType());
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
@@ -159,8 +161,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_ALREADY_EXIST);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 				.addPublicKey(
 						identity,
 						req.getPublicKey(),
@@ -254,8 +257,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			return BaseResp.build(RetEnum.RET_PID_PUBLICKEY_ALREADY_REVOCATED);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 						.updatePublicKey(
 								PidUtils.convertPidToAddressStr(pid),
 								req.getPublicKey(),
@@ -328,8 +332,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		}
 
 		// revocation the publicKey
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 						.revocationPublicKey(
 								identity,
 								req.getPublicKey(),
@@ -389,8 +394,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			return BaseResp.build(RetEnum.RET_PID_IDENTITY_ALREADY_REVOCATED);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 						.setService(
 								identity,
 								req.getService().getId(),
@@ -468,8 +474,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			return BaseResp.build(RetEnum.RET_PID_SET_SERVICE_ALREADY_REVOCATED);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 						.setService(
 								identity,
 								req.getService().getId(),
@@ -511,8 +518,9 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 			return BaseResp.build(RetEnum.RET_PID_INVALID);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> resp =
-				this.getPidContractService(new InitContractData(req.getPrivateKey()))
+				this.getPidContractService()
 				.changeStatus(PidUtils.convertPidToAddressStr(pid), req.getStatus().getCode());
 		if (resp.checkFail()) {
 			return BaseResp.build(resp.getCode(), resp.getErrMsg());

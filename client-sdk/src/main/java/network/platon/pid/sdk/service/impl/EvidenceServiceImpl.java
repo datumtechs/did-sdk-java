@@ -82,7 +82,8 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		}
 
 		String createTime = DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp());
-		TransactionResp<String> resp = getCredentialContractService(new InitContractData(req.getPrivateKey()))
+		this.ChangePrivateKey(req.getPrivateKey());
+		TransactionResp<String> resp = getCredentialContractService()
 				.createCredentialEvience(credentialHash, checkResp.getData().getPublicKeyHex(), credential.obtainSign(), createTime);
 		if(!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(),resp.getErrMsg());
@@ -137,7 +138,8 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.build(RetEnum.RET_EVIDENCE_STATUS_INVALID);
 		}
 
-		TransactionResp<Boolean> changeStatusResp = this.getCredentialContractService(new InitContractData(req.getPrivateKey())).changeStatus(hash, CredentialStatus.INVALID.getStatus());
+		this.ChangePrivateKey(req.getPrivateKey());
+		TransactionResp<Boolean> changeStatusResp = this.getCredentialContractService().changeStatus(hash, CredentialStatus.INVALID.getStatus());
 		if(changeStatusResp.checkFail()){
 			return BaseResp.build(changeStatusResp.getCode(),changeStatusResp.getErrMsg());
 		}

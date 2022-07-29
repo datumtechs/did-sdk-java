@@ -40,4 +40,8 @@ public class InitContractData {
         this.gasProvider = gasProvider;
         this.contractAddress = contractAddress;
     }
+
+    public void ChangePrivateKey(String privateKey){
+        transPrivateKey = privateKey;
+    }
 }

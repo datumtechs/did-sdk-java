@@ -57,7 +57,8 @@ public class PctServiceImpl extends BusinessBaseService implements PctService,Se
             return BaseResp.build(RetEnum.RET_PCT_JSON_SCHEMA_ERROR);
         }
 
-        TransactionResp<BigInteger> tresp = this.getPctContractService(new InitContractData(req.getPrivateKey())).registerPct(req.getPctjson(), req.getExtra());
+        this.ChangePrivateKey(req.getPrivateKey());
+        TransactionResp<BigInteger> tresp = this.getPctContractService().registerPct(req.getPctjson(), req.getExtra());
         if(tresp.checkFail()) {
         	log.error("Failed to register pctJson schema, req: {}, error:{}", req, tresp.getErrMsg());
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());

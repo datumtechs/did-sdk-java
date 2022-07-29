@@ -76,6 +76,10 @@ public abstract class BusinessBaseService {
 		this.initContractData = initContractData;
 		return getCredentialContractService();
 	}
+
+	protected void ChangePrivateKey(String privateKey) {
+		this.initContractData.ChangePrivateKey(privateKey);
+	}
 	
 	public void reloadContractData(InitContractData initContractData) {
 		this.initContractData = initContractData;
