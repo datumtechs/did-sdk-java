@@ -81,7 +81,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.build(RetEnum.RET_EVIDENCE_EXIST_ERROR);
 		}
 
-		String createTime = DateUtils.getCurrentTimeStampString();
+		String createTime = DateUtils.convertTimestampToUtc(DateUtils.getCurrentTimeStamp());
 		TransactionResp<String> resp = getCredentialContractService(new InitContractData(req.getPrivateKey()))
 				.createCredentialEvience(credentialHash, checkResp.getData().getPublicKeyHex(), credential.obtainSign(), createTime);
 		if(!resp.checkSuccess()) {

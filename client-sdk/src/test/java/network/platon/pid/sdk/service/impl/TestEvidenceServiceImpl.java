@@ -153,8 +153,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		// Create credential
 		Credential credential = testCreateCredential(pctId, pid, issuerPriKey, issuerPubKeyId, issuer);
 
-		// String evidenceId =
-		// testCreateEvidence(credential, issuerPriKey);
+		testCreateEvidence(credential, issuerPriKey);
 
 		// The evidence is not exists
 		VerifyCredentialEvidenceReq req = VerifyCredentialEvidenceReq.builder().credential(credential).build();

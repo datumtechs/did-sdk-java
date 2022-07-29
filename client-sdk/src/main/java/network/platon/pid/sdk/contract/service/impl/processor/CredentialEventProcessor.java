@@ -3,6 +3,7 @@ package network.platon.pid.sdk.contract.service.impl.processor;
 import com.platon.abi.solidity.EventEncoder;
 import com.platon.abi.solidity.EventValues;
 import com.platon.abi.solidity.datatypes.Event;
+import com.platon.abi.solidity.datatypes.Type;
 import com.platon.crypto.Hash;
 import com.platon.protocol.core.DefaultBlockParameterNumber;
 import com.platon.protocol.core.methods.response.*;
@@ -61,15 +62,15 @@ public class CredentialEventProcessor {
 	                	continue;
 	                }
 
-					String typeName = String.valueOf( eventValues.getNonIndexedValues().get(0));
+					String typeName = String.valueOf((BigInteger) eventValues.getNonIndexedValues().get(0).getValue());
 					switch (TypeEnum.findType(typeName)) {
 					case SIGNER:
-						typedResponse.setSigner(String.valueOf( eventValues.getNonIndexedValues().get(1)));
-						typedResponse.setCreate(String.valueOf( eventValues.getNonIndexedValues().get(3)));
+						typedResponse.setSigner((String) eventValues.getNonIndexedValues().get(1).getValue());
+						typedResponse.setCreate((String) eventValues.getNonIndexedValues().get(3).getValue());
 						break;
 					case SIGNATUREDATA:
-						typedResponse.setSignaturedata(String.valueOf( eventValues.getNonIndexedValues().get(1)));
-						typedResponse.setCreate(String.valueOf( eventValues.getNonIndexedValues().get(3)));
+						typedResponse.setSignaturedata((String) eventValues.getNonIndexedValues().get(1).getValue());
+						typedResponse.setCreate((String) eventValues.getNonIndexedValues().get(3).getValue());
 						break;
 					default:
 						break;

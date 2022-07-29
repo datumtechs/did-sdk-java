@@ -107,7 +107,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	@Override
 	public TransactionResp<BigInteger> getStatus(String hash) {
 		try {
-			BigInteger status = this.getCredentialContract().getStatus(hash.getBytes()).send();
+			BigInteger status = this.getCredentialContract().getStatus(Numeric.hexStringToByteArray(hash)).send();
 			return TransactionResp.buildSuccess(status);
 		} catch (Exception e) {
 			log.error("query credential status erorr.", e);
