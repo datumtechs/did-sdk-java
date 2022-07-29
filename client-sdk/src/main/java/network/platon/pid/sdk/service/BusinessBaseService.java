@@ -17,71 +17,71 @@ import network.platon.pid.sdk.service.impl.PctServiceImpl;
 import network.platon.pid.sdk.service.impl.PidentityServiceImpl;
 
 public abstract class BusinessBaseService {
-	
-	private InitContractData initContractData ;
 
-	protected PidentityService getPidentityService(){
-		return PidentityServiceImpl.getInstance();
-	}
+    private InitContractData initContractData;
 
-	protected PctService getPctService(){
-		return PctServiceImpl.getInstance();
-	}
-	
-	protected CredentialService getCredentialService(){
-		return CredentialServiceImpl.getInstance();
-	}
-	
-	protected EvidenceService getEvidenceService(){
-		return EvidenceServiceImpl.getInstance();
-	}
-	
-	protected PidContractService getPidContractService(){
-		return (PidContractService) this.createContractService(PidContracServiceImpl.getInstance(), ContractNameValues.PID);
-	}
-	
-	protected PctContractService getPctContractService(){
-		return (PctContractService) this.createContractService(PctContractServiceImpl.getInstance(), ContractNameValues.PCT);
-	}
+    protected PidentityService getPidentityService() {
+        return PidentityServiceImpl.getInstance();
+    }
 
-	protected VoteContractService getVoteContractService(){
-		return (VoteContractService) this.createContractService(VoteContractServiceImpl.getInstance(), ContractNameValues.VOTE);
-	}
+    protected PctService getPctService() {
+        return PctServiceImpl.getInstance();
+    }
 
-	protected CredentialContractService getCredentialContractService(){
-		return (CredentialContractService) this.createContractService(CredentialContractServiceImpl.getInstance(), ContractNameValues.CREDENTIAL);
-	}
-	
-	private ContractService createContractService(ContractService contractService,ContractNameValues contractNameValues) {
-		contractService.reloadAddress(initContractData, contractNameValues);
-		return contractService;
-	}
-	
-	protected PidContractService getPidContractService(InitContractData initContractData){
-		this.initContractData = initContractData;
-		return getPidContractService();
-	}
-	
-	protected VoteContractService getVoteContractService(InitContractData initContractData){
-		this.initContractData = initContractData;
-		return getVoteContractService();
-	}
+    protected CredentialService getCredentialService() {
+        return CredentialServiceImpl.getInstance();
+    }
 
-	protected PctContractService getPctContractService(InitContractData initContractData){
-		this.initContractData = initContractData;
-		return getPctContractService();
-	}
+    protected EvidenceService getEvidenceService() {
+        return EvidenceServiceImpl.getInstance();
+    }
 
-	protected CredentialContractService getCredentialContractService(InitContractData initContractData){
-		this.initContractData = initContractData;
-		return getCredentialContractService();
-	}
+    protected PidContractService getPidContractService() {
+        return (PidContractService) this.createContractService(PidContracServiceImpl.getInstance(), ContractNameValues.PID);
+    }
 
-	protected void ChangePrivateKey(String privateKey) {
-		this.initContractData.ChangePrivateKey(privateKey);
-	}
-	
-	public void reloadContractData(InitContractData initContractData) {
-		this.initContractData = initContractData;
-	}
+    protected PctContractService getPctContractService() {
+        return (PctContractService) this.createContractService(PctContractServiceImpl.getInstance(), ContractNameValues.PCT);
+    }
+
+    protected VoteContractService getVoteContractService() {
+        return (VoteContractService) this.createContractService(VoteContractServiceImpl.getInstance(), ContractNameValues.VOTE);
+    }
+
+    protected CredentialContractService getCredentialContractService() {
+        return (CredentialContractService) this.createContractService(CredentialContractServiceImpl.getInstance(), ContractNameValues.CREDENTIAL);
+    }
+
+    private ContractService createContractService(ContractService contractService, ContractNameValues contractNameValues) {
+        contractService.reloadAddress(initContractData, contractNameValues);
+        return contractService;
+    }
+
+    protected PidContractService getPidContractService(InitContractData initContractData) {
+        this.initContractData = initContractData;
+        return getPidContractService();
+    }
+
+    protected VoteContractService getVoteContractService(InitContractData initContractData) {
+        this.initContractData = initContractData;
+        return getVoteContractService();
+    }
+
+    protected PctContractService getPctContractService(InitContractData initContractData) {
+        this.initContractData = initContractData;
+        return getPctContractService();
+    }
+
+    protected CredentialContractService getCredentialContractService(InitContractData initContractData) {
+        this.initContractData = initContractData;
+        return getCredentialContractService();
+    }
+
+    protected void ChangePrivateKey(String privateKey) {
+        this.initContractData.ChangePrivateKey(privateKey);
+    }
+
+    public void reloadContractData(InitContractData initContractData) {
+        this.initContractData = initContractData;
+    }
 }

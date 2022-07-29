@@ -133,7 +133,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 		VerifyCredentialEvidenceReq verifyEvidenceReq = VerifyCredentialEvidenceReq.builder().credential(credential)
 				.build();
-		resp = PClient.createEvidenceClient().verifyCredentialEvidence(verifyEvidenceReq);
+		resp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).verifyCredentialEvidence(verifyEvidenceReq);
 	}
 
 	@Test

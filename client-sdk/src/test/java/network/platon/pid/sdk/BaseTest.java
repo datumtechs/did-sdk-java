@@ -17,11 +17,13 @@ import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.common.utils.PropertyUtils;
 import network.platon.pid.contract.client.RetryableClient;
 import network.platon.pid.contract.dto.DeployContractData;
+import network.platon.pid.contract.dto.InitContractData;
 import network.platon.pid.csies.algorithm.AlgorithmHandler;
 import network.platon.pid.sdk.base.dto.Credential;
 import network.platon.pid.sdk.client.ReloadClient;
 import network.platon.pid.sdk.contract.service.ContractService;
 import network.platon.pid.sdk.deploy.DeployContract;
+import network.platon.pid.sdk.factory.PClient;
 import network.platon.pid.sdk.req.credential.CreateCredentialReq;
 import network.platon.pid.sdk.req.pid.CreatePidReq;
 import network.platon.pid.sdk.resp.BaseResp;
@@ -49,15 +51,15 @@ public class BaseTest {
         NetworkParameters.init(210309L, "lat");
     }
 
-    protected CredentialService credentialService = new CredentialServiceImpl();
+    protected CredentialService credentialService = PClient.createCredentialClient(new InitContractData(PidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected EvidenceService evidenceService = new EvidenceServiceImpl();
+    protected EvidenceService evidenceService = PClient.createEvidenceClient(new InitContractData(PidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected VoteService voteService = new VoteServiceImpl();
+    protected VoteService voteService = PClient.createAgencyClient(new InitContractData(PidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected PctService pctService = new PctServiceImpl();
+    protected PctService pctService = PClient.createPctClient(new InitContractData(PidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected PidentityService pidService = new PidentityServiceImpl();
+    protected PidentityService pidService = PClient.createPidentityClient(new InitContractData(PidConfig.getCONTRACT_PRIVATEKEY()));
 
     protected BaseResp<?> resp;
 

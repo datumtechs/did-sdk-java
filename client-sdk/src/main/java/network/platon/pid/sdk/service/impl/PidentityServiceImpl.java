@@ -81,20 +81,6 @@ public class PidentityServiceImpl extends BusinessBaseService implements Pidenti
 		return this.queryPidDocument(pid);
 	}
 
-	public BaseResp<QueryPidDocumentDataResp> queryPidDocumentData (QueryPidDocumentReq req){
-		BaseResp<String> verifyBaseResp = req.validFiled();
-		if (verifyBaseResp.checkFail()) {
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
-		}
-		String pid = req.getPid();
-
-		BaseResp<DocumentData> getDocResp = this.getPidContractService().getDocument(PidUtils.convertPidToAddressStr(pid));
-		if (getDocResp.checkFail()) {
-			return BaseResp.build(getDocResp.getCode(), getDocResp.getErrMsg());
-		}
-		return BaseResp.buildSuccess(new QueryPidDocumentDataResp(getDocResp.getData()));
-	}
-
 	private BaseResp<QueryPidDocumentResp> queryPidDocument(String pid) {
 
 		if(!PidUtils.isValidPid(pid)) {

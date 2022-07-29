@@ -1,20 +1,15 @@
 package network.platon.pid.sdk.client;
 
 import network.platon.pid.sdk.constant.PidConst;
-import network.platon.pid.sdk.req.pid.AddPublicKeyReq;
-import network.platon.pid.sdk.req.pid.ChangeDocumentStatusReq;
-import network.platon.pid.sdk.req.pid.CreatePidReq;
-import network.platon.pid.sdk.req.pid.QueryPidDocumentReq;
-import network.platon.pid.sdk.req.pid.RevocationPublicKeyReq;
-import network.platon.pid.sdk.req.pid.SetPidAuthReq;
-import network.platon.pid.sdk.req.pid.SetServiceReq;
-import network.platon.pid.sdk.req.pid.UpdatePublicKeyReq;
+import network.platon.pid.sdk.req.pid.*;
 import network.platon.pid.sdk.resp.BaseResp;
-import network.platon.pid.sdk.resp.pid.*;
+import network.platon.pid.sdk.resp.pid.ChangeDocumentStatusResp;
+import network.platon.pid.sdk.resp.pid.CreatePidResp;
+import network.platon.pid.sdk.resp.pid.QueryPidDocumentResp;
+import network.platon.pid.sdk.resp.pid.SetPidAttrResp;
 import network.platon.pid.sdk.service.PidentityService;
 
 public class PidentityClient extends BusinessClient implements PidentityService  {
-	
 
 	@Override
 	public BaseResp<CreatePidResp> createPid(CreatePidReq req) {
@@ -24,11 +19,6 @@ public class PidentityClient extends BusinessClient implements PidentityService 
 	@Override
 	public BaseResp<QueryPidDocumentResp> queryPidDocument(QueryPidDocumentReq req) {
 		return getPidentityService().queryPidDocument(req);
-	}
-
-	@Override
-	public BaseResp<QueryPidDocumentDataResp> queryPidDocumentData (QueryPidDocumentReq req){
-		return getPidentityService().queryPidDocumentData(req);
 	}
 
 	@Override

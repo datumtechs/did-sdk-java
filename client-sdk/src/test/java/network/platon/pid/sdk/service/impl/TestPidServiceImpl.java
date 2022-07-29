@@ -12,6 +12,7 @@ import network.platon.pid.sdk.constant.PidConst;
 import network.platon.pid.sdk.req.pid.*;
 import network.platon.pid.sdk.resp.BaseResp;
 import network.platon.pid.sdk.resp.pid.QueryPidDocumentDataResp;
+import network.platon.pid.sdk.resp.pid.QueryPidDocumentResp;
 import network.platon.pid.sdk.service.PidentityService;
 import network.platon.pid.sdk.utils.PidUtils;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class TestPidServiceImpl extends BaseTest{
 		}
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 
 		okResult(resp);
 	}
@@ -178,7 +179,7 @@ public class TestPidServiceImpl extends BaseTest{
 
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -315,7 +316,7 @@ public class TestPidServiceImpl extends BaseTest{
 		okResult(pidService.updatePublicKey(req));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -356,7 +357,7 @@ public class TestPidServiceImpl extends BaseTest{
 		okResult(pidService.updatePublicKey(req));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -441,7 +442,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.updatePublicKey(updatePublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -501,7 +502,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.updatePublicKey(updatePublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -543,7 +544,7 @@ public class TestPidServiceImpl extends BaseTest{
 		okResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -569,7 +570,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -604,7 +605,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -649,7 +650,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -702,7 +703,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.revocationPublicKey(revocationPublicKeyReq));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -733,7 +734,7 @@ public class TestPidServiceImpl extends BaseTest{
 		okResult(pidService.setService(req));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -762,7 +763,7 @@ public class TestPidServiceImpl extends BaseTest{
 		failedResult(pidService.setService(req));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 
@@ -831,7 +832,7 @@ public class TestPidServiceImpl extends BaseTest{
 		okResult(pidService.revocationService(req));
 
 		QueryPidDocumentReq queryPidDocumentReq = QueryPidDocumentReq.builder().pid(result.getPid()).build();
-		BaseResp<QueryPidDocumentDataResp> resp =  pidService.queryPidDocumentData(queryPidDocumentReq);
+		BaseResp<QueryPidDocumentResp> resp =  pidService.queryPidDocument(queryPidDocumentReq);
 		okResult(resp);
 	}
 

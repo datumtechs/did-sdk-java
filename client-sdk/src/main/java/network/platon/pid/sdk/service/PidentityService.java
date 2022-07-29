@@ -22,13 +22,6 @@ public interface PidentityService {
 	 */
 	BaseResp<QueryPidDocumentResp> queryPidDocument(QueryPidDocumentReq req);
 
-
-	/**
-	 * Query the documentData info
-	 * @return
-	 */
-	BaseResp<QueryPidDocumentDataResp> queryPidDocumentData (QueryPidDocumentReq req);
-
 	/**
 	 * Set the corresponding publickey parameter according to PId
 	 * @param req
