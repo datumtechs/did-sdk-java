@@ -3,7 +3,6 @@ package network.platon.pid.sdk.contract.service.impl;
 import com.platon.crypto.Credentials;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import lombok.extern.slf4j.Slf4j;
-import network.platon.pid.contract.Pid;
 import network.platon.pid.common.enums.RetEnum;
 import network.platon.pid.common.utils.DateUtils;
 import network.platon.pid.contract.dto.ContractNameValues;
