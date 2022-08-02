@@ -1,7 +1,9 @@
 package network.platon.did.sdk.base.dto;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +13,10 @@ import lombok.Data;
 import network.platon.did.common.constant.ClaimMetaKey;
 import network.platon.did.common.constant.VpOrVcPoofKey;
 import network.platon.did.csies.utils.ConverDataUtils;
+import network.platon.did.csies.utils.Sha256;
 import network.platon.did.sdk.annoation.CustomNotBlank;
 import network.platon.did.sdk.annoation.CustomSize;
+import network.platon.did.sdk.constant.DidConst;
 import network.platon.did.sdk.constant.ReqAnnoationArgs;
 import network.platon.did.sdk.utils.CredentialsUtils;
 
@@ -128,7 +132,9 @@ public class Credential implements Serializable{
         }
         Credential credential = ConverDataUtils.clone(this);
         credential.setProof(null);
-        return CredentialsUtils.getCredentialHash(credential, salt, disclosures);
+		BigInteger seedUint64 = new BigInteger(String.valueOf(claimMeta.get(DidConst.CLAIMSEED)));
+		byte[] seed = Sha256.uint64ToByte(seedUint64);
+        return CredentialsUtils.getCredentialHash(credential, salt, disclosures, seed);
     }
 	
 	@SuppressWarnings("unchecked")
@@ -140,12 +146,20 @@ public class Credential implements Serializable{
 			disclosures = (Map<String, Object>) proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
         }
         Credential credential = ConverDataUtils.clone(this);
-        return CredentialsUtils.getCredentialHash(credential, salt, disclosures);
+		BigInteger seedUint64 = new BigInteger(String.valueOf(claimMeta.get(DidConst.CLAIMSEED)));
+		byte[] seed = Sha256.uint64ToByte(seedUint64);
+        return CredentialsUtils.getCredentialHash(credential, salt, disclosures, seed);
     }
 	
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> obtainSalt() {
-		return (Map<String, Object>) this.getProof().get(VpOrVcPoofKey.PROOF_SALT);
+		BigInteger seedUint64 = new BigInteger(String.valueOf(claimMeta.get(DidConst.CLAIMSEED)));
+		byte[] seed = Sha256.uint64ToByte(seedUint64);
+		HashMap<String, Object> saltMap = ConverDataUtils.clone((HashMap<String, Object>)claimData);
+		saltMap.remove(DidConst.CLAIMROOTHASH);
+		saltMap.remove(DidConst.CLAIMSEED);
+		CredentialsUtils.generateSalt(saltMap, seed);
+		return saltMap;
 	}
 	
 	public String obtainPctId() {

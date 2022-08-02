@@ -340,6 +340,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		retryableClient.init();
 		Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
 		Credentials credentials = Credentials.create(DidConfig.getCONTRACT_PRIVATEKEY());
+
 		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 		String hexAddress = Keys.getAddress(publicKey);
 		String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
@@ -355,7 +356,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 			throw new Exception(msg);
 		}
 
-		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).build();
+		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
 		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient().createDid(req);
 		if (createDidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createDidResp);
@@ -368,7 +369,8 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 
 	private String testCreatePct(String did, String privateKey, String pctJson, Integer type) throws Exception {
-		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).build();
+		String str = "test create pct";
+		CreatePctReq req = CreatePctReq.builder().privateKey(DidConfig.getCONTRACT_PRIVATEKEY()).pctjson(pctJson).extra(str.getBytes()).build();
 		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(privateKey)).registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);

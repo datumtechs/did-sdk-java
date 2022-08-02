@@ -19,6 +19,7 @@ import network.platon.did.sdk.resp.BaseResp;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -59,12 +60,16 @@ public class VerifyInputDataUtils {
 	}
 	
 	public static RetEnum checkPct(String pctJson,Map<String, Object> claim) {
+		HashMap<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>)claim);
+		newClaim.remove(DidConst.CLAIMROOTHASH);
+		newClaim.remove(DidConst.CLAIMSEED);
+
 		//TODO 补充claim数据判断
 		if(StringUtils.isBlank(pctJson)) {
 			log.error("get pct json is null");
 			return RetEnum.RET_CREDENTIAL_GET_PCT_ERROR;
 		}
-		String jsonData = ConverDataUtils.serialize(claim);
+		String jsonData = ConverDataUtils.serialize(newClaim);
 		if(!ConverDataUtils.isValidateJsonVersusSchema(jsonData, pctJson)) {
 			log.error("json isValidateJsonVersusSchema fail, jsonData:{},pctJson:{}",jsonData,pctJson);
 			return RetEnum.RET_CREDENTIAL_PCT_MATCH_ERROR;
@@ -75,8 +80,7 @@ public class VerifyInputDataUtils {
 	
 	public static RetEnum checkMap(Map<String, Object> claimMate,Map<String, Object> proof) {
 		if(!proof.containsKey(VpOrVcPoofKey.PROOF_VERIFICATIONMETHOD) || !proof.containsKey(VpOrVcPoofKey.PROOF_JWS)
-				|| !proof.containsKey(VpOrVcPoofKey.PROOF_CTEATED) || !proof.containsKey(VpOrVcPoofKey.PROOF_TYPE)
-				|| !proof.containsKey(VpOrVcPoofKey.PROOF_SALT)) {
+				|| !proof.containsKey(VpOrVcPoofKey.PROOF_CTEATED) || !proof.containsKey(VpOrVcPoofKey.PROOF_TYPE)) {
 			return RetEnum.RET_COMMON_PARAM_PROOF_INVALID;
 		}
 		if(!claimMate.containsKey(ClaimMetaKey.PCTID)) {

@@ -128,6 +128,9 @@ public class DidConst {
      */
     public static final String CLAIM = "claimData";
 
+	public static final String CLAIMROOTHASH = "rootHash";
+	public static final String CLAIMSEED = "seed";
+
     public static final String DEFAULT_PRESENTATION_TYPE = "VerifiablePresentation";
 
 

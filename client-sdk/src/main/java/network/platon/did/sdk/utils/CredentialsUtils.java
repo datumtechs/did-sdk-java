@@ -5,15 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import network.platon.did.common.constant.VpOrVcPoofKey;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.csies.utils.ConverDataUtils;
+import network.platon.did.csies.utils.Sha256;
 import network.platon.did.sdk.base.dto.Credential;
 import network.platon.did.sdk.constant.DidConst;
 import network.platon.did.sdk.enums.CredentialDisclosedValue;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Tools for credential
@@ -34,9 +33,9 @@ public class CredentialsUtils {
 	 * @return
 	 */
 	public static String getCredentialHash(Credential credential, Map<String, Object> salt,
-			Map<String, Object> disclosures) {
+			Map<String, Object> disclosures, byte[] seed) {
 		// Obtain signature data based on
-		String rawData = getCredentialData(credential, salt, disclosures);
+		String rawData = getCredentialData(credential, salt, disclosures, seed);
 		if (StringUtils.isEmpty(rawData)) {
 			return StringUtils.EMPTY;
 		}
@@ -52,19 +51,17 @@ public class CredentialsUtils {
 	 * @return
 	 */
 	public static String getCredentialData(Credential credential, Map<String, Object> salt,
-			Map<String, Object> disclosures) {
+			Map<String, Object> disclosures, byte[] seed) {
 		try {
 			Map<String, Object> credMap = ConverDataUtils.objToMap(credential);
 			// reset claim
-			credMap.put(DidConst.CLAIM, getClaimHash(credential, salt, disclosures));
+			credMap.put(DidConst.CLAIM, getClaimHash(credential, salt, disclosures, seed));
 
 			Map<String, Object> proof = (Map<String, Object>) credMap.get(VpOrVcPoofKey.PROOF);
 			// Remove salt for calculation proof
 			if(proof == null) {
 				proof = new HashMap<>();
 			}
-			proof.remove(VpOrVcPoofKey.PROOF_SALT);
-			proof.put(VpOrVcPoofKey.PROOF_SALT, null);
 			credMap.remove(VpOrVcPoofKey.PROOF);
 			credMap.put(VpOrVcPoofKey.PROOF, proof);
 			return ConverDataUtils.mapToCompactJson(credMap);
@@ -83,11 +80,14 @@ public class CredentialsUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getClaimHash(Credential credential, Map<String, Object> salt,
-			Map<String, Object> disclosures) {
+			Map<String, Object> disclosures, byte[] seed) {
 		Map<String, Object> claim = credential.getClaimData();
 		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) claim);
 
-		addSaltAndGetHash(newClaim, salt, disclosures);
+		String allNewValueHashes = "";
+		addSaltAndGetHash(newClaim, salt, disclosures, allNewValueHashes);
+		newClaim.put(DidConst.CLAIMROOTHASH, ConverDataUtils.sha3(allNewValueHashes));
+		newClaim.put(DidConst.CLAIMSEED, Sha256.byteToUin64(seed));
 		return newClaim;
 	}
 
@@ -98,7 +98,7 @@ public class CredentialsUtils {
 	 * @param disclosures
 	 */
 	private static void addSaltAndGetHash(Map<String, Object> claim, Map<String, Object> salt,
-			Map<String, Object> disclosures) {
+			Map<String, Object> disclosures, String allNewValueHashes) {
 		for (Map.Entry<String, Object> entry : salt.entrySet()) {
 			String key = entry.getKey();
 			Object disclosureObj = null;
@@ -110,16 +110,16 @@ public class CredentialsUtils {
 
 			if (saltObj instanceof Map) {
 				addSaltAndGetHash((Map<String, Object>) newClaimObj, (Map<String, Object>) saltObj,
-						(Map<String, Object>) disclosureObj);
+						(Map<String, Object>) disclosureObj, allNewValueHashes);
 			} else if (saltObj instanceof List) {
 				ArrayList<Object> disclosureObjList = null;
 				if (disclosureObj != null) {
 					disclosureObjList = (ArrayList<Object>) disclosureObj;
 				}
 				addSaltAndGetHashForList((ArrayList<Object>) newClaimObj, (ArrayList<Object>) saltObj,
-						disclosureObjList);
+						disclosureObjList, allNewValueHashes);
 			} else {
-				addSaltByDisclose(claim, key, disclosureObj, saltObj, newClaimObj);
+				addSaltByDisclose(claim, key, disclosureObj, saltObj, newClaimObj, allNewValueHashes);
 			}
 		}
 	}
@@ -133,13 +133,17 @@ public class CredentialsUtils {
 	 * @param newClaimObj
 	 */
 	private static void addSaltByDisclose(Map<String, Object> claim, String key, Object disclosureObj, Object saltObj,
-			Object newClaimObj) {
+			Object newClaimObj,  String allNewValueHashes) {
 		if (disclosureObj == null) {
 			if (!CredentialDisclosedValue.DISCLOSED.getStatus().equals(saltObj)) {
-				claim.put(key, getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj)));
+				String newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
+				allNewValueHashes += newValue;
+				claim.put(key, newValue);
 			}
 		} else if (CredentialDisclosedValue.DISCLOSED.getStatus().equals(disclosureObj)) {
-			claim.put(key, getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj)));
+			String newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
+			allNewValueHashes += newValue;
+			claim.put(key, newValue);
 		}
 	}
 
@@ -153,7 +157,7 @@ public class CredentialsUtils {
 	 * @param salt
 	 * @param disclosures
 	 */
-	private static void addSaltAndGetHashForList(List<Object> claim, List<Object> salt, List<Object> disclosures) {
+	private static void addSaltAndGetHashForList(List<Object> claim, List<Object> salt, List<Object> disclosures, String allNewValueHashes) {
 		for (int i = 0; claim != null && i < claim.size(); i++) {
 			Object obj = claim.get(i);
 			Object saltObj = salt.get(i);
@@ -163,7 +167,7 @@ public class CredentialsUtils {
 					disclosureObj = disclosures.get(0);
 				}
 				addSaltAndGetHash((Map<String, Object>) obj, (Map<String, Object>) saltObj,
-						(Map<String, Object>) disclosureObj);
+						(Map<String, Object>) disclosureObj, allNewValueHashes);
 			} else if (obj instanceof List) {
 				ArrayList<Object> disclosureObjList = null;
 				if (disclosures != null) {
@@ -172,29 +176,8 @@ public class CredentialsUtils {
 						disclosureObjList = (ArrayList<Object>) disclosureObj;
 					}
 				}
-				addSaltAndGetHashForList((ArrayList<Object>) obj, (ArrayList<Object>) saltObj, disclosureObjList);
+				addSaltAndGetHashForList((ArrayList<Object>) obj, (ArrayList<Object>) saltObj, disclosureObjList, allNewValueHashes);
 			}
-		}
-	}
-
-
-	/**
-	 * convert credential to corresponding json object
-	 * 
-	 * @param credential
-	 * @return
-	 */
-	public static String getCredentialThumbprintWithoutSig(Credential credential) {
-		try {
-			Map<String, Object> credMap = ConverDataUtils.objToMap(credential);
-			credMap.remove(VpOrVcPoofKey.PROOF);
-			credMap.put(VpOrVcPoofKey.PROOF, null);
-			Map<String, Object> salt = (Map<String, Object>) credential.getProof().get(VpOrVcPoofKey.PROOF_SALT);
-			credMap.put(DidConst.CLAIM, getClaimHash(credential, salt, null));
-			return ConverDataUtils.mapToCompactJson(credMap);
-		} catch (Exception e) {
-			log.error("get Credential Thumbprint WithoutSig error.", e);
-			return StringUtils.EMPTY;
 		}
 	}
 
@@ -213,28 +196,36 @@ public class CredentialsUtils {
 	/**
 	 * Generate a map of salts based on the map. If fixed has a value, all salts use the fixed value
 	 * @param map
-	 * @param fixed
+	 * @param seed
 	 */
-	public static void generateSalt(Map<String, Object> map, Object fixed) {
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
+	public static void generateSalt(Map<String, Object> map, byte[] seed) {
+		if(null == seed){
+			Random r = new Random();
+			long oneRandom = r.nextLong();
+			seed = Sha256.uint64ToByte(new BigInteger(String.valueOf(oneRandom)));
+		}
+
+		List<Map.Entry<String, Object>> list = new ArrayList<Map.Entry<String, Object>>(map.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<String, Object>>() {
+
+			@Override
+			public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+
+		for (Map.Entry<String, Object> entry : list) {
 			Object value = entry.getValue();
 			if (value instanceof Map) {
-				generateSalt((Map<String, Object>) value, fixed);
+				generateSalt((Map<String, Object>) value, seed);
 			} else if (value instanceof List) {
-				boolean isMapOrList = generateSaltFromList((ArrayList<Object>) value, fixed);
+				boolean isMapOrList = generateSaltFromList((ArrayList<Object>) value, seed);
 				if (!isMapOrList) {
-					if (fixed == null) {
-						addSalt(entry);
-					} else {
-						entry.setValue(fixed);
-					}
+					entry.setValue(seed);
 				}
 			} else {
-				if (fixed == null) {
-					addSalt(entry);
-				} else {
-					entry.setValue(fixed);
-				}
+				seed = Sha256.sha256(seed);
+				entry.setValue(Sha256.byteToUin64(seed));
 			}
 		}
 	}
@@ -248,13 +239,13 @@ public class CredentialsUtils {
 		entry.setValue(salt);
 	}
 
-	private static boolean generateSaltFromList(List<Object> objList, Object fixed) {
+	private static boolean generateSaltFromList(List<Object> objList, byte[] seed) {
 		List<Object> list = (List<Object>) objList;
 		for (Object obj : list) {
 			if (obj instanceof Map) {
-				generateSalt((Map<String, Object>) obj, fixed);
+				generateSalt((Map<String, Object>) obj, seed);
 			} else if (obj instanceof List) {
-				boolean result = generateSaltFromList((ArrayList<Object>) obj, fixed);
+				boolean result = generateSaltFromList((ArrayList<Object>) obj, seed);
 				if (!result) {
 					return result;
 				}

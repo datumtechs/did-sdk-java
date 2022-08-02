@@ -11,6 +11,7 @@ import network.platon.did.common.enums.RetEnum;
 import network.platon.did.common.utils.DateUtils;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.csies.utils.ConverDataUtils;
+import network.platon.did.csies.utils.Sha256;
 import network.platon.did.sdk.base.dto.CheckData;
 import network.platon.did.sdk.base.dto.Credential;
 import network.platon.did.sdk.req.credential.CreateCredentialReq;
@@ -27,10 +28,8 @@ import network.platon.did.sdk.utils.PresentationUtils;
 import network.platon.did.sdk.utils.VerifyInputDataUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 @Slf4j
 public class CredentialServiceImpl extends BusinessBaseService implements CredentialService,Serializable,Cloneable {
@@ -72,9 +71,15 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		// Get random salt
 		HashMap<String, Object> claimMap =  (HashMap<String, Object>) credential.getClaimData();
 		Map<String, Object> saltMap = ConverDataUtils.clone(claimMap);
-		CredentialsUtils.generateSalt(saltMap, null);
+
+		// get claim data seed and salt map
+		Random r = new Random();
+		long oneRandom = r.nextLong();
+		byte[] seed = Sha256.uint64ToByte(new BigInteger(String.valueOf(oneRandom)));
+		CredentialsUtils.generateSalt(saltMap, seed);
+
 		// Get sign data
-		String rawData = CredentialsUtils.getCredentialHash(credential, saltMap, null);
+		String rawData = CredentialsUtils.getCredentialHash(credential, saltMap, null, seed);
 		// Get signature
 		String signature = AlgorithmHandler.signMessageStr(rawData, req.getPrivateKey());
 
@@ -83,7 +88,6 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		proof.put(VpOrVcPoofKey.PROOF_VERIFICATIONMETHOD, req.getPublicKeyId());
 		proof.put(VpOrVcPoofKey.PROOF_JWS, signature);
 		proof.put(VpOrVcPoofKey.PROOF_CTEATED, credential.getIssuanceDate());
-		proof.put(VpOrVcPoofKey.PROOF_SALT, saltMap);
 		proof.put(VpOrVcPoofKey.PROOF_TYPE, AlgorithmTypeEnum.ECC.getDesc());
 		credential.setProof(proof);
 		CreateCredentialResp createCredentialResp = new CreateCredentialResp();
