@@ -104,7 +104,7 @@ subprojects {
 	check.dependsOn jacocoTestReport
 }
 
-configure(subprojects.findAll { it.name != 'pid-tests' }) {
+configure(subprojects.findAll { it.name != 'did-tests' }) {
     apply plugin: 'maven'
     apply plugin: 'signing'
     apply plugin: 'maven-publish'

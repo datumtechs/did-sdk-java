@@ -35,7 +35,7 @@ build/
 .DS_Store
 
 # JVM crash logs
-hs_err_pid*.log
+hs_err_did*.log
 dependency-reduced-pom.xml
 manager/log
 manager/target/
@@ -62,7 +62,7 @@ dao/.settings/
 manager/.settings/
 pojo/bin/
 
-server/apidoc/doc/
+server/adidoc/doc/
 serverdoc/
 logs/
 codegen/out/

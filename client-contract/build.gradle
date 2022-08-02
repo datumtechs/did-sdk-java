@@ -6,7 +6,7 @@ sonarqube {
 	properties {
 		property "sonar.exclusions", "**/Credential.java," +
 				"**/Pct.java," +
-				"**/Pid.java," +
+				"**/Did.java," +
 				"**/Vote.java,"
 	}
 }
