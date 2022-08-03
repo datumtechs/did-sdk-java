@@ -65,9 +65,9 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	}
 
 	@Override
-	public TransactionResp<String> createCredentialEvience(String hash, String signer, String signatureData, String updateTime) {
+	public TransactionResp<String> createCredentialEvience(String hash, String signerPublicKey, String signatureData, String updateTime) {
 		try {
-			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(Numeric.hexStringToByteArray(hash), signer, signatureData, updateTime).send();
+			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(Numeric.hexStringToByteArray(hash), signerPublicKey, signatureData, updateTime).send();
 			return TransactionResp.buildTxSuccess(new TransactionInfo(transactionReceipt));
 		} catch (Exception e) {
 			log.error("create credential erorr.", e);

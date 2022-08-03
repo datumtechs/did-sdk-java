@@ -18,7 +18,7 @@ public interface CredentialContractService {
      * Create credential in CredentialContract
      * @return
      */
-    TransactionResp<String> createCredentialEvience(String hash, String signer, String signatureData, String updateTime);
+    TransactionResp<String> createCredentialEvience(String hash, String signerPublicKey, String signatureData, String updateTime);
 
     /**
      * Query credential by hash
