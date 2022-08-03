@@ -135,6 +135,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		VerifyCredentialEvidenceReq verifyEvidenceReq = VerifyCredentialEvidenceReq.builder().credential(credential)
 				.build();
 		resp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).verifyCredentialEvidence(verifyEvidenceReq);
+		assertTrue(resp.checkFail());
 	}
 
 	@Test
@@ -154,15 +155,15 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		// Create credential
 		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
 
-		testCreateEvidence(credential, issuerPriKey);
-
 		// The evidence is not exists
 		VerifyCredentialEvidenceReq req = VerifyCredentialEvidenceReq.builder().credential(credential).build();
 		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).verifyCredentialEvidence(req);
+		assertTrue(resp.checkFail());
 
 		// The credential is null
 		req = VerifyCredentialEvidenceReq.builder().credential(null).build();
 		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).verifyCredentialEvidence(req);
+		assertTrue(resp.checkFail());
 
 		// Create evidence
 		testCreateEvidence(credential, issuerPriKey);
@@ -170,6 +171,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		// susccess
 		req = VerifyCredentialEvidenceReq.builder().credential(credential).build();
 		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).verifyCredentialEvidence(req);
+		assertTrue(resp.checkSuccess());
 	}
 
 	private String testCreateEvidence(Credential credential, String issuerPriKey) throws Exception {
