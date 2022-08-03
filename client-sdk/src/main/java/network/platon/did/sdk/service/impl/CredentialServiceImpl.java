@@ -73,6 +73,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		// get claim data seed and salt map
 		Random r = new Random();
 		long oneRandom = r.nextLong();
+		if(oneRandom < 0) oneRandom = - oneRandom;
 		byte[] seed = Sha256.uint64ToByte(new BigInteger(String.valueOf(oneRandom)));
 		CredentialsUtils.generateSalt(saltMap, seed);
 

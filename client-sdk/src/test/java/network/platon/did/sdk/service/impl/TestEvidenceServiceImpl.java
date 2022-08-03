@@ -75,7 +75,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
 
 		CreateEvidenceReq req = CreateEvidenceReq.builder().credential(credential).privateKey(issuerPriKey).build();
-		resp = PClient.createEvidenceClient().createEvidence(req);
+		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).createEvidence(req);
 
 		assertTrue(resp.checkSuccess());
 	}
@@ -129,7 +129,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 		RevokeEvidenceReq req = RevokeEvidenceReq.builder().evidenceId(credential.obtainHash())
 				.privateKey(issuerPriKey).build();
-		resp = PClient.createEvidenceClient().revokeEvidence(req);
+		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).revokeEvidence(req);
 		assertTrue(resp.checkSuccess());
 
 		VerifyCredentialEvidenceReq verifyEvidenceReq = VerifyCredentialEvidenceReq.builder().credential(credential)
@@ -158,23 +158,23 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 		// The evidence is not exists
 		VerifyCredentialEvidenceReq req = VerifyCredentialEvidenceReq.builder().credential(credential).build();
-		resp = PClient.createEvidenceClient().verifyCredentialEvidence(req);
+		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).verifyCredentialEvidence(req);
 
 		// The credential is null
 		req = VerifyCredentialEvidenceReq.builder().credential(null).build();
-		resp = PClient.createEvidenceClient().verifyCredentialEvidence(req);
+		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).verifyCredentialEvidence(req);
 
 		// Create evidence
 		testCreateEvidence(credential, issuerPriKey);
 
 		// susccess
 		req = VerifyCredentialEvidenceReq.builder().credential(credential).build();
-		resp = PClient.createEvidenceClient().verifyCredentialEvidence(req);
+		resp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).verifyCredentialEvidence(req);
 	}
 
 	private String testCreateEvidence(Credential credential, String issuerPriKey) throws Exception {
 		CreateEvidenceReq req = CreateEvidenceReq.builder().credential(credential).privateKey(issuerPriKey).build();
-		BaseResp<CreateEvidenceResp> createEvidenceBaseResp = PClient.createEvidenceClient().createEvidence(req);
+		BaseResp<CreateEvidenceResp> createEvidenceBaseResp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).createEvidence(req);
 
 		if (createEvidenceBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createEvidenceBaseResp);
@@ -187,7 +187,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 	private Boolean testRevokeEvidence(Credential credential, String issuerPriKey) throws Exception {
 		RevokeEvidenceReq req = RevokeEvidenceReq.builder().evidenceId(credential.obtainHash())
 				.privateKey(issuerPriKey).build();
-		BaseResp<RevokeEvidenceResp> revokeEvidence = PClient.createEvidenceClient().revokeEvidence(req);
+		BaseResp<RevokeEvidenceResp> revokeEvidence = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).revokeEvidence(req);
 
 		if (revokeEvidence.checkFail()) {
 			String msg = JSONObject.toJSONString(revokeEvidence);
@@ -199,7 +199,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 	private QueryEvidenceResp testQueryEvidence(String evidenceId) throws Exception {
 		QueryEvidenceReq req = QueryEvidenceReq.builder().evidenceId(evidenceId).build();
-		BaseResp<QueryEvidenceResp> queryEvidenceResp = PClient.createEvidenceClient().queryEvidence(req);
+		BaseResp<QueryEvidenceResp> queryEvidenceResp = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).queryEvidence(req);
 		if (queryEvidenceResp.checkFail()) {
 			String msg = JSONObject.toJSONString(queryEvidenceResp);
 
@@ -223,7 +223,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 					.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 					.type(credentialType).build();
-			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient().createCredential(req);
+			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).createCredential(req);
 			if (resp.checkSuccess())
 				return resp.getData().getCredential();
 		} catch (Exception e) {
@@ -257,7 +257,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		}
 
 		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
-		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient().createDid(req);
+		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).createDid(req);
 		if (createDidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createDidResp);
 			logger.error("Create did error,error msg:{}", msg);
@@ -271,7 +271,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 		String str = "This is a String";
 		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).privateKey(DidConfig.getCONTRACT_PRIVATEKEY()).extra(str.getBytes()).build();
-		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient().registerPct(req);
+		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);
 			logger.error("Register pct error,error msg:{}", msg);

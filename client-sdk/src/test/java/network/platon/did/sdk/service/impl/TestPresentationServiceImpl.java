@@ -14,6 +14,7 @@ import com.platon.utils.Numeric;
 import network.platon.did.common.config.DidConfig;
 import network.platon.did.common.utils.DateUtils;
 import network.platon.did.contract.client.RetryableClient;
+import network.platon.did.contract.dto.InitContractData;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.sdk.BaseTest;
 import network.platon.did.sdk.base.dto.*;
@@ -168,7 +169,7 @@ public class TestPresentationServiceImpl extends BaseTest{
 		}
 
 		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
-		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient().createDid(req);
+		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).createDid(req);
 		if (createDidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createDidResp);
 			logger.error("Create did error,error msg:{}", msg);

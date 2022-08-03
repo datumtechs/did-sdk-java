@@ -3,6 +3,7 @@ package network.platon.did.sdk.factory;
 
 import network.platon.did.common.config.DidConfig;
 import network.platon.did.common.enums.Web3jProtocolEnum;
+import network.platon.did.contract.dto.InitContractData;
 import org.junit.Test;
 
 import network.platon.did.contract.dto.InitClientData;
@@ -32,7 +33,7 @@ public class TestPClient extends BaseTest{
 				.build();
 		ReloadClient.reload(initClientData);
 		DeployContract.deployContractData(adminPrivateKey, adminAddress, adminServiceUrl);
-		DidentityClient didentityClient = PClient.createDidentityClient();
+		DidentityClient didentityClient = PClient.createDidentityClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
 		CreateDidReq req = CreateDidReq.builder()
 				.privateKey(adminPrivateKey)
 				.build();
