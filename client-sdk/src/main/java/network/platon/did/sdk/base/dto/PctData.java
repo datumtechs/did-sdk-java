@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PctData {
 
-    private String did;
+    private String pctId;
 
     private String issue;
 

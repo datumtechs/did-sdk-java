@@ -47,12 +47,7 @@ public class TestPctServiceImpl extends BaseTest {
 
     @Test
     public void test_createPct() {
-        // okResult(createPct().getCreatePctResp());
-        Random randTest = new Random(23523865082340324L);
-        System.out.println(randTest.nextLong());
-        System.out.println(randTest.nextLong());
-        System.out.println(randTest.nextLong());
-        System.out.println(randTest.nextLong());
+        okResult(createPct().getCreatePctResp());
     }
 
     @Test

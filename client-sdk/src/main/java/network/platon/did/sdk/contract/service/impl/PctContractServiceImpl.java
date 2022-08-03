@@ -69,7 +69,7 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 				return BaseResp.build(RetEnum.RET_PCT_QUERY_JSON_NOT_FOUND_ERROR);
 			}
 			PctData result = new PctData();
-			result.setDid(pctId);
+			result.setPctId(pctId);
 			result.setIssue(pctInfo.getValue1());
 			result.setPctJson(pctInfo.getValue2());
 			result.setExtra(pctInfo.getValue3());
