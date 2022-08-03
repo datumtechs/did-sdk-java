@@ -49,6 +49,10 @@ public class DidConfig {
 	private static Long CHAIN_ID;
 	
 	private final static String ChainIdName = "platon.web3j.chainId";
+
+	private static String CHAIN_HRP;
+
+	private final static String ChainHrpName = "platon.web3j.chainHrp";
 	
 	private static String CONTRACT_PRIVATEKEY;
 	
@@ -67,7 +71,6 @@ public class DidConfig {
 	}
 	
 	public static void load() {
-		NetworkParameters.selectPlatON();
 		web3jProtocolEnum = Web3jProtocolEnum.HTTP;
 		String protocol = PropertyUtils.getProperty(ProtocolName,"");
 		if("ws".equals(protocol)) {
@@ -92,10 +95,12 @@ public class DidConfig {
 		}
 
 		CHAIN_ID = Long.valueOf(PropertyUtils.getProperty(ChainIdName,"120"));
+		CHAIN_HRP = PropertyUtils.getProperty(ChainHrpName,"");
 		CONTRACT_PRIVATEKEY = PropertyUtils.getProperty(ContractPrivateName,"");
 
 		ADMIN_ADDRESS = PropertyUtils.getProperty(AdminAddressName,"");
 		ADMIN_SERVICE_URL = PropertyUtils.getProperty(AdminServiceUrlName,"");
+		NetworkParameters.init(CHAIN_ID, CHAIN_HRP);
 	}
 	
 	public static Web3jProtocolEnum getWeb3jProtocolEnum() {
@@ -178,6 +183,14 @@ public class DidConfig {
 		CHAIN_ID = cHAIN_ID;
 	}
 
+	public static String getCHAIN_HRP() {
+		return CHAIN_HRP;
+	}
+
+	public static void setCHAIN_HRP(Long cHAIN_HRP) {
+		CHAIN_ID = cHAIN_HRP;
+	}
+
 	public static String getADMIN_ADDRESS() {
 		return ADMIN_ADDRESS;
 	}
@@ -241,6 +254,10 @@ public class DidConfig {
 
 	public static String getChainidname() {
 		return ChainIdName;
+	}
+
+	public static String getChainhrpname() {
+		return ChainHrpName;
 	}
 
 	public static String getContractprivatename() {

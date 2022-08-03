@@ -1,7 +1,9 @@
 package network.platon.did.sdk.constant;
 
+import com.platon.abi.solidity.EventEncoder;
 import com.platon.rlp.wasm.datatypes.Uint8;
 import com.platon.utils.Numeric;
+import network.platon.did.contract.Did;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -9,26 +11,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Storage variable
- * @Auther: Rongjin Zhang
- * @Date: 2020年5月29日
- * @Description:
- */
+
 public class DidConst {
 
 	public static final String DID_PREFIX = "did:did:";
 
 	public static final String DID_EVENT_ATTRIBUTE_CHANGE_STR = "DIDAttributeChanged";
-	public static final String DID_EVENT_ATTRIBUTE_CHANGE_RLP = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(
-			DID_EVENT_ATTRIBUTE_CHANGE_STR.getBytes(StandardCharsets.UTF_8)), 64);
+	public static final String DID_EVENT_ATTRIBUTE_CHANGE_TOPIC = EventEncoder.encode(Did.DIDATTRIBUTECHANGE_EVENT);
+	public static final String PLATON_DID_PATTERN = "did:did:[a-zA-Z0-9]{42}";
+	public static final String PLATON_ADDRESS_PATTERN = "[a-zA-Z0-9]{42}";
 
-	public static final String PLATONE_DID_PATTERN = "did:did:[a-zA-Z0-9]{42}";
-
-	public static final String PLATONE_ADDRESS_PATTERN = "[a-zA-Z0-9]{42}";
-
-	public static final String PLATONE_PRIVATE_KEY_PATTERN = "0x[a-fA-f0-9]{60,64}|[a-fA-f0-9]{60,64}";
-	public static final String PLATONE_PUBLICK_KEY_PATTERN = "0x[a-fA-f0-9]{120,128}|[a-fA-f0-9]{120,128}";
+	public static final String PLATON_PRIVATE_KEY_PATTERN = "0x[a-fA-f0-9]{60,64}|[a-fA-f0-9]{60,64}";
+	public static final String PLATON_PUBLICK_KEY_PATTERN = "0x[a-fA-f0-9]{120,128}|[a-fA-f0-9]{120,128}";
 
 	public static final int ADDRESS_LENGTH_IN_HEX = 42;
 	public static final int MAX_AUTHORITY_ISSUER_NAME_LENGTH = 32;
@@ -119,7 +113,7 @@ public class DidConst {
 	 * the document attr value member length
 	 */
 	public static final int DID_SERVICE_VALUE_MEM_LEN = 4;
-	public static final int DID_PUBLICKEY_VALUE_MEM_LEN = 5;
+	public static final int DID_PUBLICKEY_VALUE_MEM_LEN = 4;
 	public static final int DID_AUTH_VALUE_MEM_LEN = 3;
 
 

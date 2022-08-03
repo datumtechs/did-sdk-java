@@ -1,11 +1,11 @@
 package network.platon.did.sdk.contract.service.impl;
 
 import com.platon.crypto.Credentials;
-import network.platon.did.contract.Credential;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.did.common.enums.RetEnum;
+import network.platon.did.contract.Credential;
 import network.platon.did.contract.dto.ContractNameValues;
 import network.platon.did.contract.dto.CredentialEvidence;
 import network.platon.did.contract.dto.DeployContractData;
@@ -67,7 +67,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	@Override
 	public TransactionResp<String> createCredentialEvience(String hash, String signer, String signatureData, String updateTime) {
 		try {
-			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(hash.getBytes(), signer, signatureData, updateTime).send();
+			TransactionReceipt transactionReceipt = this.getCredentialContract().createCredential(Numeric.hexStringToByteArray(hash), signer, signatureData, updateTime).send();
 			return TransactionResp.buildTxSuccess(new TransactionInfo(transactionReceipt));
 		} catch (Exception e) {
 			log.error("create credential erorr.", e);
@@ -82,7 +82,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 			if(blockNumber == null || blockNumber.longValue() == 0) {
 				return TransactionResp.build(RetEnum.RET_CREDENTIAL_CONTRACT_NOT_FOUND_ERROR);
 			}
-			CredentialEvidence credentialEvidence = CredentialEventProcessor.decodeCredentialByBlock(blockNumber, Credential.CREDENTIALATTRIBUTECHANGE_EVENT,hash);
+			CredentialEvidence credentialEvidence = CredentialEventProcessor.decodeCredentialByBlock(blockNumber, Credential.CREDENTIALATTRIBUTECHANGE_EVENT, hash);
 			if(credentialEvidence == null) {
 				return TransactionResp.build(RetEnum.RET_CREDENTIAL_CONTRACT_NOT_FOUND_ERROR);
 			}
@@ -107,7 +107,7 @@ public class CredentialContractServiceImpl extends ContractService implements Cr
 	@Override
 	public TransactionResp<BigInteger> getStatus(String hash) {
 		try {
-			BigInteger status = this.getCredentialContract().getStatus(hash.getBytes()).send();
+			BigInteger status = this.getCredentialContract().getStatus(Numeric.hexStringToByteArray(hash)).send();
 			return TransactionResp.buildSuccess(status);
 		} catch (Exception e) {
 			log.error("query credential status erorr.", e);

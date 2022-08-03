@@ -4,11 +4,13 @@ import com.platon.crypto.Credentials;
 import com.platon.protocol.core.methods.response.TransactionReceipt;
 import com.platon.tuples.generated.Tuple3;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import network.platon.did.common.enums.RetEnum;
 import network.platon.did.contract.Pct;
 import network.platon.did.contract.dto.ContractNameValues;
 import network.platon.did.contract.dto.DeployContractData;
 import network.platon.did.contract.dto.TransactionInfo;
+import network.platon.did.sdk.base.dto.PctData;
 import network.platon.did.sdk.contract.service.ContractService;
 import network.platon.did.sdk.contract.service.PctContractService;
 import network.platon.did.sdk.resp.BaseResp;
@@ -50,6 +52,7 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 		try {
 			TransactionReceipt receipt = this.getPctContract().registerPct(pctJson, extra).send();
 
+
 			List<Pct.RegisterPctEventResponse> registerPctEventResponses = this.getPctContract().getRegisterPctEvents(receipt);
 			BigInteger arg1 = registerPctEventResponses.get(0).pctId;
 			return TransactionResp.buildTxSuccess(arg1, new TransactionInfo(receipt));
@@ -60,14 +63,18 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 	}
 
 	@Override
-	public BaseResp<String> queryPctById(String pctId) {
+	public BaseResp<PctData> queryPctById(String pctId) {
 		try {
 			Tuple3<String, String, byte[]> pctInfo = this.getPctContract().getPctInfo(new BigInteger(pctId)).send();
-			String pctJson = new String(pctInfo.getValue2());
-			if (StringUtils.isBlank(pctJson)) {
+			if (StringUtils.isBlank(pctInfo.getValue2())) {
 				return BaseResp.build(RetEnum.RET_PCT_QUERY_JSON_NOT_FOUND_ERROR);
 			}
-			return BaseResp.buildSuccess(pctJson);
+			PctData result = new PctData();
+			result.setDid(pctId);
+			result.setIssue(pctInfo.getValue1());
+			result.setPctJson(pctInfo.getValue2());
+			result.setExtra(pctInfo.getValue3());
+			return BaseResp.buildSuccess(result);
 		} catch (Exception e) {
 			log.error("queryPctJsonById pct error {}", pctId, e);
 			return BaseResp.build(RetEnum.RET_PCT_QUERY_BY_ID_ERROR,e.getMessage());

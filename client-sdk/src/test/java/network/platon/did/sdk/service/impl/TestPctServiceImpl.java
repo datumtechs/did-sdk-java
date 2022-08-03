@@ -1,16 +1,21 @@
 package network.platon.did.sdk.service.impl;
 
+import com.platon.crypto.ECKeyPair;
+import com.platon.utils.Numeric;
 import lombok.Data;
-import network.platon.did.contract.dto.InitContractData;
-import network.platon.did.sdk.req.pct.QueryPctJsonListReq;
+import network.platon.did.common.config.DidConfig;
+import network.platon.did.csies.algorithm.AlgorithmHandler;
+import network.platon.did.sdk.req.pct.QueryPctInfoReq;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.pct.CreatePctResp;
-import network.platon.did.sdk.resp.did.CreateDidResp;
+import network.platon.did.sdk.resp.pct.QueryPctInfoResp;
+import network.platon.did.sdk.utils.DidUtils;
 import org.junit.Test;
 
 import network.platon.did.sdk.BaseTest;
 import network.platon.did.sdk.req.pct.CreatePctReq;
-import network.platon.did.sdk.req.pct.QueryPctJsonReq;
+
+import java.util.Random;
 
 public class TestPctServiceImpl extends BaseTest {
 
@@ -21,15 +26,17 @@ public class TestPctServiceImpl extends BaseTest {
     }
 
     private createPctResult createPct () {
-        BaseResp<CreateDidResp> createDidResp = this.createDidBase();
-        if (createDidResp.checkFail()) {
-            failedResult(createDidResp);
-        }
-        String did = createDidResp.getData().getDid();
-        ((PctServiceImpl)pctService).reloadContractData(new InitContractData(createDidResp.getData().getPrivateKey()));
+
+        ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(DidConfig.getCONTRACT_PRIVATEKEY());
+        String didPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
+        String did = DidUtils.generateDid(didPublicKey);
+
         String pctJson = "{\"properties\": { \"name\": { \"type\": \"string\" }, \"no\": { \"type\": \"string\" }, \"data\": { \"type\": \"string\" }}}";
+        String str = "This is a String";
         CreatePctReq req = CreatePctReq.builder()
+                .privateKey(DidConfig.getCONTRACT_PRIVATEKEY())
                 .pctjson(pctJson)
+                .extra(str.getBytes())
                 .build();
 
         createPctResult res = new createPctResult();
@@ -40,23 +47,22 @@ public class TestPctServiceImpl extends BaseTest {
 
     @Test
     public void test_createPct() {
-        okResult(createPct().getCreatePctResp());
+        // okResult(createPct().getCreatePctResp());
+        Random randTest = new Random(23523865082340324L);
+        System.out.println(randTest.nextLong());
+        System.out.println(randTest.nextLong());
+        System.out.println(randTest.nextLong());
+        System.out.println(randTest.nextLong());
     }
 
     @Test
     public void test_queryPctJson() {
         BaseResp<CreatePctResp> createPctResp = createPct().getCreatePctResp();
         okResult(createPctResp);
-        QueryPctJsonReq req = QueryPctJsonReq.builder()
+        QueryPctInfoReq req = QueryPctInfoReq.builder()
         		.pctId(createPctResp.getData().getPctId()).build();
-        okResult(pctService.queryPctJsonById(req));
-    }
-
-    @Test
-    public void test_queryPctIdsByDid() {
-        createPctResult res = createPct();
-        okResult(res.getCreatePctResp());
-        QueryPctJsonListReq issuer = QueryPctJsonListReq.of(res.getIssuer());
+        BaseResp<QueryPctInfoResp> resp = pctService.queryPctInfoById(req);
+        okResult(resp);
     }
 
 

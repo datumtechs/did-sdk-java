@@ -1,5 +1,6 @@
 package network.platon.did.sdk.contract.service;
 
+import network.platon.did.sdk.base.dto.PctData;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.TransactionResp;
 
@@ -25,5 +26,5 @@ public interface PctContractService {
 	 * @param pctId
 	 * @return
 	 */
-	BaseResp<String> queryPctById(String pctId);
+	BaseResp<PctData> queryPctById(String pctId);
 }

@@ -17,11 +17,13 @@ import network.platon.did.common.enums.RetEnum;
 import network.platon.did.common.utils.PropertyUtils;
 import network.platon.did.contract.client.RetryableClient;
 import network.platon.did.contract.dto.DeployContractData;
+import network.platon.did.contract.dto.InitContractData;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.sdk.base.dto.Credential;
 import network.platon.did.sdk.client.ReloadClient;
 import network.platon.did.sdk.contract.service.ContractService;
 import network.platon.did.sdk.deploy.DeployContract;
+import network.platon.did.sdk.factory.PClient;
 import network.platon.did.sdk.req.credential.CreateCredentialReq;
 import network.platon.did.sdk.req.did.CreateDidReq;
 import network.platon.did.sdk.resp.BaseResp;
@@ -29,7 +31,6 @@ import network.platon.did.sdk.resp.TransactionResp;
 import network.platon.did.sdk.resp.credential.CreateCredentialResp;
 import network.platon.did.sdk.resp.did.CreateDidResp;
 import network.platon.did.sdk.service.*;
-import network.platon.did.sdk.service.impl.*;
 import network.platon.did.sdk.utils.DidUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -45,17 +46,19 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class BaseTest {
 
-    protected CredentialService credentialService = new CredentialServiceImpl();
+    static {
+        NetworkParameters.init(210309L, "lat");
+    }
 
-    protected PresentationService presentationService = new PresentationServiceImpl();
+    protected CredentialService credentialService = PClient.createCredentialClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected EvidenceService evidenceService = new EvidenceServiceImpl();
+    protected EvidenceService evidenceService = PClient.createEvidenceClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected VoteService agencyService = new VoteServiceImpl();
+    protected VoteService voteService = PClient.createAgencyClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected PctService pctService = new PctServiceImpl();
+    protected PctService pctService = PClient.createPctClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
 
-    protected DidentityService didService = new DidentityServiceImpl();
+    protected DidentityService didService = PClient.createDidentityClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
 
     protected BaseResp<?> resp;
 
@@ -148,19 +151,22 @@ public class BaseTest {
     }
 
     public boolean createIdentityByPrivateKey(BaseResp<?> resp, String privateKey) {
+
         ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
-        RetryableClient retryableClient = new RetryableClient();
-        retryableClient.init();
-        Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
-        Credentials credentials = Credentials.create(DidConfig.getCONTRACT_PRIVATEKEY());
         String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
         String hexAddress = Keys.getAddress(publicKey);
         String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
+
+        RetryableClient retryableClient = new RetryableClient();
+        retryableClient.init();
+        Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
+
+        Credentials credentials = Credentials.create(DidConfig.getCONTRACT_PRIVATEKEY());
         TransactionReceipt receipt = null;
         try {
             receipt = Transfer.sendFunds(
                             web3j, credentials, address,
-                            BigDecimal.valueOf(80000000), Convert.Unit.PVON)
+                            BigDecimal.valueOf(1), Convert.Unit.KPVON)
                     .send();
         }catch (Exception e) {
             log.error(
@@ -179,7 +185,8 @@ public class BaseTest {
             return false;
         }
 
-        CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).build();
+
+        CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
         BaseResp<CreateDidResp> createDidResp = didService.createDid(req);
         resp = createDidResp;
         if (createDidResp.checkFail() && createDidResp.getCode() != RetEnum.RET_DID_IDENTITY_ALREADY_EXIST.getCode()) {
@@ -224,6 +231,7 @@ public class BaseTest {
         retryableClient.init();
         Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
         Credentials credentials = Credentials.create(DidConfig.getCONTRACT_PRIVATEKEY());
+
         String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
         String hexAddress = Keys.getAddress(publicKey);
         String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
@@ -231,7 +239,7 @@ public class BaseTest {
         try {
             receipt = Transfer.sendFunds(
                             web3j, credentials, address,
-                            BigDecimal.valueOf(80000000), Convert.Unit.PVON)
+                            BigDecimal.valueOf(1), Convert.Unit.KPVON)
                     .send();
         }catch (Exception e) {
             log.error(
@@ -248,7 +256,7 @@ public class BaseTest {
         }
 
         String privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
-        CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).build();
+        CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
         return didService.createDid(req);
     }
 

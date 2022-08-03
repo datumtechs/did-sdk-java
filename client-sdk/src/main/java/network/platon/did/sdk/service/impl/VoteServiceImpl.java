@@ -40,8 +40,9 @@ public class VoteServiceImpl extends BusinessBaseService implements VoteService,
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
 
+        this.ChangePrivateKey(req.getPrivateKey());
         TransactionResp<Boolean> resp =
-                (TransactionResp<Boolean>) this.getVoteContractService(new InitContractData(req.getPrivateKey()))
+                (TransactionResp<Boolean>) this.getVoteContractService()
                         .submitProposal(req.getProposalType(), req.getProposalUrl(), req.getCandidate(), req.getCandidateServiceUrl());
 
         return resp;
@@ -54,8 +55,9 @@ public class VoteServiceImpl extends BusinessBaseService implements VoteService,
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
 
+        this.ChangePrivateKey(req.getPrivateKey());
         TransactionResp<Boolean> resp =
-                (TransactionResp<Boolean>) this.getVoteContractService(new InitContractData(req.getPrivateKey()))
+                (TransactionResp<Boolean>) this.getVoteContractService()
                         .withdrawProposal(req.getProposalId());
 
         return resp;
@@ -68,8 +70,9 @@ public class VoteServiceImpl extends BusinessBaseService implements VoteService,
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
 
+        this.ChangePrivateKey(req.getPrivateKey());
         TransactionResp<Boolean> resp =
-                (TransactionResp<Boolean>) this.getVoteContractService(new InitContractData(req.getPrivateKey()))
+                (TransactionResp<Boolean>) this.getVoteContractService()
                         .voteProposal(req.getProposalId());
 
         return resp;
@@ -82,8 +85,9 @@ public class VoteServiceImpl extends BusinessBaseService implements VoteService,
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
 
+        this.ChangePrivateKey(req.getPrivateKey());
         TransactionResp<Boolean> resp =
-                (TransactionResp<Boolean>) this.getVoteContractService(new InitContractData(req.getPrivateKey()))
+                (TransactionResp<Boolean>) this.getVoteContractService()
                         .effectProposal(req.getProposalId());
 
         return resp;

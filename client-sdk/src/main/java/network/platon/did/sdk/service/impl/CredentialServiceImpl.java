@@ -57,17 +57,15 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
 		}
 
-		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
-		String issuerDidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
-		String issuerDid = DidUtils.generateDid(issuerDidPublicKey);
+		BaseResp<CheckData> checkResp = VerifyInputDataUtils.checkBaseData(req.getDid(), req.getIssuer(), req.getPublicKeyId(), req.getPrivateKey(), req.getPctId(), req.getClaim());
 
-		BaseResp<CheckData> checkResp = VerifyInputDataUtils.checkBaseData(req.getDid(), issuerDid, req.getPublicKeyId(), req.getPrivateKey(), req.getPctId(), req.getClaim());
 		if (checkResp.checkFail()) {
 			return BaseResp.build(checkResp.getCode(),checkResp.getErrMsg());
 		}
 
 		// Build a credential entity
 		Credential credential = this.generateCredential(req);
+
 		// Get random salt
 		HashMap<String, Object> claimMap =  (HashMap<String, Object>) credential.getClaimData();
 		Map<String, Object> saltMap = ConverDataUtils.clone(claimMap);
@@ -166,11 +164,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		type.add(String.valueOf(req.getType()));
 		credential.setType(type);
 
-		ECKeyPair ecKeyPair = AlgorithmHandler.createEcKeyPair(req.getPrivateKey());
-		String issuerDidPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
-		String issuerDid = DidUtils.generateDid(issuerDidPublicKey);
-
-		credential.setIssuer(issuerDid);
+		credential.setIssuer(req.getIssuer());
 		Map<String, Object> claimMate = new HashMap<>();
 		claimMate.put(ClaimMetaKey.PCTID, req.getPctId());
 		credential.setClaimMeta(claimMate);

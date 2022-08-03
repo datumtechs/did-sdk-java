@@ -169,7 +169,7 @@ public class Credential implements Serializable{
 	public String obtainPublickeyId() {
 		return (String) this.getProof().get(VpOrVcPoofKey.PROOF_VERIFICATIONMETHOD);
 	}
-	
+
 	public String obtainSign() {
 		return (String) this.getProof().get(VpOrVcPoofKey.PROOF_JWS);
 	}

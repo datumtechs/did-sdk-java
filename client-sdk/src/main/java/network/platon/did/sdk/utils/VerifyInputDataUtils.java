@@ -2,14 +2,13 @@ package network.platon.did.sdk.utils;
 
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
+
 import network.platon.did.common.constant.ClaimMetaKey;
 import network.platon.did.common.constant.VpOrVcPoofKey;
 import network.platon.did.common.enums.RetEnum;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.csies.utils.ConverDataUtils;
-import network.platon.did.sdk.base.dto.CheckData;
-import network.platon.did.sdk.base.dto.DocumentData;
-import network.platon.did.sdk.base.dto.DocumentPubKeyData;
+import network.platon.did.sdk.base.dto.*;
 import network.platon.did.sdk.constant.DidConst;
 import network.platon.did.sdk.contract.service.PctContractService;
 import network.platon.did.sdk.contract.service.DidContractService;
@@ -59,6 +58,7 @@ public class VerifyInputDataUtils {
 		return RetEnum.RET_SUCCESS;
 	}
 	
+
 	public static RetEnum checkPct(String pctJson,Map<String, Object> claim) {
 		HashMap<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>)claim);
 		newClaim.remove(DidConst.CLAIMROOTHASH);
@@ -89,7 +89,8 @@ public class VerifyInputDataUtils {
 		return RetEnum.RET_SUCCESS;
 	}
 	
-	public static BaseResp<CheckData> checkBaseData(String holder, String issuer, String publicKeyId,String privateKey,String pctId, Map<String, Object> claim){
+
+	public static BaseResp<CheckData> checkBaseData(String holder, String issuer, String publicKeyId, String privateKey, String pctId, Map<String, Object> claim){
 		String holderAddress = DidUtils.convertDidToAddressStr(holder);
 		if(StringUtils.isBlank(holderAddress)) {
 			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID,"holder invaild",null);
@@ -118,11 +119,11 @@ public class VerifyInputDataUtils {
 		}
 		
 		PctContractService pctContractService = new PctContractServiceImpl();
-		BaseResp<String> resp = pctContractService.queryPctById(pctId);
+		BaseResp<PctData> resp = pctContractService.queryPctById(pctId);
 		if(!resp.checkSuccess()) {
 			return BaseResp.build(resp.getCode(),resp.getErrMsg(),null);
 		}
-		retEnum = VerifyInputDataUtils.checkPct(resp.getData(), claim);
+		retEnum = VerifyInputDataUtils.checkPct(resp.getData().getPctJson(), claim);
 		if(!RetEnum.isSuccess(retEnum)) {
 			return BaseResp.buildError(retEnum);
 		}

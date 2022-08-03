@@ -18,7 +18,7 @@ public class SubmitProposalReq extends BaseReq {
     @CustomNotBlank
     @CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
             max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-    @CustomPattern(value = DidConst.PLATONE_PRIVATE_KEY_PATTERN)
+    @CustomPattern(value = DidConst.PLATON_PRIVATE_KEY_PATTERN)
     private String privateKey;
 
     @CustomNotNull

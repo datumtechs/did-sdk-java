@@ -27,7 +27,7 @@ public class VerifyPresetationReq extends BaseReq{
 	@CustomNotNull
     @CustomSize(min = ReqAnnoationArgs.DID_SIZE_MIN,
             max = ReqAnnoationArgs.DID_SIZE_MAX)
-    @CustomPattern(value = DidConst.PLATONE_DID_PATTERN)
+    @CustomPattern(value = DidConst.PLATON_DID_PATTERN)
     private String did;
 
 	@CustomNotNull

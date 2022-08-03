@@ -1,16 +1,14 @@
 package network.platon.did.sdk.contract.service;
 
-import java.math.BigInteger;
-
 import com.platon.crypto.Credentials;
 import com.platon.protocol.Web3j;
 import com.platon.protocol.Web3jService;
 import com.platon.tx.gas.ContractGasProvider;
 import com.platon.tx.gas.GasProvider;
+import network.platon.did.contract.Credential;
 import network.platon.did.contract.Did;
 import network.platon.did.contract.Pct;
 import network.platon.did.contract.Vote;
-import network.platon.did.contract.Credential;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +18,8 @@ import network.platon.did.contract.client.RetryableClient;
 import network.platon.did.contract.dto.ContractNameValues;
 import network.platon.did.contract.dto.InitContractData;
 
-/**
- * 
- * @Auther: Rongjin Zhang
- * @Date: 2020年6月8日
- * @Description:
- */
+import java.math.BigInteger;
+
 @Slf4j
 public abstract class ContractService {
 

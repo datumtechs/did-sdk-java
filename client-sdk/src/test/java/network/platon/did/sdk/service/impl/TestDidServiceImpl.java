@@ -5,20 +5,24 @@ import com.platon.crypto.Keys;
 import com.platon.utils.Numeric;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import network.platon.did.csies.algorithm.AlgorithmHandler;
+import network.platon.did.sdk.BaseTest;
 import network.platon.did.sdk.base.dto.DidService;
 import network.platon.did.sdk.constant.DidConst;
 import network.platon.did.sdk.req.did.*;
+import network.platon.did.sdk.resp.BaseResp;
+import network.platon.did.sdk.resp.did.QueryDidDocumentDataResp;
+import network.platon.did.sdk.resp.did.QueryDidDocumentResp;
+import network.platon.did.sdk.service.DidentityService;
 import network.platon.did.sdk.utils.DidUtils;
 import org.junit.Test;
-import network.platon.did.sdk.BaseTest;
-import network.platon.did.sdk.service.DidentityService;
 
 
 @Slf4j
 public class TestDidServiceImpl extends BaseTest{
 
 	private DidentityService didService = new DidentityServiceImpl();
-
 
 	@Data
 	private class createDidResult{
@@ -50,8 +54,6 @@ public class TestDidServiceImpl extends BaseTest{
 		result.setDid(did);
 		return result;
 	}
-
-
 
 	@Test
 	public void test_createDidByPrivateKey() {
@@ -99,14 +101,15 @@ public class TestDidServiceImpl extends BaseTest{
 
 	@Test
 	public void test_queryDidDocumentData() {
-
 		createDidResult result = this.createDid();
 		if (null == result) {
 			return;
 		}
 
 		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
-		okResult(didService.queryDidDocumentData(queryDidDocumentReq));
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+
+		okResult(resp);
 	}
 
 	@Test
@@ -146,13 +149,39 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+		String publicKey1 = Numeric.toHexStringWithPrefix( AlgorithmHandler.createEcKeyPair(result.getPrivateKey()).getPublicKey());
 
+		// duplicate public key
 		AddPublicKeyReq req= AddPublicKeyReq.builder()
+				.privateKey(result.getPrivateKey())
+				.publicKey(publicKey1)
+				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
+				.build();
+		failedResult(didService.addPublicKey(req));
+
+		// duplicate index
+		req= AddPublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(1)
+				.build();
+		failedResult(didService.addPublicKey(req));
+
+
+		req= AddPublicKeyReq.builder()
+				.privateKey(result.getPrivateKey())
+				.publicKey(publicKey2)
+				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(didService.addPublicKey(req));
+
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -205,6 +234,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(didService.addPublicKey(req));
 
@@ -229,8 +259,6 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 
-
-
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
 				.privateKey(result.getPrivateKey())
@@ -253,6 +281,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(1)
 				.build();
 
 		// add publicKey to revocation document
@@ -278,15 +307,18 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = DidUtils.generateDid(publicKey2);
-
 
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
-				.publicKey(result.getPublicKey())
+				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.RSA)
+				.index(1)
 				.build();
 		okResult(didService.updatePublicKey(req));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -307,14 +339,27 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = DidUtils.generateDid(publicKey2);
 
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
 				.publicKey(result.getPublicKey())
 				.type(DidConst.PublicKeyType.RSA)
+				.index(1)
 				.build();
 		failedResult(didService.updatePublicKey(req));
+
+		req= UpdatePublicKeyReq.builder()
+				.privateKey(result.getPrivateKey())
+				.publicKey(publicKey2)
+				.type(DidConst.PublicKeyType.RSA)
+				.index(1)
+				.build();
+
+		okResult(didService.updatePublicKey(req));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
 	}
 
 
@@ -335,13 +380,13 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 		String publicKey2 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
-		String controller = DidUtils.generateDid(publicKey2);
 
 		// update the not exist public Key
 		UpdatePublicKeyReq req= UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.RSA)
+				.index(2)
 				.build();
 		failedResult(didService.updatePublicKey(req));
 	}
@@ -369,6 +414,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(result.getPrivateKey())
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(didService.addPublicKey(req));
 
@@ -380,12 +426,25 @@ public class TestDidServiceImpl extends BaseTest{
 
 		okResult(didService.revocationPublicKey(revocationPublicKeyReq));
 
+		try {
+			keyPair = Keys.createEcKeyPair();
+		} catch (Exception e) {
+			log.error("Failed to create EcKeyPair, exception: {}", e);
+			return;
+		}
+		String publicKey3 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+
 		UpdatePublicKeyReq updatePublicKeyReq = UpdatePublicKeyReq.builder()
 				.privateKey(result.getPrivateKey())
-				.publicKey(publicKey2)
+				.publicKey(publicKey3)
 				.type(DidConst.PublicKeyType.RSA)
+				.index(2)
 				.build();
 		failedResult(didService.updatePublicKey(updatePublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -395,7 +454,6 @@ public class TestDidServiceImpl extends BaseTest{
 		if (null == result) {
 			return;
 		}
-
 
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
@@ -415,6 +473,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		// add the publicKey
 		okResult(didService.addPublicKey(req));
@@ -427,12 +486,25 @@ public class TestDidServiceImpl extends BaseTest{
 
 		okResult(didService.changeDocumentStatus(changeDocumentStatusReq));
 
+		try {
+			keyPair = Keys.createEcKeyPair();
+		} catch (Exception e) {
+			log.error("Failed to create EcKeyPair, exception: {}", e);
+			return;
+		}
+		String publicKey3 = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
+
 		UpdatePublicKeyReq updatePublicKeyReq = UpdatePublicKeyReq.builder()
 				.privateKey(privateKey)
-				.publicKey(publicKey2)
+				.publicKey(publicKey3)
 				.type(DidConst.PublicKeyType.RSA)
+				.index(2)
 				.build();
 		failedResult(didService.updatePublicKey(updatePublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -441,7 +513,6 @@ public class TestDidServiceImpl extends BaseTest{
 		if (null == result) {
 			return;
 		}
-
 
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
@@ -462,6 +533,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(didService.addPublicKey(addPublicKeyReq));
 
@@ -470,7 +542,13 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
+
 		okResult(didService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 
@@ -487,14 +565,18 @@ public class TestDidServiceImpl extends BaseTest{
 		String publicKey = result.getPublicKey();
 		String did = DidUtils.generateDid(publicKey);
 
-
-
 		// revacation the last public key
 		RevocationPublicKeyReq revocationPublicKeyReq= RevocationPublicKeyReq.builder()
 				.privateKey(privateKey)
 				.publicKey(publicKey)
 				.build();
+
 		failedResult(didService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 	@Test
@@ -525,7 +607,13 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
+
 		failedResult(didService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 	@Test
@@ -556,6 +644,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(didService.addPublicKey(addPublicKeyReq));
 
@@ -564,8 +653,14 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
+
 		okResult(didService.revocationPublicKey(revocationPublicKeyReq));
 		failedResult(didService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 
@@ -596,6 +691,7 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.type(DidConst.PublicKeyType.SECP256K1)
+				.index(2)
 				.build();
 		okResult(didService.addPublicKey(addPublicKeyReq));
 
@@ -613,7 +709,13 @@ public class TestDidServiceImpl extends BaseTest{
 				.privateKey(privateKey)
 				.publicKey(publicKey2)
 				.build();
+
 		failedResult(didService.revocationPublicKey(revocationPublicKeyReq));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 	@Test
@@ -634,13 +736,18 @@ public class TestDidServiceImpl extends BaseTest{
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_VALID)
 				.service(svr)
 				.build();
+
 		okResult(didService.setService(req));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
 	}
 
 	@Test
@@ -651,23 +758,28 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 
-
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
 		String did = DidUtils.generateDid(publicKey);
 
-
 		DidService svr = new DidService();
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
+
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_INVALID)
 				.service(svr)
 				.build();
+
 		failedResult(didService.setService(req));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 
@@ -679,11 +791,9 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 
-
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
 		String did = DidUtils.generateDid(publicKey);
-
 
 		// revocation document
 		ChangeDocumentStatusReq changeDocumentStatusReq = ChangeDocumentStatusReq.builder()
@@ -693,12 +803,12 @@ public class TestDidServiceImpl extends BaseTest{
 
 		okResult(didService.changeDocumentStatus(changeDocumentStatusReq));
 
-
 		DidService svr = new DidService();
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
+
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_INVALID)
@@ -716,17 +826,15 @@ public class TestDidServiceImpl extends BaseTest{
 			return;
 		}
 
-
 		String  privateKey = result.getPrivateKey();
 		String publicKey = result.getPublicKey();
 		String did = DidUtils.generateDid(publicKey);
-
 
 		DidService svr = new DidService();
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_VALID)
@@ -738,6 +846,11 @@ public class TestDidServiceImpl extends BaseTest{
 
 		// revocation the service
 		okResult(didService.revocationService(req));
+
+		QueryDidDocumentReq queryDidDocumentReq = QueryDidDocumentReq.builder().did(result.getDid()).build();
+		BaseResp<QueryDidDocumentResp> resp =  didService.queryDidDocument(queryDidDocumentReq);
+		okResult(resp);
+
 	}
 
 
@@ -758,7 +871,7 @@ public class TestDidServiceImpl extends BaseTest{
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_VALID)
@@ -790,7 +903,7 @@ public class TestDidServiceImpl extends BaseTest{
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_VALID)
@@ -819,7 +932,7 @@ public class TestDidServiceImpl extends BaseTest{
 		// serviceId: did:did:lax1s4u4p9j95lh72a2c0ttj48ntd58s45resjgtza#some-service
 		svr.setId("some-service");
 		svr.setType("SomeServiceType");
-		svr.setServiceEndpoint("https://PIdentity.platon.com/some-service/v1");
+		svr.setServiceEndpoint("https://DIdentity.platon.com/some-service/v1");
 		SetServiceReq req= SetServiceReq.builder()
 				.privateKey(privateKey)
 				.status(DidConst.DocumentAttrStatus.DID_SERVICE_VALID)

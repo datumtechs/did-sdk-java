@@ -33,14 +33,6 @@ public interface EvidenceService {
 	 * @return
 	 */
 	BaseResp<QueryEvidenceResp> queryEvidence(QueryEvidenceReq req);
-	
-	/**
-	 * Verify evidence based on request parameters
-	 * The verification agency can check whether the credential information on the PlatON is legal
-	 * @param req
-	 * @return
-	 */
-	BaseResp<String> verifyEvidence(VerifyEvidenceReq req);
 
 	/**
 	 * revokeCredential

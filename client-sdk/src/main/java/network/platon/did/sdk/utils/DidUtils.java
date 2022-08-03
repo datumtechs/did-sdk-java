@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * PId tools
+ * DId tools
  * @Auther: Zhangrj
  * @Date: 2020年5月29日
  * @Description:
@@ -88,7 +88,7 @@ public class DidUtils {
 
 	public static boolean isValidAddressStr(String addr) {
 		if (StringUtils.isBlank(addr)
-				|| !Pattern.compile(DidConst.PLATONE_ADDRESS_PATTERN).matcher(addr).matches()) {
+				|| !Pattern.compile(DidConst.PLATON_ADDRESS_PATTERN).matcher(addr).matches()) {
 			return false;
 		}
 		if(!addr.startsWith(NetworkParameters.getHrp())) {
@@ -197,7 +197,6 @@ public class DidUtils {
 			DidPublicKey pk = new DidPublicKey();
 			pk.setId(pubKey.getId());
 			pk.setType(pubKey.getType());
-			pk.setController(pubKey.getController());
 			pk.setPublicKeyHex(pubKey.getPublicKeyHex());
 
 			pubKeyMap.put(pubKey.getPublicKeyHex(), pubKey.getId());

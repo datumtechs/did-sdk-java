@@ -1,19 +1,15 @@
 package network.platon.did.sdk.client;
 
 import network.platon.did.sdk.constant.DidConst;
-import network.platon.did.sdk.req.did.AddPublicKeyReq;
-import network.platon.did.sdk.req.did.ChangeDocumentStatusReq;
-import network.platon.did.sdk.req.did.CreateDidReq;
-import network.platon.did.sdk.req.did.QueryDidDocumentReq;
-import network.platon.did.sdk.req.did.RevocationPublicKeyReq;
-import network.platon.did.sdk.req.did.SetServiceReq;
-import network.platon.did.sdk.req.did.UpdatePublicKeyReq;
+import network.platon.did.sdk.req.did.*;
 import network.platon.did.sdk.resp.BaseResp;
-import network.platon.did.sdk.resp.did.*;
+import network.platon.did.sdk.resp.did.ChangeDocumentStatusResp;
+import network.platon.did.sdk.resp.did.CreateDidResp;
+import network.platon.did.sdk.resp.did.QueryDidDocumentResp;
+import network.platon.did.sdk.resp.did.SetDidAttrResp;
 import network.platon.did.sdk.service.DidentityService;
 
 public class DidentityClient extends BusinessClient implements DidentityService  {
-	
 
 	@Override
 	public BaseResp<CreateDidResp> createDid(CreateDidReq req) {
@@ -23,11 +19,6 @@ public class DidentityClient extends BusinessClient implements DidentityService 
 	@Override
 	public BaseResp<QueryDidDocumentResp> queryDidDocument(QueryDidDocumentReq req) {
 		return getDidentityService().queryDidDocument(req);
-	}
-
-	@Override
-	public BaseResp<QueryDidDocumentDataResp> queryDidDocumentData (QueryDidDocumentReq req){
-		return getDidentityService().queryDidDocumentData(req);
 	}
 
 	@Override

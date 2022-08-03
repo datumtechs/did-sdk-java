@@ -1,22 +1,25 @@
 package network.platon.did.sdk.contract.service.impl.processor;
 
+import com.platon.abi.solidity.EventEncoder;
 import com.platon.abi.solidity.EventValues;
 import com.platon.abi.solidity.datatypes.Event;
+
 import com.platon.protocol.core.DefaultBlockParameterNumber;
-import com.platon.protocol.core.methods.response.Log;
-import com.platon.protocol.core.methods.response.PlatonBlock;
-import com.platon.protocol.core.methods.response.PlatonGetTransactionReceipt;
-import com.platon.protocol.core.methods.response.Transaction;
+import com.platon.protocol.core.methods.response.*;
 import com.platon.tx.Contract;
 import lombok.extern.slf4j.Slf4j;
+
 import network.platon.did.common.enums.ContractStatusEnum;
+import network.platon.did.contract.Credential;
 import network.platon.did.contract.client.RetryableClient;
 import network.platon.did.contract.dto.CredentialEvidence;
 import network.platon.did.contract.dto.CredentialEvidence.TypeEnum;
 import network.platon.did.sdk.exception.ContractException;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,10 +42,9 @@ public class CredentialEventProcessor {
 		List<Transaction> transList = latestBlock.getBlock().getTransactions().stream()
 				.map(transactionResult -> (Transaction) transactionResult.get()).collect(Collectors.toList());
 
-//		WasmEvent wasmEvent1 = new WasmEvent(hash, Arrays.asList(new WasmEventParameter(byte[].class, true)), Arrays.asList(new WasmEventParameter(Int8.class) , new WasmEventParameter(String.class) , new WasmEventParameter(Uint64.class) , new WasmEventParameter(Int64.class)));
-//		String eventSignature = WasmEventEncoder.encode(wasmEvent1);
 
-		String eventSignature = hash;
+		String evidenceHash = hash;
+		String creadentialChangeTopic = EventEncoder.encode(Credential.CREDENTIALATTRIBUTECHANGE_EVENT);
 		CredentialEvidence typedResponse = new CredentialEvidence();
 		try {
 			for (Transaction transaction : transList) {
@@ -50,7 +52,8 @@ public class CredentialEventProcessor {
 				PlatonGetTransactionReceipt rec1 = RetryableClient.getWeb3j().platonGetTransactionReceipt(transHash).send();
 				List<Log> logs = rec1.getResult().getLogs();
 				for (Log log : logs) {
-					if(log.getTopics() == null || log.getTopics().size() < 2 || !eventSignature.equals( log.getTopics().get(1))){
+					if(log.getTopics() == null || log.getTopics().size() < 2
+							|| ! creadentialChangeTopic.equals(log.getTopics().get(0)) || !evidenceHash.equals( log.getTopics().get(1))){
 						continue;
 					}
 					EventValues eventValues = Contract.staticExtractEventParameters(event, log);;
@@ -58,13 +61,15 @@ public class CredentialEventProcessor {
 	                	continue;
 	                }
 
-					String typeName = String.valueOf( eventValues.getNonIndexedValues().get(0));
+					String typeName = String.valueOf((BigInteger) eventValues.getNonIndexedValues().get(0).getValue());
 					switch (TypeEnum.findType(typeName)) {
 					case SIGNER:
-						typedResponse.setSigner(String.valueOf( eventValues.getNonIndexedValues().get(1)));
+						typedResponse.setSigner((String) eventValues.getNonIndexedValues().get(1).getValue());
+						typedResponse.setCreate((String) eventValues.getNonIndexedValues().get(3).getValue());
 						break;
 					case SIGNATUREDATA:
-						typedResponse.setSignaturedata(String.valueOf( eventValues.getNonIndexedValues().get(1)));
+						typedResponse.setSignaturedata((String) eventValues.getNonIndexedValues().get(1).getValue());
+						typedResponse.setCreate((String) eventValues.getNonIndexedValues().get(3).getValue());
 						break;
 					default:
 						break;

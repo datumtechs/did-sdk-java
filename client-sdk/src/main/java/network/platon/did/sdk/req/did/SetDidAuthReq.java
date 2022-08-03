@@ -21,25 +21,25 @@ public class SetDidAuthReq extends BaseReq {
 	@CustomNotBlank
     @CustomSize(min = ReqAnnoationArgs.DID_SIZE_MIN,
             max = ReqAnnoationArgs.DID_SIZE_MAX)
-    @CustomPattern(value = DidConst.PLATONE_DID_PATTERN)
+    @CustomPattern(value = DidConst.PLATON_DID_PATTERN)
     private String did;
 
 	@CustomNotBlank
     @CustomSize(min = ReqAnnoationArgs.DID_SIZE_MIN,
             max = ReqAnnoationArgs.DID_SIZE_MAX)
-    @CustomPattern(value = DidConst.PLATONE_DID_PATTERN)
+    @CustomPattern(value = DidConst.PLATON_DID_PATTERN)
     private String controller;
 
 	@CustomNotBlank
     @CustomSize(min = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MIN,
             max = ReqAnnoationArgs.PRIVATE_KEY_SIZE_MAX)
-    @CustomPattern(value = DidConst.PLATONE_PRIVATE_KEY_PATTERN)
+    @CustomPattern(value = DidConst.PLATON_PRIVATE_KEY_PATTERN)
     private String privateKey;
 
 	@CustomNotBlank
     @CustomSize(min = ReqAnnoationArgs.PUBLIC_KEY_SIZE_MIN,
             max = ReqAnnoationArgs.PUBLIC_KEY_SIZE_MAX)
-    @CustomPattern(value = DidConst.PLATONE_PUBLICK_KEY_PATTERN)
+    @CustomPattern(value = DidConst.PLATON_PUBLICK_KEY_PATTERN)
     private String publicKey;
 
 	@CustomNotNull

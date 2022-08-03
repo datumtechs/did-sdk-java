@@ -14,10 +14,6 @@ public class commonConstant {
 
     public static final String SEPARATOR_PIPELINE = "|";
 
-    public static final String SEPARATOR_DIAGONAL = "/";
-
-    public static final String SEPARATOR_HORIZONTAL = "-";
-
     public static final String  SEPARATOR_POUND = "#";
 
     public static final String SEPARATOR_DOCUMENT_PUBLICKEY_ID = "#keys-";

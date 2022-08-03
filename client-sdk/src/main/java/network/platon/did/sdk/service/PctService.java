@@ -1,10 +1,10 @@
 package network.platon.did.sdk.service;
 
 import network.platon.did.sdk.req.pct.CreatePctReq;
-import network.platon.did.sdk.req.pct.QueryPctJsonReq;
+import network.platon.did.sdk.req.pct.QueryPctInfoReq;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.pct.CreatePctResp;
-import network.platon.did.sdk.resp.pct.QueryPctJsonResp;
+import network.platon.did.sdk.resp.pct.QueryPctInfoResp;
 
 /**
  * Pct(PlatON Claim Template)  related method interface class
@@ -26,5 +26,5 @@ public interface PctService {
 	 * @param req
 	 * @return
 	 */
-	BaseResp<QueryPctJsonResp> queryPctJsonById(QueryPctJsonReq req);
+	BaseResp<QueryPctInfoResp> queryPctInfoById(QueryPctInfoReq req);
 }

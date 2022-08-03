@@ -3,7 +3,7 @@ package network.platon.did.sdk.base.dto;
 import lombok.Data;
 
 /**
- * PId document publickey dto
+ * DId document publickey dto
  * @Auther: Rongjin Zhang
  * @Date: 2020年6月3日
  * @Description:
@@ -16,7 +16,5 @@ public class DidPublicKey {
 	private String type;
 	
 	private String publicKeyHex;
-	
-	private String controller;
 	
 }

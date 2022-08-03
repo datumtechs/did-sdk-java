@@ -60,6 +60,7 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
             log.error("get did document data fail.{}", getDocResp.getErrMsg());
             return BaseResp.build(getDocResp.getCode(),getDocResp.getErrMsg());
         }
+
         DocumentData documentData = (DocumentData) getDocResp.getData();
         CheckData checkData = new CheckData();
         RetEnum retEnum = VerifyInputDataUtils.checkDocumentData(documentData, didAuthentication.getPublicKeyId(), didAuthentication.getPrivateKey(),checkData);
@@ -166,6 +167,7 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
         if (!presentation.obtainNonce().equals(req.getChallenge().getNonce())) {
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, "nonce not match");
         }
+
         //Determine whether the document data is consistent
         BaseResp<DocumentData> getDocResp = this.getDidContractService().getDocument(DidUtils.convertDidToAddressStr(req.getDid()));
         if(!getDocResp.checkSuccess()) {

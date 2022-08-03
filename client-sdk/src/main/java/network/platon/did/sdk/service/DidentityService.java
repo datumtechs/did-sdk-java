@@ -22,43 +22,36 @@ public interface DidentityService {
 	 */
 	BaseResp<QueryDidDocumentResp> queryDidDocument(QueryDidDocumentReq req);
 
-
 	/**
-	 * Query the documentData info
-	 * @return
-	 */
-	BaseResp<QueryDidDocumentDataResp> queryDidDocumentData (QueryDidDocumentReq req);
-
-	/**
-	 * Set the corresponding publickey parameter according to PId
+	 * Set the corresponding publickey parameter according to DId
 	 * @param req
 	 * @return
 	 */
 	BaseResp<SetDidAttrResp> addPublicKey(AddPublicKeyReq req);
 
 	/**
-	 * Set the corresponding publickey parameter according to PId
+	 * Set the corresponding publickey parameter according to DId
 	 * @param req
 	 * @return
 	 */
 	BaseResp<SetDidAttrResp> updatePublicKey(UpdatePublicKeyReq req);
 
 	/**
-	 * Revocation the corresponding publickey parameter according to PId
+	 * Revocation the corresponding publickey parameter according to DId
 	 * @param req
 	 * @return
 	 */
 	BaseResp<SetDidAttrResp> revocationPublicKey(RevocationPublicKeyReq req);
 
 	/**
-	 * Set the corresponding service parameter according to PId
+	 * Set the corresponding service parameter according to DId
 	 * @param req
 	 * @return
 	 */
 	BaseResp<SetDidAttrResp> setService(SetServiceReq req);
 
 	/**
-	 * Revocation the corresponding service parameter according to PId
+	 * Revocation the corresponding service parameter according to DId
 	 * @param req
 	 * @return
 	 */

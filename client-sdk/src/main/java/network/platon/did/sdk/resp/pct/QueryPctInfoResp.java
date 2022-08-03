@@ -2,13 +2,12 @@ package network.platon.did.sdk.resp.pct;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import network.platon.did.sdk.base.dto.PctData;
 
 @Data
 @AllArgsConstructor(staticName = "of")
-public class QueryPctJsonResp {
+public class QueryPctInfoResp {
 
-	private String did;
-	
-	private String pctJson;
-	
+    private PctData pctInfo;
+
 }

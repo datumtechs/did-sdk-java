@@ -20,13 +20,6 @@ import network.platon.did.sdk.contract.service.impl.DidContracServiceImpl;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.TransactionResp;
 
-/**
- * Release contract tools
- * 
- * @Auther: Rongjin Zhang
- * @Date: 2020年6月16日
- * @Description:
- */
 @Slf4j
 public class DeployContract {
 
@@ -140,7 +133,7 @@ public class DeployContract {
 						PropertyUtils.setProperty(DidConfig.getDidcontractname(), deployContractData.getContractAddress());
 						break;
 					case VOTE:
-						write.append("contract.role.address=");
+						write.append("contract.vote.address=");
 						PropertyUtils.setProperty(DidConfig.getVotecontractname(), deployContractData.getContractAddress());
 						break;
 					case PCT:

@@ -4,18 +4,18 @@ import com.platon.crypto.ECKeyPair;
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.did.common.enums.RetEnum;
-import network.platon.did.contract.dto.InitContractData;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
+import network.platon.did.sdk.base.dto.PctData;
 import network.platon.did.sdk.req.pct.CreatePctReq;
-import network.platon.did.sdk.req.pct.QueryPctJsonReq;
+import network.platon.did.sdk.req.pct.QueryPctInfoReq;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.TransactionResp;
 import network.platon.did.sdk.resp.pct.CreatePctResp;
-import network.platon.did.sdk.resp.pct.QueryPctJsonResp;
+import network.platon.did.sdk.resp.pct.QueryPctInfoResp;
 import network.platon.did.sdk.service.BusinessBaseService;
 import network.platon.did.sdk.service.PctService;
-import network.platon.did.sdk.utils.PctUtils;
 import network.platon.did.sdk.utils.DidUtils;
+import network.platon.did.sdk.utils.PctUtils;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -56,7 +56,8 @@ public class PctServiceImpl extends BusinessBaseService implements PctService,Se
             return BaseResp.build(RetEnum.RET_PCT_JSON_SCHEMA_ERROR);
         }
 
-        TransactionResp<BigInteger> tresp = this.getPctContractService(new InitContractData(req.getPrivateKey())).registerPct(req.getPctjson(), req.getExtra());
+        this.ChangePrivateKey(req.getPrivateKey());
+        TransactionResp<BigInteger> tresp = this.getPctContractService().registerPct(req.getPctjson(), req.getExtra());
         if(tresp.checkFail()) {
         	log.error("Failed to register pctJson schema, req: {}, error:{}", req, tresp.getErrMsg());
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
@@ -68,16 +69,16 @@ public class PctServiceImpl extends BusinessBaseService implements PctService,Se
     }
 
     @Override
-    public BaseResp<QueryPctJsonResp> queryPctJsonById(QueryPctJsonReq req) {
+    public BaseResp<QueryPctInfoResp> queryPctInfoById(QueryPctInfoReq req) {
         BaseResp<String> verifyBaseResp = req.validFiled();
         if (verifyBaseResp.getCode() != RetEnum.RET_SUCCESS.getCode()) {
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
         }
-        BaseResp<String> pctJsonResp = this.getPctContractService().queryPctById(req.getPctId());
-        if(!pctJsonResp.checkSuccess()) {
+        BaseResp<PctData> pctInfoResp = this.getPctContractService().queryPctById(req.getPctId());
+        if(!pctInfoResp.checkSuccess()) {
         	log.error("Failed to call queryPctJsonById, req: {}", req);
-			return BaseResp.build(pctJsonResp.getCode(),pctJsonResp.getErrMsg());
+			return BaseResp.build(pctInfoResp.getCode(),pctInfoResp.getErrMsg());
 		}
-        return BaseResp.buildSuccess(QueryPctJsonResp.of(req.getPctId(), pctJsonResp.getData()));
+        return BaseResp.buildSuccess(QueryPctInfoResp.of(pctInfoResp.getData()));
     }
 }

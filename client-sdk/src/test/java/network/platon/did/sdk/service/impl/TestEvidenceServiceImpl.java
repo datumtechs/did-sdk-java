@@ -12,6 +12,7 @@ import com.platon.tx.Transfer;
 import com.platon.utils.Convert;
 import com.platon.utils.Numeric;
 import network.platon.did.common.config.DidConfig;
+import network.platon.did.common.utils.DateUtils;
 import network.platon.did.contract.client.RetryableClient;
 import network.platon.did.contract.dto.InitContractData;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
@@ -63,18 +64,18 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String did = testCreateDid(privateKey);
 
 		// Create issuer's did by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = DidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreateDid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
 		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+		String pctId = testCreatePct(pctJson);
 
 		// Create credential
 		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
 
 		CreateEvidenceReq req = CreateEvidenceReq.builder().credential(credential).privateKey(issuerPriKey).build();
-		resp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).createEvidence(req);
+		resp = PClient.createEvidenceClient().createEvidence(req);
 
 		assertTrue(resp.checkSuccess());
 	}
@@ -86,12 +87,12 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String did = testCreateDid(privateKey);
 
 		// Create issuer's did by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = DidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreateDid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
 		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+		String pctId = testCreatePct(pctJson);
 
 		// Create credential
 		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
@@ -104,36 +105,6 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		assertTrue(resp.checkSuccess());
 	}
 
-	@Test
-	public void test_verifyEvidence() throws Exception {
-		// Create did by privateKey
-		String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
-		String did = testCreateDid(privateKey);
-
-		// Create issuer's did by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
-		String issuer = testCreateDid(issuerPriKey);
-		String issuerPubKeyId = issuer + "#keys-1";
-
-		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
-
-		// Create credential
-		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
-
-		// Create evidence
-		String evidenceId = testCreateEvidence(credential, issuerPriKey);
-
-		// Query evidence by id
-		QueryEvidenceResp queryEvidenceResp = testQueryEvidence(evidenceId);
-
-		// success
-		VerifyEvidenceReq req = VerifyEvidenceReq.builder().credentialHash(credential.obtainAllHash())
-				.evidenceSignInfo(queryEvidenceResp.getSignInfo()).publicKeyId(issuerPubKeyId).build();
-		resp = PClient.createEvidenceClient().verifyEvidence(req);
-
-		assertTrue(resp.checkSuccess());
-	}
 
 	@Test
 	public void test_revokeEvidence() throws Exception {
@@ -142,12 +113,13 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String did = testCreateDid(privateKey);
 
 		// Create issuer's did by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = DidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreateDid(issuerPriKey);
+
 		String issuerPubKeyId = issuer + "#keys-1";
 
 		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+		String pctId = testCreatePct(pctJson);
 
 		// Create credential
 		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
@@ -155,9 +127,9 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		// Create evidence
 		String evidenceId = testCreateEvidence(credential, issuerPriKey);
 
-		RevokeEvidenceReq req = RevokeEvidenceReq.builder().credential(credential)
+		RevokeEvidenceReq req = RevokeEvidenceReq.builder().evidenceId(credential.obtainHash())
 				.privateKey(issuerPriKey).build();
-		resp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).revokeEvidence(req);
+		resp = PClient.createEvidenceClient().revokeEvidence(req);
 		assertTrue(resp.checkSuccess());
 
 		VerifyCredentialEvidenceReq verifyEvidenceReq = VerifyCredentialEvidenceReq.builder().credential(credential)
@@ -172,18 +144,17 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		String did = testCreateDid(privateKey);
 
 		// Create issuer's did by privateKey.
-		String issuerPriKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
+		String issuerPriKey = DidConfig.getCONTRACT_PRIVATEKEY();
 		String issuer = testCreateDid(issuerPriKey);
 		String issuerPubKeyId = issuer + "#keys-1";
 
 		// Create pct data in PlatON
-		String pctId = testCreatePct(issuer, issuerPriKey, pctJson, type);
+		String pctId = testCreatePct(pctJson);
 
 		// Create credential
 		Credential credential = testCreateCredential(pctId, did, issuerPriKey, issuerPubKeyId, issuer);
 
-		// String evidenceId =
-		// testCreateEvidence(credential, issuerPriKey);
+		testCreateEvidence(credential, issuerPriKey);
 
 		// The evidence is not exists
 		VerifyCredentialEvidenceReq req = VerifyCredentialEvidenceReq.builder().credential(credential).build();
@@ -203,7 +174,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 
 	private String testCreateEvidence(Credential credential, String issuerPriKey) throws Exception {
 		CreateEvidenceReq req = CreateEvidenceReq.builder().credential(credential).privateKey(issuerPriKey).build();
-		BaseResp<CreateEvidenceResp> createEvidenceBaseResp = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).createEvidence(req);
+		BaseResp<CreateEvidenceResp> createEvidenceBaseResp = PClient.createEvidenceClient().createEvidence(req);
 
 		if (createEvidenceBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createEvidenceBaseResp);
@@ -214,9 +185,9 @@ public class TestEvidenceServiceImpl extends BaseTest {
 	}
 
 	private Boolean testRevokeEvidence(Credential credential, String issuerPriKey) throws Exception {
-		RevokeEvidenceReq req = RevokeEvidenceReq.builder().credential(credential)
+		RevokeEvidenceReq req = RevokeEvidenceReq.builder().evidenceId(credential.obtainHash())
 				.privateKey(issuerPriKey).build();
-		BaseResp<RevokeEvidenceResp> revokeEvidence = PClient.createEvidenceClient(new InitContractData(issuerPriKey)).revokeEvidence(req);
+		BaseResp<RevokeEvidenceResp> revokeEvidence = PClient.createEvidenceClient().revokeEvidence(req);
 
 		if (revokeEvidence.checkFail()) {
 			String msg = JSONObject.toJSONString(revokeEvidence);
@@ -246,12 +217,11 @@ public class TestEvidenceServiceImpl extends BaseTest {
 			claim.put("data", "456");
 
 			String context = "https://platon.network/";
-			long expirationDate = new Date(1691863929).getTime();
-			long issuanceDate = new Date().getTime();
+			long expirationDate = DateUtils.getCurrentTimeStamp() + 1000000000;
 			String credentialType = "VerifiableCredential";
 
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
-					.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
+					.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 					.type(credentialType).build();
 			BaseResp<CreateCredentialResp> resp = PClient.createCredentialClient().createCredential(req);
 			if (resp.checkSuccess())
@@ -263,18 +233,21 @@ public class TestEvidenceServiceImpl extends BaseTest {
 	}
 
 	private String testCreateDid(String privateKey) throws Exception {
-		ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
+
 		RetryableClient retryableClient = new RetryableClient();
 		retryableClient.init();
 		Web3j web3j = retryableClient.getWeb3jWrapper().getWeb3j();
 		Credentials credentials = Credentials.create(DidConfig.getCONTRACT_PRIVATEKEY());
+
+		ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
 		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 		String hexAddress = Keys.getAddress(publicKey);
 		String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
+
 		TransactionReceipt receipt = null;
 		receipt = Transfer.sendFunds(
 						web3j, credentials, address,
-						BigDecimal.valueOf(80000000), Convert.Unit.PVON)
+						BigDecimal.valueOf(1), Convert.Unit.KPVON)
 				.send();
 		if(!receipt.isStatusOK()){
 			String msg = "Create did error";
@@ -283,7 +256,7 @@ public class TestEvidenceServiceImpl extends BaseTest {
 			throw new Exception(msg);
 		}
 
-		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).build();
+		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
 		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient().createDid(req);
 		if (createDidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createDidResp);
@@ -294,9 +267,11 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		return createDidResp.getData().getDid();
 	}
 
-	private String testCreatePct(String did, String privateKey, String pctJson, Integer type) throws Exception {
-		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).build();
-		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(privateKey)).registerPct(req);
+	private String testCreatePct(String pctJson) throws Exception {
+
+		String str = "This is a String";
+		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).privateKey(DidConfig.getCONTRACT_PRIVATEKEY()).extra(str.getBytes()).build();
+		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient().registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);
 			logger.error("Register pct error,error msg:{}", msg);

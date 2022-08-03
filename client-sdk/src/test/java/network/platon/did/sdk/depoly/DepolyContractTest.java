@@ -1,6 +1,5 @@
 package network.platon.did.sdk.depoly;
 
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,8 +10,8 @@ import network.platon.did.common.config.DidConfig;
 import network.platon.did.sdk.BaseTest;
 import network.platon.did.sdk.deploy.DeployContract;
 
-public class DepolyContractTest extends BaseTest {
 
+public class DepolyContractTest extends BaseTest {
 
 	@Test
 	public void test_depolyAllContract() {

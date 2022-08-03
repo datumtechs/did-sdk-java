@@ -42,7 +42,7 @@ public class DidEventProcessor {
         topicMap = new HashMap<String, String>();
         // EVENT Name: `DIDAttributeChanged` on Did
         topicMap.put(
-                DidConst.DID_EVENT_ATTRIBUTE_CHANGE_RLP,
+                DidConst.DID_EVENT_ATTRIBUTE_CHANGE_TOPIC,
                 DidConst.DID_EVENT_ATTRIBUTE_CHANGE_STR
         );
     }
@@ -93,6 +93,11 @@ public class DidEventProcessor {
                     } else {
                     	continue;
                     }
+
+                    if (!StringUtils.equals(receipt.getTo(), Did.getContractAddress())) {
+                        continue;
+                    }
+
                     List<Log> logs = platonReceipt.getResult().getLogs();
 
                     for (Log log : logs) {
@@ -165,9 +170,7 @@ public class DidEventProcessor {
 
             String address = DidUtils.convertDidToAddressStr(document.getId());
 
-            // the `topic` is already sha3(rlp(topic)) encoded value
-            String didTopicHash = Numeric.toHexStringWithPrefixZeroPadded(Numeric.toBigInt(Bech32.addressDecode(address)), 64);
-            if (!StringUtils.equals(didTopicHash, identity)) {
+            if (!StringUtils.equals(address, identity)) {
                 response.setDecodeEventLogStatus(ContractStatusEnum.C_KEY_NOT_MATCH);
                 return response;
             }
@@ -235,6 +238,13 @@ public class DidEventProcessor {
             if (StringUtils.equals(pub.getPublicKeyHex(), publicKey)) {
                 return;
             }
+
+            String[] valueIdArray = StringUtils.splitByWholeSeparator(pub.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
+
+            if (StringUtils.equals(valueIdArray[1], index)) {
+                return;
+            }
+
         }
         DocumentPubKeyData pubKey = new DocumentPubKeyData();
         pubKey.setId(new StringBuilder()

@@ -9,6 +9,7 @@ import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.sdk.base.dto.*;
 import network.platon.did.sdk.constant.DidConst;
 import network.platon.did.sdk.constant.commonConstant;
+import network.platon.did.sdk.contract.service.DidContractService;
 import network.platon.did.sdk.req.did.*;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.TransactionResp;
@@ -53,9 +54,11 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 		String didPublicKey = Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey());
 		String did = DidUtils.generateDid(didPublicKey);
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 						.createDid(did, req.getPublicKey(), req.getType());
+
 		if (tresp.checkFail()) {
 			return BaseResp.build(tresp.getCode(), tresp.getErrMsg());
 		}
@@ -68,30 +71,11 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 		return BaseResp.buildSuccess(createDidResp);
 	}
 
-
 	@Override
 	public BaseResp<QueryDidDocumentResp> queryDidDocument(QueryDidDocumentReq req) {
-		BaseResp<String> verifyBaseResp = req.validFiled();
-		if (verifyBaseResp.checkFail()) {
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
-		}
-		String did = req.getDid();
-		return this.queryDidDocument(did);
+		return null;
 	}
 
-	public BaseResp<QueryDidDocumentDataResp> queryDidDocumentData (QueryDidDocumentReq req){
-		BaseResp<String> verifyBaseResp = req.validFiled();
-		if (verifyBaseResp.checkFail()) {
-			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
-		}
-		String did = req.getDid();
-
-		BaseResp<DocumentData> getDocResp = this.getDidContractService().getDocument(DidUtils.convertDidToAddressStr(did));
-		if (getDocResp.checkFail()) {
-			return BaseResp.build(getDocResp.getCode(), getDocResp.getErrMsg());
-		}
-		return BaseResp.buildSuccess(new QueryDidDocumentDataResp(getDocResp.getData()));
-	}
 
 	private BaseResp<QueryDidDocumentResp> queryDidDocument(String did) {
 
@@ -140,13 +124,15 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 		int index = req.getIndex();
 		boolean isExist = false;
 		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
+			String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
+			if(index == Integer.parseInt(valueArray[1])){
+				isExist = true;
+				break;
+			}
+
 			if (StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())) {
-				String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(),
-						commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
-				if(index == Integer.parseInt(valueArray[1])){
-					isExist = true;
-					break;
-				}
+				isExist = true;
+				break;
 			}
 		}
 		if (isExist) {
@@ -157,8 +143,9 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 			return BaseResp.build(RetEnum.RET_DID_PUBLICKEY_ALREADY_EXIST);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 				.addPublicKey(
 						identity,
 						req.getPublicKey(),
@@ -221,6 +208,7 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 		for (DocumentPubKeyData pubKey : doc.getPublicKey()) {
 			String[] valueArray = StringUtils.splitByWholeSeparator(pubKey.getId(), commonConstant.SEPARATOR_DOCUMENT_PUBLICKEY_ID);
 			if (index == Integer.parseInt(valueArray[1])) {
+				pubKeyStatus = pubKey.getStatus();
 				isExist = true;
 				if(StringUtils.equals(pubKey.getPublicKeyHex(), req.getPublicKey())){
 					isSame = true;
@@ -251,8 +239,9 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 			return BaseResp.build(RetEnum.RET_DID_PUBLICKEY_ALREADY_REVOCATED);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 						.updatePublicKey(
 								DidUtils.convertDidToAddressStr(did),
 								req.getPublicKey(),
@@ -325,8 +314,9 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 		}
 
 		// revocation the publicKey
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 						.revocationPublicKey(
 								identity,
 								req.getPublicKey(),
@@ -386,8 +376,9 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 			return BaseResp.build(RetEnum.RET_DID_IDENTITY_ALREADY_REVOCATED);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 						.setService(
 								identity,
 								req.getService().getId(),
@@ -465,8 +456,9 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 			return BaseResp.build(RetEnum.RET_DID_SET_SERVICE_ALREADY_REVOCATED);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> tresp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 						.setService(
 								identity,
 								req.getService().getId(),
@@ -508,8 +500,9 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 			return BaseResp.build(RetEnum.RET_DID_INVALID);
 		}
 
+		this.ChangePrivateKey(req.getPrivateKey());
 		TransactionResp<Boolean> resp =
-				this.getDidContractService(new InitContractData(req.getPrivateKey()))
+				this.getDidContractService()
 				.changeStatus(DidUtils.convertDidToAddressStr(did), req.getStatus().getCode());
 		if (resp.checkFail()) {
 			return BaseResp.build(resp.getCode(), resp.getErrMsg());
