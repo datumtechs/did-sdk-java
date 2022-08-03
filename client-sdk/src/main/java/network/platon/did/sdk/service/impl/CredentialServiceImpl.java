@@ -114,6 +114,10 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		if (!RetEnum.isSuccess(retEnum)) {
 			return BaseResp.buildError(retEnum);
 		}
+
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData())){
+			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
+		}
 		
 		if (!CredentialsUtils.verifyEccSignature(credential.obtainHash(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);

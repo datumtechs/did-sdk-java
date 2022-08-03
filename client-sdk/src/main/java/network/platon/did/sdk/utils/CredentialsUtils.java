@@ -54,8 +54,15 @@ public class CredentialsUtils {
 			Map<String, Object> disclosures, byte[] seed) {
 		try {
 			Map<String, Object> credMap = ConverDataUtils.objToMap(credential);
+
 			// reset claim
-			credMap.put(DidConst.CLAIM, getClaimHash(credential, salt, disclosures, seed));
+			Map<String, Object> claimHash = getClaimHash(credential, salt, disclosures, seed);
+			credMap.put(DidConst.CLAIM, claimHash);
+
+			// reset credential claim data
+			Map<String, Object> credentialClaimData = credential.getClaimData();
+			credentialClaimData.put(DidConst.CLAIMROOTHASH, claimHash.get(DidConst.CLAIMROOTHASH));
+			credentialClaimData.put(DidConst.CLAIMSEED,  claimHash.get(DidConst.CLAIMSEED));
 
 			Map<String, Object> proof = (Map<String, Object>) credMap.get(VpOrVcPoofKey.PROOF);
 			// Remove salt for calculation proof
@@ -84,9 +91,8 @@ public class CredentialsUtils {
 		Map<String, Object> claim = credential.getClaimData();
 		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) claim);
 
-		String allNewValueHashes = "";
-		addSaltAndGetHash(newClaim, salt, disclosures, allNewValueHashes);
-		newClaim.put(DidConst.CLAIMROOTHASH, ConverDataUtils.sha3(allNewValueHashes));
+		String allNewValueHashes = addSaltAndGetHash(newClaim, salt, disclosures);
+		newClaim.put(DidConst.CLAIMROOTHASH, ConverDataUtils.sha3(allNewValueHashes).substring(2));
 		newClaim.put(DidConst.CLAIMSEED, Sha256.byteToUin64(seed));
 		return newClaim;
 	}
@@ -97,8 +103,9 @@ public class CredentialsUtils {
 	 * @param salt
 	 * @param disclosures
 	 */
-	private static void addSaltAndGetHash(Map<String, Object> claim, Map<String, Object> salt,
-			Map<String, Object> disclosures, String allNewValueHashes) {
+	private static String addSaltAndGetHash(Map<String, Object> claim, Map<String, Object> salt,
+			Map<String, Object> disclosures) {
+		String allNewValueHashes = "";
 		for (Map.Entry<String, Object> entry : salt.entrySet()) {
 			String key = entry.getKey();
 			Object disclosureObj = null;
@@ -109,19 +116,21 @@ public class CredentialsUtils {
 			Object newClaimObj = claim.get(key);
 
 			if (saltObj instanceof Map) {
-				addSaltAndGetHash((Map<String, Object>) newClaimObj, (Map<String, Object>) saltObj,
-						(Map<String, Object>) disclosureObj, allNewValueHashes);
+				allNewValueHashes += addSaltAndGetHash((Map<String, Object>) newClaimObj, (Map<String, Object>) saltObj,
+						(Map<String, Object>) disclosureObj);
 			} else if (saltObj instanceof List) {
 				ArrayList<Object> disclosureObjList = null;
 				if (disclosureObj != null) {
 					disclosureObjList = (ArrayList<Object>) disclosureObj;
 				}
-				addSaltAndGetHashForList((ArrayList<Object>) newClaimObj, (ArrayList<Object>) saltObj,
-						disclosureObjList, allNewValueHashes);
+				allNewValueHashes += addSaltAndGetHashForList((ArrayList<Object>) newClaimObj, (ArrayList<Object>) saltObj,
+						disclosureObjList);
 			} else {
-				addSaltByDisclose(claim, key, disclosureObj, saltObj, newClaimObj, allNewValueHashes);
+				allNewValueHashes += addSaltByDisclose(claim, key, disclosureObj, saltObj, newClaimObj);
 			}
 		}
+
+		return allNewValueHashes;
 	}
 
 	/**
@@ -132,19 +141,20 @@ public class CredentialsUtils {
 	 * @param saltObj
 	 * @param newClaimObj
 	 */
-	private static void addSaltByDisclose(Map<String, Object> claim, String key, Object disclosureObj, Object saltObj,
-			Object newClaimObj,  String allNewValueHashes) {
+	private static String addSaltByDisclose(Map<String, Object> claim, String key, Object disclosureObj, Object saltObj,
+			Object newClaimObj) {
+		String newValue = "";
 		if (disclosureObj == null) {
 			if (!CredentialDisclosedValue.DISCLOSED.getStatus().equals(saltObj)) {
-				String newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
-				allNewValueHashes += newValue;
+				newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
 				claim.put(key, newValue);
 			}
 		} else if (CredentialDisclosedValue.DISCLOSED.getStatus().equals(disclosureObj)) {
-			String newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
-			allNewValueHashes += newValue;
+			newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
 			claim.put(key, newValue);
 		}
+
+		return newValue;
 	}
 
 	public static String getFieldSaltHash(String field, String salt) {
@@ -157,7 +167,8 @@ public class CredentialsUtils {
 	 * @param salt
 	 * @param disclosures
 	 */
-	private static void addSaltAndGetHashForList(List<Object> claim, List<Object> salt, List<Object> disclosures, String allNewValueHashes) {
+	private static String addSaltAndGetHashForList(List<Object> claim, List<Object> salt, List<Object> disclosures) {
+		String allNewValueHashes = "";
 		for (int i = 0; claim != null && i < claim.size(); i++) {
 			Object obj = claim.get(i);
 			Object saltObj = salt.get(i);
@@ -166,8 +177,8 @@ public class CredentialsUtils {
 				if (disclosures != null) {
 					disclosureObj = disclosures.get(0);
 				}
-				addSaltAndGetHash((Map<String, Object>) obj, (Map<String, Object>) saltObj,
-						(Map<String, Object>) disclosureObj, allNewValueHashes);
+				allNewValueHashes += addSaltAndGetHash((Map<String, Object>) obj, (Map<String, Object>) saltObj,
+						(Map<String, Object>) disclosureObj);
 			} else if (obj instanceof List) {
 				ArrayList<Object> disclosureObjList = null;
 				if (disclosures != null) {
@@ -176,9 +187,29 @@ public class CredentialsUtils {
 						disclosureObjList = (ArrayList<Object>) disclosureObj;
 					}
 				}
-				addSaltAndGetHashForList((ArrayList<Object>) obj, (ArrayList<Object>) saltObj, disclosureObjList, allNewValueHashes);
+				allNewValueHashes += addSaltAndGetHashForList((ArrayList<Object>) obj, (ArrayList<Object>) saltObj, disclosureObjList);
 			}
 		}
+
+		return allNewValueHashes;
+	}
+
+	public static boolean verifyClaimDataRootHash(Map<String, Object> claimData){
+
+		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) claimData);
+		newClaim.remove(DidConst.CLAIMROOTHASH);
+		newClaim.remove(DidConst.CLAIMSEED);
+
+		BigInteger seedUint64 = new BigInteger(String.valueOf(claimData.get(DidConst.CLAIMSEED)));
+		byte[] seed = Sha256.uint64ToByte(seedUint64);
+
+		HashMap<String, Object> saltMap = ConverDataUtils.clone((HashMap<String, Object>)newClaim);
+		CredentialsUtils.generateSalt(saltMap, seed);
+
+		String rootHash = (String)claimData.get(DidConst.CLAIMROOTHASH);
+
+		String allNewValueHashes = addSaltAndGetHash(newClaim, saltMap, null);
+		return rootHash.equals(ConverDataUtils.sha3(allNewValueHashes).substring(2));
 	}
 
 	/**

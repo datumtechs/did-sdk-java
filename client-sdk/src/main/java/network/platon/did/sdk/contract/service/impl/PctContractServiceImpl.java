@@ -52,7 +52,6 @@ public class PctContractServiceImpl extends ContractService implements PctContra
 		try {
 			TransactionReceipt receipt = this.getPctContract().registerPct(pctJson, extra).send();
 
-
 			List<Pct.RegisterPctEventResponse> registerPctEventResponses = this.getPctContract().getRegisterPctEvents(receipt);
 			BigInteger arg1 = registerPctEventResponses.get(0).pctId;
 			return TransactionResp.buildTxSuccess(arg1, new TransactionInfo(receipt));

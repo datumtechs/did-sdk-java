@@ -319,7 +319,6 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 			String context = "https://platon.network/";
 			long expirationDate = DateUtils.convertUtcDateToTimeStamp("2080-08-04T13:35:49Z");
-			long issuanceDate = new Date().getTime();
 			String credentialType = "VerifiableCredential";
 
 			CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
@@ -349,6 +348,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 		String hexAddress = Keys.getAddress(publicKey);
 		String address = Bech32.addressEncode(NetworkParameters.getHrp(), hexAddress);
+
 		TransactionReceipt receipt = null;
 		receipt = Transfer.sendFunds(
 							web3j, credentials, address,
@@ -362,7 +362,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		}
 
 		CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
-		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient().createDid(req);
+		BaseResp<CreateDidResp> createDidResp = PClient.createDidentityClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).createDid(req);
 		if (createDidResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createDidResp);
 			logger.error("Create did error,error msg:{}", msg);
@@ -378,7 +378,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		String str = "This is a String";
 		CreatePctReq req = CreatePctReq.builder().pctjson(pctJson).privateKey(DidConfig.getCONTRACT_PRIVATEKEY()).extra(str.getBytes()).build();
-		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient().registerPct(req);
+		BaseResp<CreatePctResp> createPctBaseResp = PClient.createPctClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY())).registerPct(req);
 		if (createPctBaseResp.checkFail()) {
 			String msg = JSONObject.toJSONString(createPctBaseResp);
 			logger.error("Register pct error,error msg:{}", msg);

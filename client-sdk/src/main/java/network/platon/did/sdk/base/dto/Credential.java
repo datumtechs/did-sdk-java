@@ -110,11 +110,6 @@ public class Credential implements Serializable{
 	@CustomSize(min = ReqAnnoationArgs.COMMON_DATA_SIZE)
 	private Map<String, Object> claimData;
 
-//	/**
-//	 * Required: The create date.
-//	 */
-//	private Revocation revocation;
-
 	/**
 	 * Required: The create date.
 	 */
@@ -125,37 +120,23 @@ public class Credential implements Serializable{
 	@SuppressWarnings("unchecked")
 	public String obtainHash() {
         Map<String, Object> salt = this.obtainSalt();
-        Object disObject  = proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+        Object disObject  = this.proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
         Map<String, Object> disclosures = null;
         if(disObject != null && disObject instanceof Map) {
-			disclosures = (Map<String, Object>) proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+			disclosures = (Map<String, Object>) this.proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
         }
         Credential credential = ConverDataUtils.clone(this);
         credential.setProof(null);
-		BigInteger seedUint64 = new BigInteger(String.valueOf(claimMeta.get(DidConst.CLAIMSEED)));
-		byte[] seed = Sha256.uint64ToByte(seedUint64);
-        return CredentialsUtils.getCredentialHash(credential, salt, disclosures, seed);
-    }
-	
-	@SuppressWarnings("unchecked")
-	public String obtainAllHash() {
-        Map<String, Object> salt = this.obtainSalt();
-        Object disObject  = proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
-        Map<String, Object> disclosures = null;
-        if(disObject != null && disObject instanceof Map) {
-			disclosures = (Map<String, Object>) proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
-        }
-        Credential credential = ConverDataUtils.clone(this);
-		BigInteger seedUint64 = new BigInteger(String.valueOf(claimMeta.get(DidConst.CLAIMSEED)));
+		BigInteger seedUint64 = new BigInteger(String.valueOf(this.claimData.get(DidConst.CLAIMSEED)));
 		byte[] seed = Sha256.uint64ToByte(seedUint64);
         return CredentialsUtils.getCredentialHash(credential, salt, disclosures, seed);
     }
 	
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> obtainSalt() {
-		BigInteger seedUint64 = new BigInteger(String.valueOf(claimMeta.get(DidConst.CLAIMSEED)));
+		BigInteger seedUint64 = new BigInteger(String.valueOf(this.claimData.get(DidConst.CLAIMSEED)));
 		byte[] seed = Sha256.uint64ToByte(seedUint64);
-		HashMap<String, Object> saltMap = ConverDataUtils.clone((HashMap<String, Object>)claimData);
+		HashMap<String, Object> saltMap = ConverDataUtils.clone((HashMap<String, Object>)this.claimData);
 		saltMap.remove(DidConst.CLAIMROOTHASH);
 		saltMap.remove(DidConst.CLAIMSEED);
 		CredentialsUtils.generateSalt(saltMap, seed);
