@@ -176,6 +176,10 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.buildError(retEnum);
 		}
 
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData())){
+			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
+		}
+
 		//Query the data on the chain according to the hash calculated by credential
 		String credentialHash = req.getCredential().obtainHash();
 
