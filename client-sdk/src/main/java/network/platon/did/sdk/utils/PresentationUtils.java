@@ -202,7 +202,9 @@ public class PresentationUtils {
 					claimPctid);
 			return RetEnum.RET_CREDENTIAL_DID_ERROR;
 		}
-		return verifyDisclosureAndSalt(selectMap, saltMap);
+		verifyDisclosureAndSalt(selectMap, saltMap);
+
+		return RetEnum.RET_SUCCESS;
 	}
 
 	/**

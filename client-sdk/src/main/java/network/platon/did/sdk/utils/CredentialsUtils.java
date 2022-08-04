@@ -143,7 +143,7 @@ public class CredentialsUtils {
 	 */
 	private static String addSaltByDisclose(Map<String, Object> claim, String key, Object disclosureObj, Object saltObj,
 			Object newClaimObj) {
-		String newValue = "";
+		String newValue = String.valueOf(newClaimObj);
 		if (disclosureObj == null) {
 			if (!CredentialDisclosedValue.DISCLOSED.getStatus().equals(saltObj)) {
 				newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
@@ -194,7 +194,7 @@ public class CredentialsUtils {
 		return allNewValueHashes;
 	}
 
-	public static boolean verifyClaimDataRootHash(Map<String, Object> claimData){
+	public static boolean verifyClaimDataRootHash(Map<String, Object> claimData, Map<String, Object> disclosureMap){
 
 		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) claimData);
 		newClaim.remove(DidConst.CLAIMROOTHASH);
@@ -208,7 +208,7 @@ public class CredentialsUtils {
 
 		String rootHash = (String)claimData.get(DidConst.CLAIMROOTHASH);
 
-		String allNewValueHashes = addSaltAndGetHash(newClaim, saltMap, null);
+		String allNewValueHashes = addSaltAndGetHash(newClaim, saltMap, disclosureMap);
 		return StringUtils.equals(rootHash, ConverDataUtils.sha3(allNewValueHashes).substring(2));
 	}
 

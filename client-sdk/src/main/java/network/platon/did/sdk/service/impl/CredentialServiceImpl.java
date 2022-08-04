@@ -116,7 +116,10 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.buildError(retEnum);
 		}
 
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData())){
+		@SuppressWarnings("unchecked")
+		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 		

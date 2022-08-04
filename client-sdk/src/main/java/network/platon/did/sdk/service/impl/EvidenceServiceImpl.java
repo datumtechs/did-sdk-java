@@ -2,6 +2,7 @@ package network.platon.did.sdk.service.impl;
 
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
+import network.platon.did.common.constant.VpOrVcPoofKey;
 import network.platon.did.common.enums.RetEnum;
 import network.platon.did.common.utils.DateUtils;
 import network.platon.did.contract.dto.CredentialEvidence;
@@ -26,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Map;
 
 /**
  * The specific implementation of evidence vouchers, including storing vouchers in PlatON, querying data, etc
@@ -75,7 +77,10 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.buildError(retEnum);
 		}
 
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData())){
+		@SuppressWarnings("unchecked")
+		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
@@ -182,7 +187,10 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.buildError(retEnum);
 		}
 
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData())){
+		@SuppressWarnings("unchecked")
+		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
