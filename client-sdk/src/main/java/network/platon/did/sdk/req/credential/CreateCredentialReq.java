@@ -48,8 +48,10 @@ public class CreateCredentialReq extends BaseReq {
 			max = ReqAnnoationArgs.DID_SIZE_MAX)
 	@CustomPattern(value = DidConst.PLATON_DID_PATTERN)
 	private String issuer;
-	
-	private String context;
+
+	@Builder.Default
+	@CustomIgnore
+	private String context = "https://datumtech.com/credentials/v1";
 	
 	private String type;
 }

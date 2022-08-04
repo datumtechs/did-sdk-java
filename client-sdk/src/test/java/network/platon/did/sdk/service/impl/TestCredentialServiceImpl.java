@@ -88,7 +88,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		String credentialType = "VerifiableCredential";
 
 		// create credential
-		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).did(did)
+		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).expirationDate(expirationDate).did(did)
 				.pctId(pctId).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 				.type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
