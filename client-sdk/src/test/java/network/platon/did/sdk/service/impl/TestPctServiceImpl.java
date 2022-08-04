@@ -5,17 +5,14 @@ import com.platon.utils.Numeric;
 import lombok.Data;
 import network.platon.did.common.config.DidConfig;
 import network.platon.did.csies.algorithm.AlgorithmHandler;
+import network.platon.did.sdk.BaseTest;
+import network.platon.did.sdk.req.pct.CreatePctReq;
 import network.platon.did.sdk.req.pct.QueryPctInfoReq;
 import network.platon.did.sdk.resp.BaseResp;
 import network.platon.did.sdk.resp.pct.CreatePctResp;
 import network.platon.did.sdk.resp.pct.QueryPctInfoResp;
 import network.platon.did.sdk.utils.DidUtils;
 import org.junit.Test;
-
-import network.platon.did.sdk.BaseTest;
-import network.platon.did.sdk.req.pct.CreatePctReq;
-
-import java.util.Random;
 
 public class TestPctServiceImpl extends BaseTest {
 

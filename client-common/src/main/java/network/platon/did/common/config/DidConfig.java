@@ -91,7 +91,7 @@ public class DidConfig {
 
 		GAS_LIMIT = PropertyUtils.getProperty(gasLimitName,"");
 		if(StringUtils.isBlank(GAS_LIMIT)) {
-			GAS_PRICE = "210000";
+			GAS_LIMIT = "210000";
 		}
 
 		CHAIN_ID = Long.valueOf(PropertyUtils.getProperty(ChainIdName,"120"));
