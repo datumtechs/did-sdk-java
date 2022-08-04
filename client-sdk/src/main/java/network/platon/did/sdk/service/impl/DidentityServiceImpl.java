@@ -73,9 +73,13 @@ public class DidentityServiceImpl extends BusinessBaseService implements Didenti
 
 	@Override
 	public BaseResp<QueryDidDocumentResp> queryDidDocument(QueryDidDocumentReq req) {
-		return null;
+		BaseResp<String> verifyBaseResp = req.validFiled();
+		if (verifyBaseResp.checkFail()) {
+			return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, verifyBaseResp.getData());
+		}
+		String did = req.getDid();
+		return this.queryDidDocument(did);
 	}
-
 
 	private BaseResp<QueryDidDocumentResp> queryDidDocument(String did) {
 
