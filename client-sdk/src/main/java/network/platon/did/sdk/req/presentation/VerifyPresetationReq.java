@@ -35,8 +35,4 @@ public class VerifyPresetationReq extends BaseReq{
 
 	@CustomNotNull
     private Challenge challenge;
-
-	@CustomNotNull
-    private PresentationPolicy policy;
-
 }

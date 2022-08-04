@@ -70,7 +70,6 @@ public class TestPresentationServiceImpl extends BaseTest{
 		VerifyPresetationReq req = VerifyPresetationReq.builder()
 				.did(adminDid)
 				.challenge(challenge)
-				.policy(policy)
 				.presentation(presentation).build();
 		okResult(PClient.createPresentationClient().verifyPresentation(req));
 	}

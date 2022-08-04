@@ -177,8 +177,6 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, "miss proof data");
         }
         Presentation presentation = req.getPresentation();
-        PresentationPolicy presentationPolicy = req.getPolicy();
-        Map<String, ClaimPolicy> claimPolicyMap = presentationPolicy.getPolicys();
         if (!presentation.obtainNonce().equals(req.getChallenge().getNonce())) {
             return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID, "nonce not match");
         }
@@ -200,16 +198,6 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
             return BaseResp.buildError(RetEnum.RET_PRESENTATION_VERIFY_ERROR);
         }
         for (Credential credential : presentation.getVerifiableCredential()) {
-            ClaimPolicy claimPolicy = claimPolicyMap.get(credential.obtainPctId());
-            if (claimPolicy == null) {
-                log.error("did in claimMeta is null,did:{}", credential.obtainPctId());
-                return BaseResp.build(RetEnum.RET_COMMON_PARAM_INVALLID,
-                        "claimPolicy is null, pctid :" + credential.obtainPctId());
-            }
-            RetEnum retEnum = PresentationUtils.verifyPolicy(credential, claimPolicy, String.valueOf(credential.obtainPctId()));
-            if (retEnum.getCode() != RetEnum.RET_SUCCESS.getCode()) {
-                return BaseResp.buildError(retEnum);
-            }
             VerifyCredentialReq verifyCredentialReq = VerifyCredentialReq.builder().credential(credential)
                     .build();
             BaseResp<String> resp = getCredentialService().verifyCredential(verifyCredentialReq);
