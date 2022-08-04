@@ -14,11 +14,11 @@ import java.util.Map;
 
 public class DidConst {
 
-	public static final String DID_PREFIX = "did:did:";
+	public static final String DID_PREFIX = "did:pid:";
 
 	public static final String DID_EVENT_ATTRIBUTE_CHANGE_STR = "DIDAttributeChanged";
 	public static final String DID_EVENT_ATTRIBUTE_CHANGE_TOPIC = EventEncoder.encode(Did.DIDATTRIBUTECHANGE_EVENT);
-	public static final String PLATON_DID_PATTERN = "did:did:[a-zA-Z0-9]{42}";
+	public static final String PLATON_DID_PATTERN = "did:pid:[a-zA-Z0-9]{42}";
 	public static final String PLATON_ADDRESS_PATTERN = "[a-zA-Z0-9]{42}";
 
 	public static final String PLATON_PRIVATE_KEY_PATTERN = "0x[a-fA-f0-9]{60,64}|[a-fA-f0-9]{60,64}";

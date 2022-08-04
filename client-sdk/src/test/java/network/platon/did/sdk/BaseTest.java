@@ -202,7 +202,7 @@ public class BaseTest {
         claim.put("data", "456");
         String context = "1";
         String pctId = "1000";
-        String publicKeyId = "did:did:lax1uqug0zq7rcxddndleq4ux2ft3tv6dqljphydrl#keys-1";
+        String publicKeyId = "did:pid:lax1uqug0zq7rcxddndleq4ux2ft3tv6dqljphydrl#keys-1";
         String type = "VerifiableCredential";
         CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(new Date(1691863929).getTime())
                 .pctId(pctId).did(adminDid).privateKey(adminPrivateKey).publicKeyId(publicKeyId)
