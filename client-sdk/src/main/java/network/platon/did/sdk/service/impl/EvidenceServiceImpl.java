@@ -22,6 +22,8 @@ import network.platon.did.sdk.service.EvidenceService;
 import network.platon.did.sdk.utils.CredentialsUtils;
 import network.platon.did.sdk.utils.DidUtils;
 import network.platon.did.sdk.utils.VerifyInputDataUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -202,8 +204,8 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.build(resp.getCode(), resp.getErrMsg());
 		}
 
-		if( !credential.obtainSign().equals(resp.getData().getSignInfo().getSignature()) ||
-				!checkResp.getData().getPublicKeyHex().equals((resp.getData().getSignInfo().getSigner()))){
+		if( !StringUtils.equals(credential.obtainSign(), resp.getData().getSignInfo().getSignature()) ||
+				!StringUtils.equals(checkResp.getData().getPublicKeyHex(), resp.getData().getSignInfo().getSigner())){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 

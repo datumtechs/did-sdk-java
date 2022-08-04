@@ -185,7 +185,6 @@ public class BaseTest {
             return false;
         }
 
-
         CreateDidReq req = CreateDidReq.builder().privateKey(privateKey).publicKey(publicKey).build();
         BaseResp<CreateDidResp> createDidResp = didService.createDid(req);
         resp = createDidResp;

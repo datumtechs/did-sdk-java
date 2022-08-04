@@ -139,17 +139,23 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
         /**
          * sign presentation data
          */
-        String signature = AlgorithmHandler.signMessageStr(presentation.toRawData(), didAuthentication.getPrivateKey());
+
         Map<String, Object> proofMap = new HashMap<>();
         String proofType = AlgorithmTypeEnum.ECC.getDesc();
         proofMap.put(VpOrVcPoofKey.PROOF_TYPE, proofType);
+
         Long proofCreated = DateUtils.getCurrentTimeStamp();
         proofMap.put(VpOrVcPoofKey.PROOF_CTEATED, proofCreated);
+
         String didPublicKeyId = didAuthentication.getPublicKeyId();
         proofMap.put(VpOrVcPoofKey.PROOF_VERIFICATIONMETHOD, didPublicKeyId);
+
         proofMap.put(VpOrVcPoofKey.PROOF_CHALLENGE, challenge.getNonce());
-        proofMap.put(VpOrVcPoofKey.PROOF_JWS, signature);
+
         presentation.setProof(proofMap);
+
+        String signature = AlgorithmHandler.signMessageStr(presentation.toRawData(), didAuthentication.getPrivateKey());
+        presentation.getProof().put(VpOrVcPoofKey.PROOF_JWS, signature);
     }
 
     @Override
@@ -180,6 +186,7 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
         if(!RetEnum.isSuccess(verify)) {
             return BaseResp.buildError(verify);
         }
+
         if(!CredentialsUtils.verifyEccSignature(presentation.toRawData(), presentation.obtainSign(), checkData.getPublicKeyHex())) {
             return BaseResp.buildError(RetEnum.RET_PRESENTATION_VERIFY_ERROR);
         }

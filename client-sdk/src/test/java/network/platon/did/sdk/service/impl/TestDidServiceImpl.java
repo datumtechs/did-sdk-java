@@ -22,8 +22,6 @@ import org.junit.Test;
 @Slf4j
 public class TestDidServiceImpl extends BaseTest{
 
-	private DidentityService didService = new DidentityServiceImpl();
-
 	@Data
 	private class createDidResult{
 		private String privateKey;
@@ -40,6 +38,7 @@ public class TestDidServiceImpl extends BaseTest{
 			log.error("Failed to create EcKeyPair, exception: {}", e);
 			return null;
 		}
+
 		String privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());
 		String publicKey = Numeric.toHexStringWithPrefix(keyPair.getPublicKey());
 		String did = DidUtils.generateDid(publicKey);

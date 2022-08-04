@@ -209,7 +209,7 @@ public class CredentialsUtils {
 		String rootHash = (String)claimData.get(DidConst.CLAIMROOTHASH);
 
 		String allNewValueHashes = addSaltAndGetHash(newClaim, saltMap, null);
-		return rootHash.equals(ConverDataUtils.sha3(allNewValueHashes).substring(2));
+		return StringUtils.equals(rootHash, ConverDataUtils.sha3(allNewValueHashes).substring(2));
 	}
 
 	/**
