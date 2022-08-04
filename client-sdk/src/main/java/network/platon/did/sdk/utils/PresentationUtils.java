@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import network.platon.did.sdk.constant.DidConst;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -201,8 +202,7 @@ public class PresentationUtils {
 					claimPctid);
 			return RetEnum.RET_CREDENTIAL_DID_ERROR;
 		}
-		verifyDisclosureAndSalt(selectMap, saltMap);
-		return RetEnum.RET_SUCCESS;
+		return verifyDisclosureAndSalt(selectMap, saltMap);
 	}
 
 	/**

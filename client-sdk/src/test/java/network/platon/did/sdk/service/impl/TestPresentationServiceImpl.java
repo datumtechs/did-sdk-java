@@ -54,6 +54,7 @@ public class TestPresentationServiceImpl extends BaseTest{
 	public void verifyPresentation()throws Exception {
 		Credential credential = this.createData();
 		BaseResp<CreatePresetationResp> createPresetationRespBaseResp = this.createPresentation(credential);
+
 		PresentationPolicy policy = new PresentationPolicy();
 		Map<String, ClaimPolicy> policyMap = new HashMap<String, ClaimPolicy>();
 		ClaimPolicy claimPolicy = new ClaimPolicy();

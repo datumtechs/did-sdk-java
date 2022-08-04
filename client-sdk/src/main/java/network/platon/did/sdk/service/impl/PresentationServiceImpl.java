@@ -10,6 +10,7 @@ import network.platon.did.csies.algorithm.AlgorithmHandler;
 import network.platon.did.csies.utils.ConverDataUtils;
 import network.platon.did.sdk.base.dto.*;
 import network.platon.did.sdk.constant.DidConst;
+import network.platon.did.sdk.enums.CredentialDisclosedValue;
 import network.platon.did.sdk.req.credential.VerifyCredentialReq;
 import network.platon.did.sdk.req.presentation.CreatePresetationReq;
 import network.platon.did.sdk.req.presentation.VerifyPresetationReq;
@@ -111,6 +112,7 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
     private BaseResp<Credential> createSelectiveCredential(Credential credential, ClaimPolicy claimPolicy,
                                                            DidAuthentication didAuthentication) {
         Credential newCredential = ConverDataUtils.clone(credential);
+
         Map<String, Object> disclosureMap;
         try {
             disclosureMap = ConverDataUtils.deserialize(claimPolicy.getDisclosedFieldsJson(), HashMap.class);
@@ -118,12 +120,19 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
             log.error("claimPolicy objToMap error", e);
             return BaseResp.buildError(RetEnum.RET_CREDENTIAL_TRANSFER_MAP_ERROR);
         }
+
+        disclosureMap.put(DidConst.CLAIMROOTHASH, CredentialDisclosedValue.DISCLOSED.getStatus());
+        disclosureMap.put(DidConst.CLAIMSEED, CredentialDisclosedValue.DISCLOSED.getStatus());
+
         // Supplement the missing key of policy
         PresentationUtils.addKeyToPolicy(disclosureMap, newCredential.getClaimData());
         // For claims without selective disclosure of data for salt calculation hash
         PresentationUtils.addSelectSalt(disclosureMap, newCredential.obtainSalt(), newCredential.getClaimData());
+        disclosureMap.remove(DidConst.CLAIMROOTHASH);
+        disclosureMap.remove(DidConst.CLAIMSEED);
         Map<String, Object> proofMap = newCredential.getProof();
         proofMap.put(VpOrVcPoofKey.PROOF_DISCLOSURES, disclosureMap);
+
         return BaseResp.buildSuccess(newCredential);
     }
 
