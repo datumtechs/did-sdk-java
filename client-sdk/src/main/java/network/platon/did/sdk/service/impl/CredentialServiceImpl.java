@@ -144,10 +144,23 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		if (!checkResp.checkSuccess()) {
 			return BaseResp.build(checkResp.getCode(),checkResp.getErrMsg());
 		}
+
 		RetEnum retEnum = VerifyInputDataUtils.checkMap(credential.getClaimMeta(), credential.getProof());
 		if (!RetEnum.isSuccess(retEnum)) {
 			return BaseResp.buildError(retEnum);
 		}
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
+			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
+		}
+
+		if (!CredentialsUtils.verifyEccSignature(credential.obtainHash(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
+			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
+		}
+
 		PresentationUtils.addSelectSalt(req.getSelectMap(), credential.obtainSalt(), credential.getClaimData());
 		credential.getProof().put(VpOrVcPoofKey.PROOF_DISCLOSURES, req.getSelectMap());
 		CreateSelectCredentialResp createSelectCredentialResp = new CreateSelectCredentialResp();

@@ -120,7 +120,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		// 1.valid claim is null
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(null).context(context).expirationDate(expirationDate)
-				.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
+				.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).issuer(issuer).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
@@ -133,7 +133,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		// resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 3.valid expirationDate is 0
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(0L).pctId(pctId)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(0L).pctId(pctId).issuer(issuer)
 				.did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
@@ -147,7 +147,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		// 5.valid issuer format error
 		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).did(did).privateKey(issuerPriKey)
-				.publicKeyId(issuerPubKeyId).type(credentialType).build();
+				.publicKeyId(issuerPubKeyId).type(credentialType).issuer("123").build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
@@ -156,22 +156,22 @@ public class TestCredentialServiceImpl extends BaseTest {
 		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
 				.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
-		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_DID_IDENTITY_NOTEXIST.getCode()));
+		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 7.valid pctId is too long
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(String.valueOf(Long.MAX_VALUE)).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
-		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_PCT_QUERY_BY_ID_ERROR.getCode()));
+		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_PCT_QUERY_JSON_NOT_FOUND_ERROR.getCode()));
 
 		// 8.valid pctId is not exists
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId("11223344").did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_PCT_QUERY_JSON_NOT_FOUND_ERROR.getCode()));
 
 		// 9.valid did format error
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(pctId).did("11111111111111111111111111111111111111111111111111").privateKey(issuerPriKey).publicKeyId(issuerPubKeyId)
 				.type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
@@ -179,28 +179,28 @@ public class TestCredentialServiceImpl extends BaseTest {
 
 		// 10.valid did is not exists
 		String did2 = DidUtils.generateDid(Numeric.toHexStringWithPrefix(Keys.createEcKeyPair().getPublicKey()));
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(pctId).did(did2).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_CREDENTIAL_DID_NOT_FOUND.getCode()));
 
 		// 11.valid privateKey is empty
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(pctId).did(did).privateKey("").publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 12.valid privateKey format error
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(pctId).did(did).privateKey(issuerPriKey + "ssss").publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 13.valid issuerPubKeyId is not exists
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(did2 + "#keys-1").type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
-		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_CREDENTIAL_PUBLICKEY_NOT_AUTH.getCode()));
+		assertTrue(resp.checkFail() && resp.getCode().equals(RetEnum.RET_CREDENTIAL_MATCH_PUBLICKEYID_ERROR.getCode()));
 
 		// 14. valid type is empty
 		// req =
@@ -211,7 +211,7 @@ public class TestCredentialServiceImpl extends BaseTest {
 		// resp.getCode().equals(RetEnum.RET_COMMON_PARAM_INVALLID.getCode()));
 
 		// 15.success
-		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)
+		req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate).issuer(issuer)
 				.pctId(pctId).did(did).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).type(credentialType).build();
 		resp = PClient.createCredentialClient().createCredential(req);
 		assertTrue(resp.checkSuccess());

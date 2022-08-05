@@ -145,7 +145,6 @@ public class PresentationUtils {
 
 		if (((Integer) value).equals(CredentialDisclosedValue.NOT_DISCLOSED.getStatus())
 				&& claim.containsKey(disclosureKey)) {
-			saltMap.put(disclosureKey, CredentialDisclosedValue.NOT_DISCLOSED.getStatus());
 			String hash = CredentialsUtils.getFieldSaltHash(String.valueOf(claimV), String.valueOf(saltV));
 			claim.put(disclosureKey, hash);
 		}

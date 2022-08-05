@@ -230,11 +230,6 @@ public class CredentialsUtils {
 	 * @param seed
 	 */
 	public static void generateSalt(Map<String, Object> map, byte[] seed) {
-		if(null == seed){
-			Random r = new Random();
-			long oneRandom = r.nextLong();
-			seed = Sha256.uint64ToByte(new BigInteger(String.valueOf(oneRandom)));
-		}
 
 		List<Map.Entry<String, Object>> list = new ArrayList<Map.Entry<String, Object>>(map.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<String, Object>>() {
@@ -252,6 +247,7 @@ public class CredentialsUtils {
 			} else if (value instanceof List) {
 				boolean isMapOrList = generateSaltFromList((ArrayList<Object>) value, seed);
 				if (!isMapOrList) {
+					seed = Sha256.sha256(seed);
 					entry.setValue(seed);
 				}
 			} else {
