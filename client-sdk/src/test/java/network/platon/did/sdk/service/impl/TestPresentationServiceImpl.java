@@ -159,7 +159,7 @@ public class TestPresentationServiceImpl extends BaseTest{
 		TransactionReceipt receipt = null;
 		receipt = Transfer.sendFunds(
 						web3j, credentials, address,
-						BigDecimal.valueOf(1), Convert.Unit.KPVON)
+						BigDecimal.valueOf(100), Convert.Unit.PVON)
 				.send();
 		if(!receipt.isStatusOK()){
 			String msg = "Create did error";

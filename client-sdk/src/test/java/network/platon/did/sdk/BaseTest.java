@@ -166,7 +166,7 @@ public class BaseTest {
         try {
             receipt = Transfer.sendFunds(
                             web3j, credentials, address,
-                            BigDecimal.valueOf(1), Convert.Unit.KPVON)
+                            BigDecimal.valueOf(100), Convert.Unit.PVON)
                     .send();
         }catch (Exception e) {
             log.error(
@@ -238,7 +238,7 @@ public class BaseTest {
         try {
             receipt = Transfer.sendFunds(
                             web3j, credentials, address,
-                            BigDecimal.valueOf(1), Convert.Unit.KPVON)
+                            BigDecimal.valueOf(100), Convert.Unit.PVON)
                     .send();
         }catch (Exception e) {
             log.error(

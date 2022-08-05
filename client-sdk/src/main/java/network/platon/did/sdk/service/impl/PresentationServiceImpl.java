@@ -94,6 +94,9 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
         type.add(DidConst.DEFAULT_PRESENTATION_TYPE);
         presentation.setType(type);
         presentation.setVerifiableCredential(newCredentialList);
+        List<String> context = new ArrayList<>();
+        context.add(req.getContext());
+        presentation.setContext(context);
 
         this.generatePresentationProof(req.getChallenge(), req.getAuthentication(), presentation);
         CreatePresetationResp createPresetationResp = new CreatePresetationResp();

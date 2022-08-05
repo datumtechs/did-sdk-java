@@ -3,6 +3,7 @@ package network.platon.did.sdk.req.presentation;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import network.platon.did.sdk.annoation.CustomIgnore;
 import network.platon.did.sdk.annoation.CustomNotNull;
 import network.platon.did.sdk.annoation.CustomSize;
 import network.platon.did.sdk.base.dto.Challenge;
@@ -36,4 +37,7 @@ public class CreatePresetationReq extends BaseReq{
 	@CustomNotNull
     private PresentationPolicy policy;
 
+    @Builder.Default
+    @CustomIgnore
+    private String context = "https://datumtech.com/presentation/v1";
 }
