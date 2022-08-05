@@ -47,7 +47,7 @@ import static org.junit.Assert.assertTrue;
 public class BaseTest {
 
     static {
-        NetworkParameters.init(210309L, "lat");
+        NetworkParameters.init(DidConfig.getCHAIN_ID(), DidConfig.getCHAIN_HRP());
     }
 
     protected CredentialService credentialService = PClient.createCredentialClient(new InitContractData(DidConfig.getCONTRACT_PRIVATEKEY()));
