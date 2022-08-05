@@ -61,8 +61,6 @@ public class VerifyInputDataUtils {
 
 	public static RetEnum checkPct(String pctJson,Map<String, Object> claim) {
 		HashMap<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>)claim);
-		newClaim.remove(DidConst.CLAIMROOTHASH);
-		newClaim.remove(DidConst.CLAIMSEED);
 
 		//TODO 补充claim数据判断
 		if(StringUtils.isBlank(pctJson)) {

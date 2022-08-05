@@ -80,7 +80,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		@SuppressWarnings("unchecked")
 		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
 
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
@@ -190,7 +190,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		@SuppressWarnings("unchecked")
 		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
 
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 

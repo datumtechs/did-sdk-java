@@ -121,15 +121,10 @@ public class PresentationServiceImpl extends BusinessBaseService implements Pres
             return BaseResp.buildError(RetEnum.RET_CREDENTIAL_TRANSFER_MAP_ERROR);
         }
 
-        disclosureMap.put(DidConst.CLAIMROOTHASH, CredentialDisclosedValue.DISCLOSED.getStatus());
-        disclosureMap.put(DidConst.CLAIMSEED, CredentialDisclosedValue.DISCLOSED.getStatus());
-
         // Supplement the missing key of policy
         PresentationUtils.addKeyToPolicy(disclosureMap, newCredential.getClaimData());
         // For claims without selective disclosure of data for salt calculation hash
         PresentationUtils.addSelectSalt(disclosureMap, newCredential.obtainSalt(), newCredential.getClaimData());
-        disclosureMap.remove(DidConst.CLAIMROOTHASH);
-        disclosureMap.remove(DidConst.CLAIMSEED);
         Map<String, Object> proofMap = newCredential.getProof();
         proofMap.put(VpOrVcPoofKey.PROOF_DISCLOSURES, disclosureMap);
 

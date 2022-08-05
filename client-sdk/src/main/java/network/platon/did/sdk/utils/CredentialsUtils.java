@@ -33,9 +33,9 @@ public class CredentialsUtils {
 	 * @return
 	 */
 	public static String getCredentialHash(Credential credential, Map<String, Object> salt,
-			Map<String, Object> disclosures, byte[] seed) {
+			Map<String, Object> disclosures) {
 		// Obtain signature data based on
-		String rawData = getCredentialData(credential, salt, disclosures, seed);
+		String rawData = getCredentialData(credential, salt, disclosures);
 		if (StringUtils.isEmpty(rawData)) {
 			return StringUtils.EMPTY;
 		}
@@ -51,18 +51,16 @@ public class CredentialsUtils {
 	 * @return
 	 */
 	public static String getCredentialData(Credential credential, Map<String, Object> salt,
-			Map<String, Object> disclosures, byte[] seed) {
+			Map<String, Object> disclosures) {
 		try {
 			Map<String, Object> credMap = ConverDataUtils.objToMap(credential);
 
 			// reset claim
-			Map<String, Object> claimHash = getClaimHash(credential, salt, disclosures, seed);
+			Map<String, Object> claimHash = getClaimHash(credential, salt, disclosures);
 			credMap.put(DidConst.CLAIM, claimHash);
 
 			// reset credential claim data
 			Map<String, Object> credentialClaimData = credential.getClaimData();
-			credentialClaimData.put(DidConst.CLAIMROOTHASH, claimHash.get(DidConst.CLAIMROOTHASH));
-			credentialClaimData.put(DidConst.CLAIMSEED,  claimHash.get(DidConst.CLAIMSEED));
 
 			Map<String, Object> proof = (Map<String, Object>) credMap.get(VpOrVcPoofKey.PROOF);
 			// Remove salt for calculation proof
@@ -71,7 +69,17 @@ public class CredentialsUtils {
 			}
 			credMap.remove(VpOrVcPoofKey.PROOF);
 			credMap.put(VpOrVcPoofKey.PROOF, proof);
-			return ConverDataUtils.mapToCompactJson(credMap);
+			String rawData = ConverDataUtils.mapToCompactJson(credMap);
+
+			// set claimRootHash
+			Map<String, Object> credentialProof = (Map<String, Object>) credential.getProof();
+			if(credentialProof == null) {
+				credentialProof = new HashMap<>();
+			}
+			credentialProof.put(VpOrVcPoofKey.PROOF_CLAIMROOTHASH, claimHash.get(VpOrVcPoofKey.PROOF_CLAIMROOTHASH));
+			credential.setProof(credentialProof);
+
+			return rawData;
 		} catch (Exception e) {
 			log.error("get credential data error.", e);
 			return StringUtils.EMPTY;
@@ -87,13 +95,12 @@ public class CredentialsUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getClaimHash(Credential credential, Map<String, Object> salt,
-			Map<String, Object> disclosures, byte[] seed) {
+			Map<String, Object> disclosures) {
 		Map<String, Object> claim = credential.getClaimData();
 		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) claim);
 
 		String allNewValueHashes = addSaltAndGetHash(newClaim, salt, disclosures);
-		newClaim.put(DidConst.CLAIMROOTHASH, ConverDataUtils.sha3(allNewValueHashes).substring(2));
-		newClaim.put(DidConst.CLAIMSEED, Sha256.byteToUin64(seed));
+		newClaim.put(VpOrVcPoofKey.PROOF_CLAIMROOTHASH, ConverDataUtils.sha3(allNewValueHashes));
 		return newClaim;
 	}
 
@@ -194,22 +201,20 @@ public class CredentialsUtils {
 		return allNewValueHashes;
 	}
 
-	public static boolean verifyClaimDataRootHash(Map<String, Object> claimData, Map<String, Object> disclosureMap){
+	public static boolean verifyClaimDataRootHash(Credential credential){
 
-		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) claimData);
-		newClaim.remove(DidConst.CLAIMROOTHASH);
-		newClaim.remove(DidConst.CLAIMSEED);
-
-		BigInteger seedUint64 = new BigInteger(String.valueOf(claimData.get(DidConst.CLAIMSEED)));
+		BigInteger seedUint64 = new BigInteger(String.valueOf(credential.getProof().get(VpOrVcPoofKey.PROOF_SEED)));
 		byte[] seed = Sha256.uint64ToByte(seedUint64);
 
+		Map<String, Object> newClaim = ConverDataUtils.clone((HashMap<String, Object>) credential.getClaimData());
 		HashMap<String, Object> saltMap = ConverDataUtils.clone((HashMap<String, Object>)newClaim);
 		CredentialsUtils.generateSalt(saltMap, seed);
 
-		String rootHash = (String)claimData.get(DidConst.CLAIMROOTHASH);
-
+		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
 		String allNewValueHashes = addSaltAndGetHash(newClaim, saltMap, disclosureMap);
-		return StringUtils.equals(rootHash, ConverDataUtils.sha3(allNewValueHashes).substring(2));
+
+		String rootHash = (String)credential.getProof().get(VpOrVcPoofKey.PROOF_CLAIMROOTHASH);
+		return StringUtils.equals(rootHash, ConverDataUtils.sha3(allNewValueHashes));
 	}
 
 	/**

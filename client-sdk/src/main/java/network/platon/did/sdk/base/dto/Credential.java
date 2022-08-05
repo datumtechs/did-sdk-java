@@ -127,18 +127,14 @@ public class Credential implements Serializable{
         }
         Credential credential = ConverDataUtils.clone(this);
         credential.setProof(null);
-		BigInteger seedUint64 = new BigInteger(String.valueOf(this.claimData.get(DidConst.CLAIMSEED)));
-		byte[] seed = Sha256.uint64ToByte(seedUint64);
-        return CredentialsUtils.getCredentialHash(credential, salt, disclosures, seed);
+        return CredentialsUtils.getCredentialHash(credential, salt, disclosures);
     }
 	
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> obtainSalt() {
-		BigInteger seedUint64 = new BigInteger(String.valueOf(this.claimData.get(DidConst.CLAIMSEED)));
+		BigInteger seedUint64 = new BigInteger(String.valueOf(this.proof.get(VpOrVcPoofKey.PROOF_SEED)));
 		byte[] seed = Sha256.uint64ToByte(seedUint64);
 		HashMap<String, Object> saltMap = ConverDataUtils.clone((HashMap<String, Object>)this.claimData);
-		saltMap.remove(DidConst.CLAIMROOTHASH);
-		saltMap.remove(DidConst.CLAIMSEED);
 		CredentialsUtils.generateSalt(saltMap, seed);
 		return saltMap;
 	}

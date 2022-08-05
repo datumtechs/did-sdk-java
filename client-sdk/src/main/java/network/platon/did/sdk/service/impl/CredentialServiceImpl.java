@@ -78,16 +78,20 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		CredentialsUtils.generateSalt(saltMap, seed);
 
 		// Get sign data
-		String rawData = CredentialsUtils.getCredentialHash(credential, saltMap, null, seed);
+		String rawData = CredentialsUtils.getCredentialHash(credential, saltMap, null);
 		// Get signature
 		String signature = AlgorithmHandler.signMessageStr(rawData, req.getPrivateKey());
 
 		//Generate proof
-		Map<String, Object> proof = new HashMap<>();
+		Map<String, Object> proof = (Map<String, Object>)credential.getProof();
+		if(proof == null) {
+			proof = new HashMap<>();
+		}
 		proof.put(VpOrVcPoofKey.PROOF_VERIFICATIONMETHOD, req.getPublicKeyId());
 		proof.put(VpOrVcPoofKey.PROOF_JWS, signature);
 		proof.put(VpOrVcPoofKey.PROOF_CTEATED, credential.getIssuanceDate());
 		proof.put(VpOrVcPoofKey.PROOF_TYPE, AlgorithmTypeEnum.ECC.getDesc());
+		proof.put(VpOrVcPoofKey.PROOF_SEED, oneRandom);
 		credential.setProof(proof);
 		CreateCredentialResp createCredentialResp = new CreateCredentialResp();
 		createCredentialResp.setCredential(credential);
@@ -116,10 +120,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.buildError(retEnum);
 		}
 
-		@SuppressWarnings("unchecked")
-		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
-
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 		
@@ -153,7 +154,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		@SuppressWarnings("unchecked")
 		Map<String, Object> disclosureMap = (Map<String, Object>)credential.getProof().get(VpOrVcPoofKey.PROOF_DISCLOSURES);
 
-		if(!CredentialsUtils.verifyClaimDataRootHash(credential.getClaimData(), disclosureMap)){
+		if(!CredentialsUtils.verifyClaimDataRootHash(credential)){
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
