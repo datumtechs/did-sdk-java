@@ -24,6 +24,7 @@ allprojects {
     	mavenLocal()
         maven {url "https://sdk.platon.network/nexus/content/repositories/releases"}
     	maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+        maven {url "https://mvnrepository.com/artifact/net.java.dev.jna/jna"}
      	// maven {url "http://192.168.9.39:8081/repository/maven-public/"}
 	}
 	
@@ -69,6 +70,7 @@ subprojects {
         testCompile group: 'org.powermock', name: 'powermock-api-easymock', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.2'
         testCompile group: 'org.powermock', name: 'powermock-core', version: '2.0.2'
+        testCompile group: 'commons-codec', name: 'commons-codec', version: '1.5'
 
 		compile "com.alibaba:fastjson:$fastJsonVersion"
         compile "org.apache.commons:commons-lang3:$commonLang3Version"
