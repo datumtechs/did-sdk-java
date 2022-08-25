@@ -84,7 +84,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
-		if (!CredentialsUtils.verifyEccSignature(credential.obtainHash(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
+		if (!CredentialsUtils.verifyEccSignature(credential.obtainRawData(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 		
@@ -217,7 +217,7 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
-		if (!CredentialsUtils.verifyEccSignature(credential.obtainHash(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
+		if (!CredentialsUtils.verifyEccSignature(credential.obtainRawData(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 

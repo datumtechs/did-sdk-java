@@ -31,20 +31,41 @@ public class EccAlgorithmTest {
     @Test
     public void test_signMessage() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, DecoderException {
         ECKeyPair ecKeyPair = Keys.createEcKeyPair();
-        Sign.SignatureData signatureData = EccAlgorithm.signMessage("123",ecKeyPair);
-        String sign = AlgorithmHandler.signMessageStr("123",ecKeyPair.getPrivateKey().toString(16));
-        EccAlgorithm algorithm = new EccAlgorithm();
+        String message = "123";
 
+        Sign.SignatureData signatureData = Sign.signMessage(message.getBytes(StandardCharsets.UTF_8), ecKeyPair);
+        BigInteger signPublicKey = Sign.signedMessageToKey(message.getBytes(StandardCharsets.UTF_8), signatureData);
         System.out.println( Numeric.toHexStringWithPrefix(ecKeyPair.getPublicKey()));
+        System.out.println( Numeric.toHexStringWithPrefix(signPublicKey));
+        Assert.assertTrue(signPublicKey.compareTo(ecKeyPair.getPublicKey()) == 0);
+
+        String sign = AlgorithmHandler.signMessageStr("123", ecKeyPair.getPrivateKey().toString(16));
         Assert.assertTrue(AlgorithmHandler.verifySignature("123", sign , ecKeyPair.getPublicKey()));
 
         String hash = "ebd5186e34a8a67b541cf27b17106bae3c77d11154d6e72c2a2f6f243bc04533";
         byte[] digest = Hex.decodeHex(hash.toCharArray());
         signatureData = Sign.signMessage(digest, ecKeyPair);
-        BigInteger signPublicKey = Sign.signedMessageToKey(digest, signatureData);
+        signPublicKey = Sign.signedMessageToKey(digest, signatureData);
         System.out.println( Numeric.toHexStringWithPrefix(signPublicKey));
 
         Assert.assertTrue(signPublicKey.compareTo(ecKeyPair.getPublicKey()) == 0);
+
+        String privateKey = "68efa6466edaed4918f0b6c3b1b9667d37cad591482d672e8abcb4c5d1720f89";
+        ECKeyPair keyPair = AlgorithmHandler.createEcKeyPair(privateKey);
+
+        hash = "cfe65d21f7089d98fa13f66a1b91c3dbbae7af97575ed139031a78ec4d8378da";
+        digest = Hex.decodeHex(hash.toCharArray());
+        signatureData = Sign.signMessage(digest, keyPair, false);
+
+        System.out.println(EccAlgorithm.signatureToString(signatureData));
+
+        message = "{\"@context\":\"http://datumtech.com/did/v1\",\"claimData\":\"0xf3da2ccc2b7c939d097a5e6f2fd97e21d124042101c79326438661ae266a0824\",\"claimMeta\":{\"pctId\":\"1000\"},\"expirationDate\":\"2122-08-22T07:56:47.061\",\"holder\":\"did:pid:lat1cq9svdd8vc83u74relncn6cyxywr5mjqccqlea\",\"id\":\"ec1f34e6-8980-41b4-9240-bb23d3c6dc5a\",\"issuanceDate\":\"2022-08-25T03:59:29.869\",\"issuer\":\"did:pid:lat1d7zjh2vx8xsqrgc4qe0v4usxn368naxvlpu70r\",\"type\":[\"VerifiableCredential\"],\"version\":\"1.0.0\"}";
+        sign = AlgorithmHandler.signMessageStr(message, keyPair.getPrivateKey().toString(16));
+        System.out.println(sign);
+        System.out.println( Numeric.toHexStringWithPrefix(keyPair.getPublicKey()));
+        System.out.println( keyPair.getPublicKey());
+        Assert.assertTrue(AlgorithmHandler.verifySignature(message, sign , keyPair.getPublicKey()));
+
     }
 
     @Test

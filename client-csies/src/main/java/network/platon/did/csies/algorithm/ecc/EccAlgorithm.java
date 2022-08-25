@@ -7,7 +7,9 @@ import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.did.csies.algorithm.Algorithm;
 import network.platon.did.csies.utils.ConverDataUtils;
+import org.apache.commons.codec.DecoderException;
 import org.bouncycastle.util.encoders.Base64;
+import org.apache.commons.codec.binary.Hex;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +31,7 @@ public class EccAlgorithm implements Algorithm  {
 	 * @return
 	 */
 	public static Sign.SignatureData signMessage(String message, ECKeyPair keyPair) {
-        return Sign.signMessage(ConverDataUtils.sha3(message.getBytes(StandardCharsets.UTF_8)), keyPair);
+        return Sign.signMessage(message.getBytes(StandardCharsets.UTF_8), keyPair);
     }
 	
 	/**
@@ -40,7 +42,7 @@ public class EccAlgorithm implements Algorithm  {
 	 * @throws SignatureException
 	 */
 	private BigInteger signatureToPublicKey(String message, Sign.SignatureData signatureData) throws SignatureException {
-	    return Sign.signedMessageToKey(ConverDataUtils.sha3(message.getBytes(StandardCharsets.UTF_8)),
+	    return Sign.signedMessageToKey(message.getBytes(StandardCharsets.UTF_8),
 	            signatureData);
 	}
 	
@@ -57,7 +59,7 @@ public class EccAlgorithm implements Algorithm  {
 		try {
 			signPublicKey = signatureToPublicKey(message, stringToSignature(signatureData));
 			return publicKey.compareTo(signPublicKey) == 0;
-		} catch (SignatureException e) {
+		} catch (SignatureException | DecoderException e) {
 			log.error("verifySignature error", e);
 		}
 	    return false;
@@ -72,29 +74,39 @@ public class EccAlgorithm implements Algorithm  {
         return Sign.publicKeyFromPrivate(privateKey);
     }
 	
-	private static String signatureToString(Sign.SignatureData signatureData) {
+	public static String signatureToString(Sign.SignatureData signatureData) {
         byte[] serializedSignatureData = new byte[65];
-        System.arraycopy(signatureData.getV(), 0, serializedSignatureData, 0, 1);
-        System.arraycopy(signatureData.getR(), 0, serializedSignatureData, 1, 32);
-        System.arraycopy(signatureData.getS(), 0, serializedSignatureData, 33, 32);
-        return Base64.toBase64String(serializedSignatureData);
+        System.arraycopy(signatureData.getR(), 0, serializedSignatureData, 0, 32);
+        System.arraycopy(signatureData.getS(), 0, serializedSignatureData, 32, 32);
+        System.arraycopy(signatureData.getV(), 0, serializedSignatureData, 64, 1);
+		int header = signatureData.getV()[0] & 0xFF;
+		int recId = header - 27;
+		serializedSignatureData[64] = (byte)recId;
+        return new String(Hex.encodeHex(serializedSignatureData));
     }
 	
-	private static Sign.SignatureData stringToSignature(String signatureData) {
-		byte[] serializedSignatureData = Base64.decode(signatureData);
-		byte[] v = new byte[1];
+	public static Sign.SignatureData stringToSignature(String signatureData) throws DecoderException {
+		if(signatureData.startsWith("0x")){
+			signatureData = signatureData.substring(2);
+		}
+		byte[] serializedSignatureData = Hex.decodeHex(signatureData.toCharArray());
 		byte[] r = new byte[32];
 		byte[] s = new byte[32];
-		System.arraycopy(serializedSignatureData, 0, v, 0, 1);
-        System.arraycopy(serializedSignatureData, 1, r, 0, 32);
-        System.arraycopy(serializedSignatureData, 33, s, 0, 32);
+		byte[] v = new byte[1];
+		System.arraycopy(serializedSignatureData, 0, r, 0, 32);
+        System.arraycopy(serializedSignatureData, 32, s, 0, 32);
+        System.arraycopy(serializedSignatureData, 64, v, 0, 1);
+		int header = v[0] & 0xFF;
+		int recId = header + 27;
+		v[0] = (byte)recId;
         return new Sign.SignatureData(v, r, s);
     }
 	
 	public String signMessageStr(String message,String privateKeyStr) {
         BigInteger privateKey = Numeric.toBigInt(privateKeyStr);
         ECKeyPair keyPair = ECKeyPair.create(privateKey);
-        return signatureToString(Sign.signMessage(ConverDataUtils.sha3(message.getBytes(StandardCharsets.UTF_8)), keyPair));
+		Sign.SignatureData signatureData = Sign.signMessage(message.getBytes(StandardCharsets.UTF_8), keyPair);
+        return signatureToString(signatureData);
 	}
 
 	@Override

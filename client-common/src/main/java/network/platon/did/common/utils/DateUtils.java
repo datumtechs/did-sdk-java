@@ -53,7 +53,7 @@ public class DateUtils {
      */
     private static DateFormat getDefaultDateFormat() {
         TimeZone tz = TimeZone.getTimeZone("Asia/Shanghai");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
         df.setTimeZone(tz);
         return df;
     }
@@ -142,6 +142,7 @@ public class DateUtils {
      * @return UTC formatted date string
      */
     public static String convertTimestampToUtc(Long date) {
+
         DateFormat df = getDefaultDateFormat();
         df.setLenient(false);
         return df.format(new Date(date));

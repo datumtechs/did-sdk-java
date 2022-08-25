@@ -106,7 +106,7 @@ public class TestPresentationServiceImpl extends BaseTest{
 		claim.put("data", "456");
 
 		String context = "https://platon.network/";
-		long expirationDate = DateUtils.convertUtcDateToTimeStamp("2080-08-04T13:35:49Z");
+		long expirationDate = DateUtils.convertUtcDateToTimeStamp("2080-08-04T13:35:49.123");
 		String credentialType = "VerifiableCredential";
 
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).context(context).expirationDate(expirationDate)

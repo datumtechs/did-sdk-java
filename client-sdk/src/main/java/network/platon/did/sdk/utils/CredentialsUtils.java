@@ -56,21 +56,8 @@ public class CredentialsUtils {
 		try {
 			Map<String, Object> credMap = ConverDataUtils.objToMap(credential);
 
-			// reset claim
+			// get claim hash
 			Map<String, Object> claimHash = getClaimHash(credential, salt, disclosures);
-			credMap.put(DidConst.CLAIM, claimHash);
-
-			// reset credential claim data
-			Map<String, Object> credentialClaimData = credential.getClaimData();
-
-			Map<String, Object> proof = (Map<String, Object>) credMap.get(VpOrVcPoofKey.PROOF);
-			// Remove salt for calculation proof
-			if(proof == null) {
-				proof = new HashMap<>();
-			}
-			credMap.remove(VpOrVcPoofKey.PROOF);
-			credMap.put(VpOrVcPoofKey.PROOF, proof);
-			String rawData = ConverDataUtils.mapToCompactJson(credMap);
 
 			// set claimRootHash
 			Map<String, Object> credentialProof = (Map<String, Object>) credential.getProof();
@@ -80,7 +67,20 @@ public class CredentialsUtils {
 			credentialProof.put(VpOrVcPoofKey.PROOF_CLAIMROOTHASH, claimHash.get(VpOrVcPoofKey.PROOF_CLAIMROOTHASH));
 			credential.setProof(credentialProof);
 
-			return rawData;
+			// reset claim
+			claimHash.remove(VpOrVcPoofKey.PROOF_CLAIMROOTHASH);
+			String claimHashStr = ConverDataUtils.mapToCompactJson(claimHash);
+			credMap.put(DidConst.CLAIM, ConverDataUtils.sha3(claimHashStr));
+
+			// Remove proof
+			credMap.remove(VpOrVcPoofKey.PROOF);
+
+			// rename context
+			credMap.remove("context");
+			String contextStr = credential.getContext();
+			credMap.put("@context", contextStr);
+			return ConverDataUtils.mapToCompactJson(credMap);
+
 		} catch (Exception e) {
 			log.error("get credential data error.", e);
 			return StringUtils.EMPTY;

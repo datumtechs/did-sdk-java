@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import network.platon.did.sdk.constant.DidConst;
 import org.apache.commons.lang3.StringUtils;
 
@@ -145,7 +146,7 @@ public class PresentationUtils {
 
 		if (((Integer) value).equals(CredentialDisclosedValue.NOT_DISCLOSED.getStatus())
 				&& claim.containsKey(disclosureKey)) {
-			String hash = CredentialsUtils.getFieldSaltHash(String.valueOf(claimV), String.valueOf(saltV));
+			String hash = CredentialsUtils.getFieldSaltHash(JSONObject.toJSONString(claimV), String.valueOf(saltV));
 			claim.put(disclosureKey, hash);
 		}
 	}

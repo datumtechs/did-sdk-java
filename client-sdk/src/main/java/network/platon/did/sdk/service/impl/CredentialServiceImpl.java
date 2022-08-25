@@ -78,7 +78,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 		CredentialsUtils.generateSalt(saltMap, seed);
 
 		// Get sign data
-		String rawData = CredentialsUtils.getCredentialHash(credential, saltMap, null);
+		String rawData = CredentialsUtils.getCredentialData(credential, saltMap, null);
 		// Get signature
 		String signature = AlgorithmHandler.signMessageStr(rawData, req.getPrivateKey());
 
@@ -124,7 +124,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 		
-		if (!CredentialsUtils.verifyEccSignature(credential.obtainHash(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
+		if (!CredentialsUtils.verifyEccSignature(credential.obtainRawData(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 		return BaseResp.buildSuccess();
@@ -158,7 +158,7 @@ public class CredentialServiceImpl extends BusinessBaseService implements Creden
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 
-		if (!CredentialsUtils.verifyEccSignature(credential.obtainHash(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
+		if (!CredentialsUtils.verifyEccSignature(credential.obtainRawData(), credential.obtainSign(), checkResp.getData().getPublicKeyHex())) {
 			return BaseResp.buildError(RetEnum.RET_CREDENTIAL_VERIFY_ERROR);
 		}
 

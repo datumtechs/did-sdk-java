@@ -129,6 +129,21 @@ public class Credential implements Serializable{
         credential.setProof(null);
         return CredentialsUtils.getCredentialHash(credential, salt, disclosures);
     }
+
+	@SuppressWarnings("unchecked")
+	public String obtainRawData() {
+		Map<String, Object> salt = this.obtainSalt();
+		Object disObject  = this.proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+		Map<String, Object> disclosures = null;
+		if(disObject != null && disObject instanceof Map) {
+			disclosures = (Map<String, Object>) this.proof.get(VpOrVcPoofKey.PROOF_DISCLOSURES);
+		}
+		Credential credential = ConverDataUtils.clone(this);
+		credential.setProof(null);
+
+		return CredentialsUtils.getCredentialData(credential, salt, disclosures);
+
+	}
 	
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> obtainSalt() {
