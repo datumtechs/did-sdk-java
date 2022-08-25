@@ -91,9 +91,12 @@ public class TestCredentialServiceImpl extends BaseTest {
 		CreateCredentialReq req = CreateCredentialReq.builder().claim(claim).expirationDate(expirationDate).did(did)
 				.pctId(pctId).privateKey(issuerPriKey).publicKeyId(issuerPubKeyId).issuer(issuer)
 				.type(credentialType).build();
-		resp = PClient.createCredentialClient().createCredential(req);
+		BaseResp<CreateCredentialResp> result = PClient.createCredentialClient().createCredential(req);
 
-		assertTrue(resp.checkSuccess());
+		String credentialStr = JSONObject.toJSONString(result.getData().getCredential());
+		System.out.println(credentialStr);
+
+		assertTrue(result.checkSuccess());
 	}
 
 	@Test

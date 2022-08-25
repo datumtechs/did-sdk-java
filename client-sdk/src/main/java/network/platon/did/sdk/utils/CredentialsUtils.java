@@ -1,5 +1,6 @@
 package network.platon.did.sdk.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.platon.utils.Numeric;
 import lombok.extern.slf4j.Slf4j;
 import network.platon.did.common.constant.VpOrVcPoofKey;
@@ -112,8 +113,18 @@ public class CredentialsUtils {
 	 */
 	private static String addSaltAndGetHash(Map<String, Object> claim, Map<String, Object> salt,
 			Map<String, Object> disclosures) {
+
+		List<Map.Entry<String, Object>> list = new ArrayList<Map.Entry<String, Object>>(salt.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<String, Object>>() {
+
+			@Override
+			public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+		});
+
 		String allNewValueHashes = "";
-		for (Map.Entry<String, Object> entry : salt.entrySet()) {
+		for (Map.Entry<String, Object> entry : list) {
 			String key = entry.getKey();
 			Object disclosureObj = null;
 			if (disclosures != null) {
@@ -153,11 +164,11 @@ public class CredentialsUtils {
 		String newValue = String.valueOf(newClaimObj);
 		if (disclosureObj == null) {
 			if (!CredentialDisclosedValue.DISCLOSED.getStatus().equals(saltObj)) {
-				newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
+				newValue = getFieldSaltHash(JSONObject.toJSONString(newClaimObj), String.valueOf(saltObj));
 				claim.put(key, newValue);
 			}
 		} else if (CredentialDisclosedValue.DISCLOSED.getStatus().equals(disclosureObj)) {
-			newValue = getFieldSaltHash(String.valueOf(newClaimObj), String.valueOf(saltObj));
+			newValue = getFieldSaltHash(JSONObject.toJSONString(newClaimObj), String.valueOf(saltObj));
 			claim.put(key, newValue);
 		}
 
@@ -165,7 +176,8 @@ public class CredentialsUtils {
 	}
 
 	public static String getFieldSaltHash(String field, String salt) {
-		return ConverDataUtils.sha3(String.valueOf(field) + String.valueOf(salt));
+		String newValue = String.valueOf(field) + String.valueOf(salt);
+		return ConverDataUtils.sha3(newValue);
 	}
 
 	/**
@@ -214,7 +226,8 @@ public class CredentialsUtils {
 		String allNewValueHashes = addSaltAndGetHash(newClaim, saltMap, disclosureMap);
 
 		String rootHash = (String)credential.getProof().get(VpOrVcPoofKey.PROOF_CLAIMROOTHASH);
-		return StringUtils.equals(rootHash, ConverDataUtils.sha3(allNewValueHashes));
+		String realRootHash = ConverDataUtils.sha3(allNewValueHashes);
+		return StringUtils.equals(rootHash, realRootHash);
 	}
 
 	/**

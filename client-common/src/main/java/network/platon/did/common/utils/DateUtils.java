@@ -24,7 +24,7 @@ public class DateUtils {
 
     private static String STRING_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    private static String UTC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static String UTC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
     /**
      * Get the ISO8601 timestamp.

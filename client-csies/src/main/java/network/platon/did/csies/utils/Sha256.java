@@ -29,6 +29,11 @@ public class Sha256 {
             System.arraycopy(array, 0, tmp, 8-array.length, array.length);
             array = tmp;
         }
+        if(array.length > 8){
+            byte[] tmp = new byte[8];
+            System.arraycopy(array, 1, tmp, 0, 8);
+            array = tmp;
+        }
         return array;
     }
 

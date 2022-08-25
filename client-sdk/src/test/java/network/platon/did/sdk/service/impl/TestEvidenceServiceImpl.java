@@ -58,6 +58,16 @@ public class TestEvidenceServiceImpl extends BaseTest {
 	}
 
 	@Test
+	public void test_nodeCredential(){
+		String credentialStr = "{\"@context\":\"https://www.w3.org/2018/credentials/v1\",\"version\":\"1.0.0\",\"id\":\"93602e24-e871-40bd-ba5f-213fad05db92\",\"type\":[\"VerifiableCredential\"],\"issuer\":\"did:pid:lat1g83xnwcqc4uufpx9588muq0e98g93rlmpgx563\",\"issuanceDate\":\"2022-08-23T10:07:16.045\",\"expirationDate\":\"2122-08-23T10:07:15.695\",\"claimData\":{\"nodeId\":\"did:pid:lat16wyuj8qqefqlph50mr5ykv246qvg3lyl9zm3vm\",\"nodeName\":\"org156org156\",\"url\":\"ipfs://QmSWSCyDxa8Be1VG4TfeyCTkXt1AZh6hjaTbKTzm2jnMQG\"},\"claimMeta\":{\"pctId\":\"1000\"},\"proof\":{\"claimRootHash\":\"0x1e6b4629c38d4a17b7a7bc81b15bebd3e73291fcdb99f190460ca50f5b70ca39\",\"created\":\"2022-08-23T10:07:16.045\",\"jws\":\"0x8d8949ec13cb55e5277a1a9749bc02f30fa46cfaaf0729527ac54132912027c86e5816ebbb79ab45bbefa643c8350f3bea65c1467d583dd73d15165af8aa100001\",\"seed\":\"11172146488962401086\",\"type\":\"Secp256k1\",\"verificationMethod\":\"did:pid:lat1g83xnwcqc4uufpx9588muq0e98g93rlmpgx563#keys-1\"},\"holder\":\"did:pid:lat16wyuj8qqefqlph50mr5ykv246qvg3lyl9zm3vm\"}";
+		Credential credential = JSONObject.parseObject(credentialStr, Credential.class);
+		VerifyCredentialEvidenceReq credentialReq = VerifyCredentialEvidenceReq.builder().credential(credential).build();
+		BaseResp<String> result = PClient.createEvidenceClient().verifyCredentialEvidence(credentialReq);
+		assertTrue(result.checkSuccess());
+		System.out.println(result);
+	}
+
+	@Test
 	public void test_createEvidence() throws Exception {
 		// Create did by privateKey
 		String privateKey = Keys.createEcKeyPair().getPrivateKey().toString(16);
