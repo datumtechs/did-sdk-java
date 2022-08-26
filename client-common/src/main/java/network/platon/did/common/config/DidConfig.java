@@ -187,8 +187,8 @@ public class DidConfig {
 		return CHAIN_HRP;
 	}
 
-	public static void setCHAIN_HRP(Long cHAIN_HRP) {
-		CHAIN_ID = cHAIN_HRP;
+	public static void setCHAIN_HRP(String cHAIN_HRP) {
+		CHAIN_HRP = cHAIN_HRP;
 	}
 
 	public static String getADMIN_ADDRESS() {
