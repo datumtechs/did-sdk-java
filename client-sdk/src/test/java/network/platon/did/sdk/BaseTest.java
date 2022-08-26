@@ -68,7 +68,7 @@ public class BaseTest {
     protected String adminDid;
     protected String adminPublicKeyId;
 
-    protected static int deployFlag = 0;
+    protected static int deployFlag = 1;
 
     @Before
     public void setup() {

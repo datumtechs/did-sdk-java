@@ -231,6 +231,17 @@ public class DidEventProcessor {
         String index = valueArray[2];
         String status = valueArray[3];
 
+        // 适配一下 Secp256k1 算法 go publicKey 带有前缀为 65 字节
+        if(type.equals(DidConst.PublicKeyType.SECP256K1.getTypeName())){
+            if(publicKey.startsWith("0x") && publicKey.length() == 132){
+                publicKey = publicKey.substring(4);
+                publicKey = "0x" + publicKey;
+            }else if(!(publicKey.startsWith("0x") && publicKey.length() == 130)){
+                publicKey = publicKey.substring(2);
+                publicKey = "0x" + publicKey;
+            }
+        }
+
         List<DocumentPubKeyData> publicKeys = document.getPublicKey();
         for (DocumentPubKeyData pub : publicKeys) {
             // The latest Attribute of the publicKey has been obtained,

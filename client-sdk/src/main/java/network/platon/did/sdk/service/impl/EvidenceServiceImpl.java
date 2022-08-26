@@ -11,6 +11,7 @@ import network.platon.did.sdk.base.dto.CheckData;
 import network.platon.did.sdk.base.dto.Credential;
 import network.platon.did.sdk.base.dto.DocumentData;
 import network.platon.did.sdk.base.dto.EvidenceSignInfo;
+import network.platon.did.sdk.constant.DidConst;
 import network.platon.did.sdk.enums.CredentialStatus;
 import network.platon.did.sdk.req.evidence.*;
 import network.platon.did.sdk.resp.BaseResp;
@@ -127,7 +128,18 @@ public class EvidenceServiceImpl extends BusinessBaseService implements Evidence
 		EvidenceSignInfo evidenceSignInfo = new EvidenceSignInfo();
 		evidenceSignInfo.setSignature(resp.getData().getSignaturedata());
 		evidenceSignInfo.setTimestamp(resp.getData().getCreate());
-		evidenceSignInfo.setSigner(resp.getData().getSigner());
+
+		String signer = resp.getData().getSigner();
+		// 适配一下 Secp256k1 算法 go publicKey 带有前缀为 65 字节
+		if(signer.startsWith("0x") && signer.length() == 132){
+			signer = signer.substring(4);
+			signer = "0x" + signer;
+		}else if(!(signer.startsWith("0x") && signer.length() == 130)){
+			signer = signer.substring(2);
+			signer = "0x" + signer;
+		}
+
+		evidenceSignInfo.setSigner(signer);
 		queryEvidenceResp.setStatus(CredentialStatus.getStatusData(status.getData()).getDesc());
 		queryEvidenceResp.setSignInfo(evidenceSignInfo);
 		return BaseResp.buildSuccess(queryEvidenceResp);

@@ -57,39 +57,15 @@ public class TestEvidenceServiceImpl extends BaseTest {
 		pctJson = "{\"properties\": { \"name\": { \"type\": \"string\" }, \"no\": { \"type\": \"string\" }, \"data\": { \"type\": \"string\" }}}";
 	}
 
-//	@Test
-//	public void test_nodeCredential(){
-//		String credentialStr ="{\n" +
-//				" \"@context\": \"http://datumtech.com/did/v1\",\n" +
-//				" \"version\": \"1.0.0\",\n" +
-//				" \"id\": \"ec1f34e6-8980-41b4-9240-bb23d3c6dc5a\",\n" +
-//				" \"type\": [\"VerifiableCredential\"],\n" +
-//				" \"issuer\": \"did:pid:lat1d7zjh2vx8xsqrgc4qe0v4usxn368naxvlpu70r\",\n" +
-//				" \"issuanceDate\": \"2022-08-25T03:59:29.869\",\n" +
-//				" \"expirationDate\": \"2122-08-22T07:56:47.061\",\n" +
-//				" \"claimData\": {\n" +
-//				"  \"nodeID\": \"did:pid:lat1cq9svdd8vc83u74relncn6cyxywr5mjqccqlea\",\n" +
-//				"  \"nodeName\": \"org_9_156\",\n" +
-//				"  \"url\": \"ipfs://QmdJTKxgiVjKd4NNwhA2jgRS2JJCJ2iSxLSW7Lidc3YnGv\"\n" +
-//				" },\n" +
-//				" \"claimMeta\": {\n" +
-//				"  \"pctId\": \"1000\"\n" +
-//				" },\n" +
-//				" \"proof\": {\n" +
-//				"  \"claimRootHash\": \"0x9301bdd97b5e337c51cedef6a391ecadefdea37806fd4df26b6be474d02959d6\",\n" +
-//				"  \"created\": \"2022-08-25T03:59:29.869\",\n" +
-//				"  \"jws\": \"0x8a5dbcd6aafef4b35d9388f7bf93aea9f6626f7ea30677258f5fd837c49623ab3fb5a605efecb025961f2fc2c385f6dfc7c7070d6cf722d176ac1b8e03e6c06a00\",\n" +
-//				"  \"seed\": \"9828766684487745566\",\n" +
-//				"  \"type\": \"Secp256k1\",\n" +
-//				"  \"verificationMethod\": \"did:pid:lat1d7zjh2vx8xsqrgc4qe0v4usxn368naxvlpu70r#keys-1\"\n" +
-//				" },\n" +
-//				" \"holder\": \"did:pid:lat1cq9svdd8vc83u74relncn6cyxywr5mjqccqlea\"}";
-//		Credential credential = JSONObject.parseObject(credentialStr, Credential.class);
-//		VerifyCredentialEvidenceReq credentialReq = VerifyCredentialEvidenceReq.builder().credential(credential).build();
-//		BaseResp<String> result = PClient.createEvidenceClient().verifyCredentialEvidence(credentialReq);
-//		assertTrue(result.checkSuccess());
-//		System.out.println(result);
-//	}
+	@Test
+	public void test_nodeCredential(){
+		String credentialStr ="{\"@context\":\"https://www.w3.org/2018/credentials/v1\",\"version\":\"1.0.0\",\"id\":\"ef5c5ec5-bbaa-4da1-aa02-f8096f7366db\",\"type\":[\"VerifiableCredential\"],\"issuer\":\"did:pid:lat1g83xnwcqc4uufpx9588muq0e98g93rlmpgx563\",\"issuanceDate\":\"2022-08-26T02:40:49.062\",\"expirationDate\":\"2122-08-26T02:40:48.777\",\"claimData\":{\"nodeId\":\"did:pid:lat1d8xw8d9ufue2dm5gg2mf9lxnundxff98xf7vah\",\"nodeName\":\"org155org155\",\"url\":\"ipfs://QmNzircwCfPzv9D6qaU2n2Py6ErXFwfcqr2vfEcUFFdhys\"},\"claimMeta\":{\"pctId\":\"1000\"},\"proof\":{\"claimRootHash\":\"0xc0276f3925c1b344a4a1716f0836e2ec1f391138d1cb8bf84f4b140544b16d74\",\"created\":\"2022-08-26T02:40:49.062\",\"jws\":\"0x1d50fdb7abd240d0a7a2ec812ff3c8953b62dcad6e388109c8aaba9b8d0ac9bd40b53c768c1ad3d0961c4881340de7539a2becb2e0b9a23deb8e3c82c8bb738401\",\"seed\":\"13785993735426160689\",\"type\":\"Secp256k1\",\"verificationMethod\":\"did:pid:lat1g83xnwcqc4uufpx9588muq0e98g93rlmpgx563#keys-1\"},\"holder\":\"did:pid:lat1d8xw8d9ufue2dm5gg2mf9lxnundxff98xf7vah\"}";
+		Credential credential = JSONObject.parseObject(credentialStr, Credential.class);
+		VerifyCredentialEvidenceReq credentialReq = VerifyCredentialEvidenceReq.builder().credential(credential).build();
+		BaseResp<String> result = PClient.createEvidenceClient().verifyCredentialEvidence(credentialReq);
+		assertTrue(result.checkSuccess());
+		System.out.println(result);
+	}
 
 	@Test
 	public void test_createEvidence() throws Exception {
